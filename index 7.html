@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧸 Study Planner Pro — หมีนมชานม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<style>
+:root{
+  --cream:#FFF8F0;
+  --cream-2:#FFF1E3;
+  --milktea:#C9A882;
+  --milktea-dark:#8A6C4E;
+  --brown-text:#5C4433;
+  --brown-soft:#7A6152;
+  --pink:#FFD6E8;
+  --pink-deep:#FFAFC7;
+  --mint:#C9F0E0;
+  --mint-deep:#9BE0C4;
+  --lavender:#E4D9F9;
+  --lavender-deep:#CBB6F0;
+  --coral:#FFB4A8;
+  --red-status:#FF9E9E;
+  --yellow-status:#FFD98A;
+  --green-status:#9BE0C4;
+  --shadow: 0 8px 24px rgba(140,108,78,0.14);
+  --shadow-sm: 0 3px 10px rgba(140,108,78,0.10);
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(255,214,232,0.55), transparent 40%),
+    radial-gradient(circle at 92% 15%, rgba(201,240,224,0.55), transparent 40%),
+    radial-gradient(circle at 50% 95%, rgba(228,217,249,0.5), transparent 45%),
+    var(--cream);
+  color:var(--brown-text);
+  min-height:100vh;
+  padding-bottom:90px;
+  position:relative;
+}
+h1,h2,h3,.font-display{font-family:'Mali',cursive;}
+button{font-family:'Sarabun',sans-serif;cursor:pointer;border:none;}
+input,select,textarea{font-family:'Sarabun',sans-serif;}
+
+/* ===== FLOATING BG DECOR ===== */
+.bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bg-decor span{position:absolute;opacity:0.4;animation:floatY 9s ease-in-out infinite;filter:drop-shadow(0 2px 4px rgba(140,108,78,0.08));}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(10deg);}}
+header.topbar, nav.tabbar, main, .mobile-nav, .modal-overlay, .toast{position:relative;z-index:1;}
+
+/* ===== HEADER ===== */
+header.topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px 10px;
+  max-width:1100px;margin:0 auto;
+}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-emoji{font-size:28px;display:inline-block;animation:wiggle 3.4s ease-in-out infinite;}
+@keyframes wiggle{0%,100%{transform:rotate(-6deg);}50%{transform:rotate(8deg);}}
+.brand-title{font-family:'Mali',cursive;font-weight:700;font-size:20px;color:var(--milktea-dark);}
+.brand-sub{font-size:11px;color:var(--brown-soft);margin-top:-2px;}
+.streak-pill{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--pink),var(--coral));
+  padding:7px 14px;border-radius:999px;font-weight:600;font-size:13px;
+  box-shadow:var(--shadow-sm); color:var(--brown-text);
+}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.user-pill{display:none;align-items:center;gap:8px;background:#fff;padding:5px 6px 5px 12px;border-radius:999px;box-shadow:var(--shadow-sm);font-size:12px;font-weight:600;color:var(--brown-soft);}
+.user-pill .user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.auth-gate-box{text-align:center;}
+.auth-gate-box .emoji{font-size:44px;margin-bottom:8px;animation:petBounce 2.4s ease-in-out infinite;}
+.auth-gate-box p{font-size:13px;color:var(--brown-soft);margin:8px 0 18px;}
+.sync-note{font-size:10.5px;color:var(--brown-soft);text-align:center;margin-top:10px;}
+
+/* ===== NAV TABS ===== */
+nav.tabbar{
+  max-width:1100px;margin:6px auto 18px;padding:0 20px;
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.tab-btn{
+  background:rgba(255,255,255,0.6);
+  padding:9px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
+  color:var(--brown-soft); transition:all .2s ease; border:2px solid transparent;
+}
+.tab-btn.active{background:var(--brown-text);color:#fff8f0;box-shadow:var(--shadow-sm);}
+.tab-btn:not(.active):hover{border-color:var(--milktea);}
+
+main{max-width:1100px;margin:0 auto;padding:0 20px;}
+.view{display:none;animation:fadeIn .35s ease;}
+.view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.card{
+  background:#fff;border-radius:var(--radius-md);
+  padding:20px; box-shadow:var(--shadow-sm);
+  border:1px solid rgba(140,108,78,0.06);
+  margin-bottom:18px;
+}
+
+/* ===== ACTIVE EXAM BAR (single global control — replaces repeated exam pickers) ===== */
+.active-exam-card{background:linear-gradient(135deg,#fff, var(--cream-2));}
+.active-exam-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px;}
+.active-exam-label{font-size:12px;font-weight:700;color:var(--brown-soft);display:flex;align-items:center;gap:5px;}
+.active-exam-select{flex:1;min-width:160px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;color:var(--brown-text);font-size:14px;font-weight:600;font-family:'Mali',cursive;}
+.hint-text{font-size:11.5px;color:var(--brown-soft);margin-top:4px;}
+
+/* Onboarding */
+.onboard-card{text-align:center;padding:34px 20px;background:linear-gradient(160deg,var(--pink),var(--lavender));}
+.onboard-card .emoji{font-size:44px;animation:petBounce 2.4s ease-in-out infinite;display:block;margin-bottom:8px;}
+.onboard-card h3{font-family:'Mali',cursive;margin:0 0 6px;}
+.onboard-card p{font-size:13px;color:var(--brown-soft);margin:0 0 16px;}
+
+/* ===== DASHBOARD GRID ===== */
+.dash-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;}
+@media(max-width:840px){.dash-grid{grid-template-columns:1fr;}}
+
+/* Pet card */
+.pet-card{
+  background:linear-gradient(160deg,var(--pink) 0%, var(--lavender) 55%, var(--mint) 100%);
+  border-radius:var(--radius-lg);
+  padding:24px; text-align:center; position:relative; overflow:hidden;
+  box-shadow:var(--shadow); margin-bottom:0;
+}
+.pet-card::before,.pet-card::after{
+  content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);
+}
+.pet-card::before{width:120px;height:120px;top:-40px;left:-30px;}
+.pet-card::after{width:80px;height:80px;bottom:-20px;right:-10px;}
+.sparkle{position:absolute;font-size:15px;opacity:.8;animation:twinkle 2.4s ease-in-out infinite;z-index:1;}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+.level-badge{
+  display:inline-block;background:rgba(255,255,255,0.75);color:var(--milktea-dark);
+  font-weight:700;font-size:12.5px;padding:4px 12px;border-radius:999px;margin-bottom:10px;
+  font-family:'Mali',cursive; position:relative; z-index:1;
+}
+.pet-stage{position:relative;z-index:1;width:150px;height:150px;margin:0 auto 8px;animation:petBounce 2.6s ease-in-out infinite;}
+@keyframes petBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.pet-name{font-family:'Mali',cursive;font-weight:700;font-size:19px;color:var(--brown-text);position:relative;z-index:1;}
+.pet-speech{
+  background:#fff;border-radius:16px;padding:10px 16px;margin:10px auto 4px;
+  max-width:280px;font-size:13.5px;color:var(--brown-soft);position:relative;box-shadow:var(--shadow-sm);
+  min-height:20px; z-index:1;
+}
+.exp-bar-wrap{margin-top:14px;position:relative;z-index:1;}
+.exp-bar-bg{background:rgba(255,255,255,0.6);border-radius:999px;height:14px;overflow:hidden;}
+.exp-bar-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--pink-deep));border-radius:999px;transition:width .5s ease;}
+.exp-label{font-size:11px;color:var(--brown-soft);margin-top:5px;font-weight:600;}
+
+/* bear css art */
+.bear{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);}
+.bear-ear{position:absolute;width:34px;height:34px;background:var(--milktea);border-radius:50%;top:-14px;}
+.bear-ear.l{left:6px;} .bear-ear.r{right:6px;}
+.bear-ear-in{position:absolute;width:16px;height:16px;background:var(--pink-deep);border-radius:50%;top:9px;left:9px;}
+.bear-head{width:118px;height:104px;background:var(--milktea);border-radius:50% 50% 46% 46%/54% 54% 46% 46%;position:relative;}
+.bear-snout{position:absolute;width:56px;height:44px;background:#FBEDD8;border-radius:50%;left:50%;top:52%;transform:translate(-50%,0);}
+.bear-nose{position:absolute;width:14px;height:10px;background:var(--brown-text);border-radius:50%;left:50%;top:12px;transform:translateX(-50%);}
+.bear-mouth{position:absolute;width:16px;height:8px;border-bottom:3px solid var(--brown-text);border-radius:0 0 50% 50%;left:50%;top:24px;transform:translateX(-50%);}
+.bear-eye{position:absolute;width:8px;height:10px;background:var(--brown-text);border-radius:50%;top:38px;}
+.bear-eye.l{left:28px;} .bear-eye.r{right:28px;}
+.bear-blush{position:absolute;width:16px;height:9px;background:var(--pink-deep);border-radius:50%;opacity:.7;top:50px;}
+.bear-blush.l{left:8px;} .bear-blush.r{right:8px;}
+.bear-scarf{position:absolute;width:120px;height:20px;background:var(--coral);left:-1px;top:88px;border-radius:8px;}
+.bear-glasses{position:absolute;width:70px;height:16px;top:35px;left:24px;}
+.bear-glasses .lens{position:absolute;width:24px;height:16px;border:2.5px solid var(--brown-text);border-radius:50%;background:rgba(255,255,255,0.4);}
+.bear-glasses .lens.l{left:0;} .bear-glasses .lens.r{right:0;}
+.bear-glasses .bridge{position:absolute;top:6px;left:22px;width:26px;height:2.5px;background:var(--brown-text);}
+.bear-cap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:0;height:0;
+  border-left:44px solid transparent;border-right:44px solid transparent;border-bottom:14px solid #6B4A9A;}
+.bear-cap-top{position:absolute;top:-16px;left:50%;transform:translateX(-50%) rotate(45deg);width:34px;height:34px;background:#6B4A9A;border-radius:4px;}
+.bear-cap-btn{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:#FFD98A;border-radius:50%;}
+.bear-egg{width:96px;height:118px;background:linear-gradient(160deg,#FFF3E0,#F6DFC0);border-radius:50% 50% 48% 48%/60% 60% 40% 40%;position:relative;margin:0 auto;}
+.bear-egg .crack{position:absolute;width:2px;height:40px;background:var(--milktea);top:20px;left:50%;transform:rotate(8deg);}
+
+/* Focus card (pomodoro + soundscape merged) */
+.focus-card{margin-bottom:0;}
+.pomo-display{font-family:'Mali',cursive;font-size:52px;font-weight:700;text-align:center;color:var(--milktea-dark);margin:6px 0 10px;letter-spacing:2px;}
+.pomo-mode{text-align:center;font-size:12.5px;font-weight:700;color:var(--brown-soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.pomo-controls{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+.btn{padding:10px 18px;border-radius:999px;font-weight:600;font-size:13.5px;transition:transform .15s ease, box-shadow .15s ease;box-shadow:var(--shadow-sm);}
+.btn:hover{transform:translateY(-2px) rotate(-1deg);}
+.btn:active{transform:scale(.94);}
+.btn-primary{background:var(--brown-text);color:#FFF8F0;}
+.btn-soft{background:var(--cream-2);color:var(--brown-text);border:1.5px solid var(--milktea);}
+.btn-pink{background:var(--pink);color:var(--brown-text);}
+.btn-danger{background:var(--red-status);color:#5c2323;}
+details.pomo-settings-details{margin-top:12px;text-align:center;}
+details.pomo-settings-details summary{cursor:pointer;font-size:12px;color:var(--brown-soft);font-weight:700;list-style:none;display:inline-flex;align-items:center;gap:4px;}
+details.pomo-settings-details summary::-webkit-details-marker{display:none;}
+.pomo-settings{display:flex;gap:10px;justify-content:center;margin-top:10px;font-size:12px;color:var(--brown-soft);}
+.pomo-settings label{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.pomo-settings input{width:60px;padding:5px 8px;border-radius:10px;border:1.5px solid var(--milktea);text-align:center;}
+.focus-divider{border:none;border-top:2px dashed var(--cream-2);margin:18px 0 14px;}
+.sound-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.sound-btn{padding:12px 14px;border-radius:16px;background:var(--cream-2);font-size:13px;font-weight:600;text-align:center;min-width:78px;border:2px solid transparent;transition:transform .15s ease;}
+.sound-btn:hover{transform:translateY(-2px);}
+.sound-btn .emoji{display:block;font-size:22px;margin-bottom:2px;}
+.sound-btn.active{border-color:var(--milktea-dark);background:var(--mint);}
+
+/* D-day (now lives inside the active-exam card) */
+.dday-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.dday-box{background:var(--cream-2);border-radius:14px;padding:12px;text-align:center;}
+.dday-num{font-family:'Mali',cursive;font-size:28px;font-weight:700;color:var(--milktea-dark);}
+.dday-label{font-size:11.5px;color:var(--brown-soft);margin-top:2px;}
+.dday-advice{margin-top:10px;background:var(--lavender);border-radius:14px;padding:10px 14px;font-size:13px;text-align:center;font-weight:600;}
+
+.section-title{font-family:'Mali',cursive;font-size:18px;font-weight:700;margin:0 0 12px;color:var(--brown-text);display:flex;align-items:center;gap:8px;}
+
+/* ===== SUBJECT COLOR CHIPS (shared look = the "sync" visual language) ===== */
+.subj-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;border:none;cursor:default;}
+.subj-chip.clickable{cursor:pointer;transition:transform .12s ease;}
+.subj-chip.clickable:hover{transform:translateY(-1px);}
+.subj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ===== CALENDAR ===== */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav-btn{background:var(--cream-2);border-radius:999px;width:34px;height:34px;font-size:16px;color:var(--brown-text);}
+.cal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;}
+.cal-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--brown-soft);padding-bottom:4px;}
+.cal-cell{
+  aspect-ratio:1/1; border-radius:14px; background:var(--cream-2);
+  padding:5px; display:flex;flex-direction:column;cursor:pointer; position:relative;
+  transition:transform .12s ease; border:2px solid transparent; overflow:hidden;
+}
+.cal-cell:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--shadow-sm);}
+.cal-cell.empty{background:transparent;cursor:default;}
+.cal-cell.empty:hover{transform:none;box-shadow:none;}
+.cal-cell.today{border-color:var(--coral);background:var(--pink);}
+.cal-daynum{font-size:12px;font-weight:700;color:var(--brown-text);}
+.cal-tasks{margin-top:2px;display:flex;flex-direction:column;gap:2px;overflow:hidden;}
+.cal-task-dot{font-size:8.5px;font-weight:700;border-radius:6px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;}
+.cal-task-dot .mini-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.cal-task-dot.done{text-decoration:line-through;opacity:.5;}
+.cal-task-dot.review{background:var(--lavender);color:var(--milktea-dark);}
+.cal-more{font-size:9px;color:var(--brown-soft);font-weight:700;}
+.cal-exam-badge{background:var(--red-status);color:#7A2323;font-size:8px;font-weight:800;border-radius:6px;padding:1px 4px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-cell.examday{border-color:#E8A93A;border-style:dashed;}
+.cal-cell.examday.today{border-style:solid;border-color:var(--coral);}
+.legend-note{font-size:10.5px;color:var(--brown-soft);display:inline-flex;align-items:center;gap:4px;}
+
+/* ===== EXAM SETS ===== */
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.exam-card{background:#fff;border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm);border-top:6px solid var(--lavender-deep);position:relative;transition:transform .15s ease;cursor:pointer;}
+.exam-card:hover{transform:translateY(-3px);}
+.exam-card.is-active{border-top-color:var(--coral);box-shadow:0 0 0 2px var(--coral), var(--shadow-sm);}
+.active-ribbon{position:absolute;top:10px;left:10px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;}
+.exam-card .edit-x{position:absolute;top:10px;right:10px;display:flex;gap:6px;}
+.icon-btn{background:var(--cream-2);border-radius:999px;width:26px;height:26px;font-size:12px;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;}
+.icon-btn:hover{transform:scale(1.15);}
+.exam-name{font-family:'Mali',cursive;font-weight:700;font-size:17px;margin:2px 0 4px;}
+.exam-date{font-size:12px;color:var(--brown-soft);margin-bottom:8px;}
+.exam-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.progress-track{background:var(--cream-2);height:10px;border-radius:999px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--mint-deep),var(--lavender-deep));}
+.progress-txt{font-size:11px;color:var(--brown-soft);margin-top:5px;font-weight:600;}
+.add-card{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed var(--milktea);border-radius:var(--radius-md);min-height:150px;color:var(--milktea-dark);font-weight:700;background:rgba(255,255,255,0.4);transition:transform .15s ease;}
+.add-card:hover{transform:translateY(-3px);}
+
+/* ===== READING LIST ===== */
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-row select{padding:8px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13px;color:var(--brown-text);}
+.subject-group{margin-bottom:14px;border-radius:16px;overflow:hidden;}
+.subject-group summary{list-style:none;cursor:pointer;padding:4px 0 10px;display:flex;align-items:center;gap:8px;}
+.subject-group summary::-webkit-details-marker{display:none;}
+.subject-group summary::before{content:'▾';font-size:11px;color:var(--brown-soft);transition:transform .15s ease;}
+.subject-group:not([open]) summary::before{transform:rotate(-90deg);}
+.group-count{font-size:11px;color:var(--brown-soft);font-weight:600;}
+.read-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow-sm);border-left:5px solid var(--milktea);transition:transform .12s ease;}
+.read-item:hover{transform:translateX(2px);}
+.status-btn{width:34px;height:34px;border-radius:50%;font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;}
+.status-btn:hover{transform:scale(1.1) rotate(-6deg);}
+.status-red{background:var(--red-status);}
+.status-yellow{background:var(--yellow-status);}
+.status-green{background:var(--green-status);}
+.read-info{flex:1;min-width:0;}
+.read-topic{font-weight:600;font-size:14px;}
+.read-meta{font-size:11.5px;color:var(--brown-soft);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.date-chip{background:var(--cream-2);border-radius:999px;font-size:10.5px;font-weight:700;padding:3px 9px;color:var(--brown-soft);white-space:nowrap;}
+.date-chip:hover{background:var(--mint);}
+.date-chip-input{border-radius:999px;font-size:11px;padding:2px 8px;border:1.5px solid var(--milktea);}
+.read-actions{display:flex;gap:6px;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--brown-soft);}
+.empty-state .emoji{font-size:40px;display:block;margin-bottom:6px;animation:petBounce 2.4s ease-in-out infinite;}
+
+/* ===== MODAL ===== */
+.modal-overlay{position:fixed;inset:0;background:rgba(92,68,51,0.35);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;backdrop-filter:blur(2px);}
+.modal-overlay.active{display:flex;}
+.modal-box{background:#FFF8F0;border-radius:24px;padding:22px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(92,68,51,0.3);}
+.modal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;margin-bottom:14px;}
+.modal-subnote{font-size:12px;color:var(--brown-soft);margin:-8px 0 14px;}
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--brown-soft);margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13.5px;color:var(--brown-text);}
+.form-group textarea{resize:vertical;min-height:50px;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+.day-add-section{border-top:2px dashed var(--milktea);margin-top:6px;padding-top:14px;}
+.day-scheduled-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--cream-2);}
+.day-scheduled-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--milktea-dark);flex-shrink:0;}
+.day-scheduled-info{flex:1;min-width:0;}
+.day-scheduled-topic{font-size:13.5px;font-weight:600;}
+.day-scheduled-topic.done{text-decoration:line-through;opacity:.55;}
+.quick-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px;}
+.quick-chip{background:var(--cream-2);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--brown-text);transition:transform .12s ease;}
+.quick-chip:hover{transform:translateY(-2px);background:var(--mint);}
+.exam-day-alert{background:var(--red-status);color:#7A2323;border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;text-align:center;}
+.day-scheduled-row.review-row{background:var(--cream-2);border-radius:12px;padding:8px 10px;border-bottom:none;margin-bottom:6px;}
+.day-empty-note{font-size:12.5px;color:var(--brown-soft);padding:4px 0 10px;}
+.no-active-exam-msg{text-align:center;font-size:13px;color:var(--brown-soft);padding:10px 0;}
+
+/* ===== BOTTOM MOBILE NAV ===== */
+.mobile-nav{display:none;}
+@media(max-width:640px){
+  .mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;
+    box-shadow:0 -4px 16px rgba(140,108,78,0.15);padding:8px 6px;justify-content:space-around;z-index:50;
+  }
+  .mobile-nav button{background:none;display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--brown-soft);gap:2px;font-weight:600;padding:4px;}
+  .mobile-nav button.active{color:var(--brown-text);}
+  .mobile-nav .m-emoji{font-size:19px;}
+  nav.tabbar{display:none;}
+  .dash-grid{grid-template-columns:1fr;}
+}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--brown-text);color:#fff8f0;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-8px);}
+@media(min-width:641px){.toast{bottom:24px;}}
+</style>
+</head>
+<body>
+
+<div class="bg-decor">
+  <span style="left:4%;top:12%;font-size:22px;animation-delay:0s;">🫧</span>
+  <span style="left:88%;top:8%;font-size:18px;animation-delay:1.2s;">✨</span>
+  <span style="left:92%;top:60%;font-size:20px;animation-delay:2.4s;">💗</span>
+  <span style="left:6%;top:70%;font-size:16px;animation-delay:.6s;">⭐</span>
+  <span style="left:50%;top:4%;font-size:16px;animation-delay:1.8s;">🌸</span>
+  <span style="left:20%;top:88%;font-size:18px;animation-delay:3s;">🧋</span>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-emoji">🧋</div>
+    <div>
+      <div class="brand-title">Study Planner Pro</div>
+      <div class="brand-sub">แพลนอ่านหนังสือกับหมีนมชานม</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="streak-pill">🔥 <span id="streakCount">0</span> วันติด</div>
+    <div class="user-pill" id="userPill">
+      <span class="user-email" id="userEmailLabel"></span>
+      <button class="icon-btn" id="logoutBtn" title="ออกจากระบบ">🚪</button>
+    </div>
+  </div>
+</header>
+
+<nav class="tabbar">
+  <button class="tab-btn active" data-view="dashboard">🏠 แดชบอร์ด</button>
+  <button class="tab-btn" data-view="calendar">📅 ปฏิทิน</button>
+  <button class="tab-btn" data-view="exams">📚 ชุดสอบ</button>
+  <button class="tab-btn" data-view="reading">✅ รายการอ่าน</button>
+</nav>
+
+<main>
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+
+    <!-- Onboarding (shown only when there are zero exam sets) -->
+    <div class="card onboard-card" id="onboardCard" style="display:none;">
+      <span class="emoji">🧸</span>
+      <h3>เริ่มต้นกันก่อนนะ!</h3>
+      <p>สร้าง "ชุดสอบ" แรกของเธอ เช่น สอบบอร์ด PT แล้วใส่รายวิชาที่ต้องอ่าน ทุกอย่างในแอปจะเชื่อมกับชุดสอบนี้ให้เองอัตโนมัติ</p>
+      <button class="btn btn-primary" id="onboardCreateBtn">➕ สร้างชุดสอบแรก</button>
+    </div>
+
+    <!-- Active exam + D-day (single control used everywhere) -->
+    <div class="card active-exam-card" id="activeExamCard" style="display:none;">
+      <div class="active-exam-top">
+        <span class="active-exam-label">🎯 ชุดสอบที่ใช้งานอยู่</span>
+      </div>
+      <select class="active-exam-select" id="activeExamSelect"></select>
+      <div class="hint-text">รายการที่เพิ่มใหม่ในปฏิทิน/รายการอ่าน จะผูกกับชุดสอบนี้โดยอัตโนมัติ</div>
+      <div id="ddayContent"></div>
+    </div>
+
+    <div class="dash-grid">
+      <div class="pet-card">
+        <span class="sparkle" style="left:14px;top:18px;">✨</span>
+        <span class="sparkle" style="right:18px;top:30px;animation-delay:1s;">⭐</span>
+        <span class="level-badge">Lv. <span id="petLevel">1</span></span>
+        <div class="pet-stage" id="petStage"></div>
+        <div class="pet-name" id="petName">น้องชานม</div>
+        <div class="pet-speech" id="petSpeech">มาอ่านหนังสือด้วยกันนะ~ 🧸</div>
+        <div class="exp-bar-wrap">
+          <div class="exp-bar-bg"><div class="exp-bar-fill" id="expFill" style="width:0%"></div></div>
+          <div class="exp-label"><span id="expNow">0</span> / <span id="expNext">300</span> EXP</div>
+        </div>
+      </div>
+
+      <div class="card focus-card">
+        <div class="section-title">🍅 โฟกัสอ่านหนังสือ</div>
+        <div class="pomo-mode" id="pomoMode">โฟกัส</div>
+        <div class="pomo-display" id="pomoDisplay">25:00</div>
+        <div class="pomo-controls">
+          <button class="btn btn-primary" id="pomoStartBtn">▶ เริ่ม</button>
+          <button class="btn btn-soft" id="pomoResetBtn">↺ รีเซ็ต</button>
+        </div>
+        <details class="pomo-settings-details">
+          <summary>⚙️ ปรับเวลาโฟกัส/พัก</summary>
+          <div class="pomo-settings">
+            <label>โฟกัส (นาที)<input type="number" id="pomoWorkInput" value="25" min="1" max="120"></label>
+            <label>พัก (นาที)<input type="number" id="pomoBreakInput" value="5" min="1" max="60"></label>
+          </div>
+        </details>
+
+        <hr class="focus-divider">
+        <div class="section-title" style="font-size:15px;">🎧 เสียงพื้นหลังช่วยสมาธิ</div>
+        <div class="sound-row">
+          <button class="sound-btn" data-sound="rain"><span class="emoji">🌧️</span>เสียงฝน</button>
+          <button class="sound-btn" data-sound="cafe"><span class="emoji">☕</span>คาเฟ่</button>
+          <button class="sound-btn" data-sound="waves"><span class="emoji">🌊</span>คลื่นทะเล</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="view" id="view-calendar">
+    <div class="card" style="margin-bottom:0;">
+      <div class="cal-header">
+        <button class="cal-nav-btn" id="calPrev">‹</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button class="cal-nav-btn" id="calNext">›</button>
+      </div>
+      <div class="cal-legend" id="calLegend"></div>
+      <div class="cal-grid" id="calDow"></div>
+      <div class="cal-grid" id="calGrid" style="margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <!-- EXAM SETS -->
+  <div class="view" id="view-exams">
+    <div class="section-title" style="margin-top:4px;">📚 ชุดการสอบของฉัน</div>
+    <div class="hint-text" style="margin-bottom:14px;">แตะการ์ดเพื่อตั้งเป็น "ชุดสอบที่ใช้งานอยู่" · แตะ ✎ เพื่อแก้ไข</div>
+    <div class="grid-cards" id="examGrid"></div>
+  </div>
+
+  <!-- READING LIST -->
+  <div class="view" id="view-reading">
+    <div class="section-title" style="margin-top:4px;">✅ รายการอ่านหลัก</div>
+    <div class="filter-row">
+      <select id="filterExam"><option value="all">ชุดสอบทั้งหมด</option></select>
+      <select id="filterStatus">
+        <option value="all">สถานะทั้งหมด</option>
+        <option value="red">🔴 ยังไม่เริ่ม</option>
+        <option value="yellow">🟡 กำลังอ่าน</option>
+        <option value="green">🟢 เสร็จแล้ว</option>
+      </select>
+      <button class="btn btn-primary" id="addReadingBtn">+ เพิ่มหัวข้อ</button>
+    </div>
+    <div id="readingListWrap"></div>
+  </div>
+</main>
+
+<div class="mobile-nav">
+  <button class="active" data-view="dashboard"><span class="m-emoji">🏠</span>หน้าหลัก</button>
+  <button data-view="calendar"><span class="m-emoji">📅</span>ปฏิทิน</button>
+  <button data-view="exams"><span class="m-emoji">📚</span>ชุดสอบ</button>
+  <button data-view="reading"><span class="m-emoji">✅</span>รายการ</button>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="examModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="examModalTitle">➕ เพิ่มชุดสอบ</div>
+    <div class="form-group"><label>ชื่อชุดสอบ</label><input type="text" id="examNameInput" placeholder="เช่น สอบปลายภาค"></div>
+    <div class="form-group"><label>วันที่สอบ</label><input type="date" id="examDateInput"></div>
+    <div class="form-group"><label>รายวิชา (คั่นด้วยเครื่องหมายจุลภาค ,)</label><textarea id="examSubjectsInput" placeholder="เช่น Neuro, Manipulation, Pharmacology"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="examCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="examSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="readModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title">➕ เพิ่มหัวข้ออ่าน</div>
+    <div class="modal-subnote">สำหรับชุดสอบ: <strong id="readModalExamName">-</strong></div>
+    <div class="form-group"><label>วิชา</label><select id="readSubjectSelect"></select></div>
+    <div class="form-group"><label>หัวข้อ</label><input type="text" id="readTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
+    <div class="form-group"><label>กำหนดวันอ่าน (ไม่บังคับ — จะโชว์บนปฏิทินให้ทันที)</label><input type="date" id="readScheduleDateInput"></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="readCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="readSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dayModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="dayModalTitle">📅 รายการวันที่</div>
+    <div id="dayExamInfo"></div>
+
+    <div class="section-title" style="font-size:13.5px;margin:4px 0 2px;">✅ หัวข้ออ่านวันนี้</div>
+    <div id="dayScheduledList"></div>
+
+    <div class="section-title" style="font-size:13.5px;margin:14px 0 2px;">🔁 การทบทวนวันนี้</div>
+    <div id="dayReviewList"></div>
+
+    <div class="day-add-section">
+      <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">➕ เพิ่มหัวข้อลงวันนี้</div>
+      <div class="modal-subnote" style="margin-top:0;">ชุดสอบ: <strong id="dayModalExamName">-</strong></div>
+      <div id="dayNoActiveExamMsg" class="no-active-exam-msg" style="display:none;">ยังไม่มีชุดสอบที่ใช้งานอยู่ ไปสร้างที่แท็บ "ชุดสอบ" ก่อนนะ 🧸</div>
+      <div id="dayAddFields">
+        <div class="form-group"><label>วิชา</label><select id="daySubjectSelect"></select></div>
+        <div class="hint-text" style="margin:-4px 0 4px;">แตะหัวข้อที่มีอยู่แล้วเพื่อเพิ่มลงวันนี้ทันที 👇</div>
+        <div class="quick-chip-row" id="dayQuickChips"></div>
+        <div class="form-group"><label>หรือพิมพ์หัวข้อใหม่</label><input type="text" id="dayNewTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
+      </div>
+    </div>
+
+    <div class="day-add-section">
+      <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">🔁 เพิ่มการทบทวน</div>
+      <div class="hint-text" style="margin:-4px 0 8px;">พิมพ์ชื่ออิสระได้เลย ไม่ต้องผูกกับวิชา เช่น "ทบทวนรวมก่อนสอบ"</div>
+      <div class="form-group"><input type="text" id="dayReviewInput" placeholder="เช่น ทบทวน Neuro รอบ 2"></div>
+      <button class="btn btn-soft" type="button" id="dayReviewAddBtn" style="width:100%;">+ เพิ่มการทบทวน</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="dayCloseBtn">ปิด</button>
+      <button class="btn btn-primary" id="dayAddBtn">+ เพิ่มลงวันนี้</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay active" id="authGate" style="z-index:500;">
+  <div class="modal-box auth-gate-box">
+    <span class="emoji">🧋🔐</span>
+    <div class="modal-title">เข้าสู่ระบบก่อนเริ่มอ่านกันนะ</div>
+    <p>ล็อกอินเพื่อบันทึกแผนอ่านหนังสือของเธอไว้บนคลาวด์ ไม่ให้หายแม้เปลี่ยนเครื่องหรือล้าง cache</p>
+    <button class="btn btn-primary" id="authLoginBtn" style="width:100%;">เข้าสู่ระบบ / สมัครสมาชิก</button>
+    <div class="sync-note" id="authStatusNote"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+const STORAGE_KEY = 'studyPlannerPro_v3';
+let state = loadState();
+
+function loadState(){
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if(raw){
+    try{
+      const s = JSON.parse(raw);
+      s.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+      if(!s.ui) s.ui = {activeExamSetId:null};
+      if(s.ui.activeExamSetId===undefined) s.ui.activeExamSetId = null;
+      if(!s.reviewSessions) s.reviewSessions = [];
+      return s;
+    }catch(e){ /* fallthrough */ }
+  }
+  // migrate from v2
+  const v2Raw = localStorage.getItem('studyPlannerPro_v2');
+  if(v2Raw){
+    try{
+      const old = JSON.parse(v2Raw);
+      old.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+      old.settings = old.settings || {pomoWork:25,pomoBreak:5};
+      old.ui = {activeExamSetId: (old.ui && old.ui.selectedDdayExam) || (old.examSets[0] && old.examSets[0].id) || null};
+      old.reviewSessions = [];
+      return old;
+    }catch(e){}
+  }
+  return {
+    user:{ exp:0, level:1, streak:0, lastActiveDate:null },
+    examSets:[],
+    readingItems:[],
+    reviewSessions:[],
+    settings:{ pomoWork:25, pomoBreak:5 },
+    ui:{ activeExamSetId:null }
+  };
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  saveRemote();
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+function getActiveExam(){
+  if(!state.ui.activeExamSetId) return null;
+  return state.examSets.find(e=>e.id===state.ui.activeExamSetId) || null;
+}
+function setActiveExam(id){
+  state.ui.activeExamSetId = id;
+  saveState();
+  renderActiveExamArea();
+  renderExamSets();
+}
+function ensureActiveExamValid(){
+  if(!getActiveExam() && state.examSets.length>0){
+    state.ui.activeExamSetId = state.examSets[0].id;
+    saveState();
+  }
+  if(state.examSets.length===0){
+    state.ui.activeExamSetId = null;
+  }
+}
+
+/* ================= SUBJECT COLORS (shared visual language for syncing) ================= */
+const SUBJECT_PALETTE = [
+  {bg:'#FFD6E8', text:'#9C4E72'},
+  {bg:'#C9F0E0', text:'#2E7D5B'},
+  {bg:'#E4D9F9', text:'#6B4A9A'},
+  {bg:'#FFE3B0', text:'#9C6B12'},
+  {bg:'#BFE3FF', text:'#2B6FA3'},
+  {bg:'#FFCFC2', text:'#B24B36'},
+  {bg:'#D8E9B2', text:'#5C7A29'},
+  {bg:'#F3C6E8', text:'#9C3E86'}
+];
+function subjectColor(subject){
+  let hash = 0;
+  const str = subject || 'ทั่วไป';
+  for(let i=0;i<str.length;i++) hash = (hash*31 + str.charCodeAt(i)) >>> 0;
+  return SUBJECT_PALETTE[hash % SUBJECT_PALETTE.length];
+}
+function subjChip(subject, clickable, extraAttr){
+  const c = subjectColor(subject);
+  return `<span class="subj-chip ${clickable?'clickable':''}" ${extraAttr||''} style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(subject)}</span>`;
+}
+
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ================= NAV ================= */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  document.querySelectorAll('.mobile-nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+}
+document.querySelectorAll('.tab-btn, .mobile-nav button').forEach(b=>{
+  b.addEventListener('click', ()=>switchView(b.dataset.view));
+});
+
+/* ================= EXP / LEVEL / STREAK ================= */
+function expForLevel(level){ return (level-1)*300; }
+function levelFromExp(exp){ return Math.floor(exp/300)+1; }
+
+function gainExp(amount){
+  const oldLevel = state.user.level;
+  state.user.exp += amount;
+  state.user.level = levelFromExp(state.user.exp);
+  saveState();
+  renderPet();
+  if(state.user.level > oldLevel){
+    showToast(`🎉 เลเวลอัพ! ตอนนี้ Lv.${state.user.level} แล้วน้าา`);
+    setPetSpeech(`เย้! โตขึ้นอีกขั้นแล้วว 🎓 เก่งมากเลย!`);
+  }
+}
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function checkStreak(){
+  const today = todayStr();
+  if(state.user.lastActiveDate === today) return;
+  if(!state.user.lastActiveDate){
+    state.user.streak = 1;
+  } else {
+    const last = new Date(state.user.lastActiveDate);
+    const now = new Date(today);
+    const diffDays = Math.round((now-last)/86400000);
+    if(diffDays === 1) state.user.streak += 1;
+    else if(diffDays > 1) state.user.streak = 1;
+  }
+  state.user.lastActiveDate = today;
+  saveState();
+}
+
+const PET_MESSAGES = [
+  'สู้ๆนะ วันนี้ก็อ่านให้ครบเป้าหมายกันเถอะ 💪',
+  'พักบ้างนะ แล้วค่อยลุยต่อ 🧋',
+  'ทุกหัวข้อที่อ่าน คือก้าวที่ใกล้สอบผ่านขึ้นอีกนิด 🌱',
+  'เหนื่อยก็พักได้ แต่อย่าพักจนลืมกลับมานะ 🐻',
+  'วันนี้ก็เก่งมากแล้วที่เปิดมาอ่าน มาต่อกันเลย!'
+];
+function setPetSpeech(text){ document.getElementById('petSpeech').textContent = text; }
+
+/* ================= PET RENDER ================= */
+function renderPet(){
+  document.getElementById('petLevel').textContent = state.user.level;
+  const nextLevelExp = expForLevel(state.user.level+1);
+  const curLevelExp = expForLevel(state.user.level);
+  const pct = Math.min(100, Math.round(((state.user.exp-curLevelExp)/(nextLevelExp-curLevelExp))*100));
+  document.getElementById('expFill').style.width = pct+'%';
+  document.getElementById('expNow').textContent = state.user.exp;
+  document.getElementById('expNext').textContent = nextLevelExp;
+
+  const stage = document.getElementById('petStage');
+  const lvl = state.user.level;
+  let html = '';
+  let name = 'น้องชานม';
+  if(lvl <= 2){
+    name = 'ไข่นมชานม';
+    html = `<div class="bear-egg"><div class="crack"></div></div>`;
+  } else {
+    let accessories = '';
+    if(lvl >= 3 && lvl < 6){ name = 'ลูกหมีชานม'; }
+    if(lvl >= 6 && lvl < 10){ name = 'หมีชานมผ้าพันคอ'; accessories += `<div class="bear-scarf"></div>`; }
+    if(lvl >= 10 && lvl < 15){ name = 'หมีชานมนักอ่าน'; accessories += `<div class="bear-scarf"></div><div class="bear-glasses"><div class="lens l"></div><div class="lens r"></div><div class="bridge"></div></div>`; }
+    if(lvl >= 15){ name = 'ด็อกเตอร์หมีชานม'; accessories += `<div class="bear-scarf"></div><div class="bear-glasses"><div class="lens l"></div><div class="lens r"></div><div class="bridge"></div></div><div class="bear-cap"></div><div class="bear-cap-top"></div><div class="bear-cap-btn"></div>`; }
+    html = `<div class="bear">
+      <div class="bear-ear l"><div class="bear-ear-in"></div></div>
+      <div class="bear-ear r"><div class="bear-ear-in"></div></div>
+      <div class="bear-head">
+        <div class="bear-eye l"></div><div class="bear-eye r"></div>
+        <div class="bear-blush l"></div><div class="bear-blush r"></div>
+        <div class="bear-snout"><div class="bear-nose"></div><div class="bear-mouth"></div></div>
+      </div>
+      ${accessories}
+    </div>`;
+  }
+  stage.innerHTML = html;
+  document.getElementById('petName').textContent = name;
+}
+
+/* ================= POMODORO ================= */
+let pomoInterval = null;
+let pomoSeconds = state.settings.pomoWork*60;
+let pomoMode = 'work';
+let pomoRunning = false;
+
+function fmtTime(sec){
+  const m = Math.floor(sec/60), s = sec%60;
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+function renderPomo(){
+  document.getElementById('pomoDisplay').textContent = fmtTime(pomoSeconds);
+  document.getElementById('pomoMode').textContent = pomoMode==='work' ? '🎯 โฟกัส' : '☕ พักผ่อน';
+}
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [880,1046,1318].forEach((freq,i)=>{
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type='sine'; o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      const t0 = ctx.currentTime + i*0.13;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.25, t0+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+0.28);
+      o.start(t0); o.stop(t0+0.3);
+    });
+  }catch(e){}
+}
+function pomoTick(){
+  pomoSeconds--;
+  if(pomoSeconds < 0){
+    playBeep();
+    if(pomoMode==='work'){
+      gainExp(50);
+      setPetSpeech('เซสชันโฟกัสจบแล้ว! ไปพักหายใจกันก่อนน้า ☁️');
+      pomoMode='break'; pomoSeconds = state.settings.pomoBreak*60;
+      showToast('🍅 ครบเวลาโฟกัสแล้ว! พักก่อนนะ (+50 EXP)');
+    } else {
+      setPetSpeech('พักพอแล้ว กลับมาลุยต่อกันเถอะ! 🔥');
+      pomoMode='work'; pomoSeconds = state.settings.pomoWork*60;
+      showToast('⏰ หมดเวลาพัก กลับมาโฟกัสกันต่อ!');
+    }
+  }
+  renderPomo();
+}
+document.getElementById('pomoStartBtn').addEventListener('click', ()=>{
+  pomoRunning = !pomoRunning;
+  const btn = document.getElementById('pomoStartBtn');
+  if(pomoRunning){
+    btn.textContent = '⏸ พัก';
+    pomoInterval = setInterval(pomoTick, 1000);
+  } else {
+    btn.textContent = '▶ เริ่ม';
+    clearInterval(pomoInterval);
+  }
+});
+document.getElementById('pomoResetBtn').addEventListener('click', ()=>{
+  clearInterval(pomoInterval); pomoRunning=false;
+  document.getElementById('pomoStartBtn').textContent='▶ เริ่ม';
+  pomoMode='work';
+  pomoSeconds = (parseInt(document.getElementById('pomoWorkInput').value)||25)*60;
+  renderPomo();
+});
+document.getElementById('pomoWorkInput').addEventListener('change', e=>{
+  state.settings.pomoWork = Math.max(1, parseInt(e.target.value)||25);
+  if(!pomoRunning && pomoMode==='work'){ pomoSeconds = state.settings.pomoWork*60; renderPomo(); }
+  saveState();
+});
+document.getElementById('pomoBreakInput').addEventListener('change', e=>{
+  state.settings.pomoBreak = Math.max(1, parseInt(e.target.value)||5);
+  if(!pomoRunning && pomoMode==='break'){ pomoSeconds = state.settings.pomoBreak*60; renderPomo(); }
+  saveState();
+});
+document.getElementById('pomoWorkInput').value = state.settings.pomoWork;
+document.getElementById('pomoBreakInput').value = state.settings.pomoBreak;
+
+/* ================= SOUNDSCAPES (WebAudio, no external files) ================= */
+let audioCtx = null;
+const activeSounds = {};
+
+function getCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+function makeNoiseBuffer(ctx){
+  const bufferSize = ctx.sampleRate*4;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let b0=0,b1=0,b2=0;
+  for(let i=0;i<bufferSize;i++){
+    const white = Math.random()*2-1;
+    b0 = 0.99*b0 + white*0.1;
+    b1 = 0.97*b1 + white*0.06;
+    b2 = white*0.02;
+    data[i] = b0+b1+b2;
+  }
+  return buffer;
+}
+function startSound(name){
+  const ctx = getCtx();
+  const buffer = makeNoiseBuffer(ctx);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  let lfo = null, lfoGain=null;
+
+  if(name==='rain'){
+    filter.type='bandpass'; filter.frequency.value=2200; filter.Q.value=0.7;
+    gain.gain.value = 0.16;
+  } else if(name==='cafe'){
+    filter.type='lowpass'; filter.frequency.value=900;
+    gain.gain.value = 0.14;
+    lfo = ctx.createOscillator(); lfo.frequency.value=0.15;
+    lfoGain = ctx.createGain(); lfoGain.gain.value=0.03;
+    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+    lfo.start();
+  } else if(name==='waves'){
+    filter.type='lowpass'; filter.frequency.value=650;
+    lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.12;
+    lfoGain = ctx.createGain(); lfoGain.gain.value=0.13;
+    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+    gain.gain.value = 0.1;
+    lfo.start();
+  }
+  source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  source.start();
+  activeSounds[name] = {source, gain, filter, lfo};
+}
+function stopSound(name){
+  const s = activeSounds[name];
+  if(!s) return;
+  try{ s.gain.gain.exponentialRampToValueAtTime(0.0001, getCtx().currentTime+0.3); }catch(e){}
+  setTimeout(()=>{ try{s.source.stop();}catch(e){} if(s.lfo){try{s.lfo.stop();}catch(e){}} }, 350);
+  delete activeSounds[name];
+}
+document.querySelectorAll('.sound-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const name = btn.dataset.sound;
+    if(activeSounds[name]){
+      stopSound(name); btn.classList.remove('active');
+    } else {
+      startSound(name); btn.classList.add('active');
+    }
+  });
+});
+
+/* ================= HELPERS ================= */
+function escapeHtml(str){
+  const div = document.createElement('div'); div.textContent = str||''; return div.innerHTML;
+}
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function formatThaiDate(dateStr){
+  if(!dateStr) return '-';
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+function shortThaiDate(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()} ${THAI_MONTHS_SHORT[d.getMonth()]}`;
+}
+
+/* ================= ACTIVE EXAM AREA (dashboard) ================= */
+function renderActiveExamArea(){
+  ensureActiveExamValid();
+  const onboard = document.getElementById('onboardCard');
+  const card = document.getElementById('activeExamCard');
+  if(state.examSets.length===0){
+    onboard.style.display = '';
+    card.style.display = 'none';
+    return;
+  }
+  onboard.style.display = 'none';
+  card.style.display = '';
+
+  const sel = document.getElementById('activeExamSelect');
+  sel.innerHTML = state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
+  sel.value = state.ui.activeExamSetId;
+
+  renderDdayContent();
+}
+document.getElementById('activeExamSelect').addEventListener('change', e=>{
+  setActiveExam(e.target.value);
+  renderReadingFilters(); renderCalendar();
+});
+document.getElementById('onboardCreateBtn').addEventListener('click', ()=>{
+  switchView('exams');
+  openExamModal(null);
+});
+
+function renderDdayContent(){
+  const content = document.getElementById('ddayContent');
+  const set = getActiveExam();
+  if(!set){ content.innerHTML=''; return; }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const examDate = new Date(set.examDate+'T00:00:00');
+  const diffDays = Math.ceil((examDate-today)/86400000);
+  const items = state.readingItems.filter(r=>r.examSetId===set.id);
+  const remaining = items.filter(r=>r.status!=='green').length;
+
+  let ddayLabel, adviceText;
+  if(diffDays > 0){
+    ddayLabel = `D-${diffDays}`;
+    if(remaining===0){
+      adviceText = '🎉 อ่านครบทุกหัวข้อแล้ว! ทบทวนเบาๆ รอวันสอบได้เลย';
+    } else {
+      const perDay = Math.ceil(remaining/diffDays);
+      adviceText = `ต้องอ่านให้ได้วันละ ~${perDay} หัวข้อ ถึงจะครบทันสอบ 💪`;
+    }
+  } else if(diffDays === 0){
+    ddayLabel = 'วันนี้!';
+    adviceText = remaining>0 ? `เหลืออีก ${remaining} หัวข้อ ทบทวนรอบสุดท้ายสู้ๆ!` : 'พร้อมลุยเต็มที่ สู้ๆนะ! 🌟';
+  } else {
+    ddayLabel = 'ผ่านไปแล้ว';
+    adviceText = 'สอบชุดนี้ผ่านไปแล้วนะ เก่งมากที่ผ่านมาได้! 🎊';
+  }
+  content.innerHTML = `
+    <div class="dday-grid">
+      <div class="dday-box"><div class="dday-num">${ddayLabel}</div><div class="dday-label">นับถอยหลัง</div></div>
+      <div class="dday-box"><div class="dday-num">${remaining}</div><div class="dday-label">หัวข้อที่เหลือ</div></div>
+    </div>
+    <div class="dday-advice">${adviceText}</div>
+  `;
+}
+
+/* ================= CALENDAR (synced directly to readingItems.scheduledDate) ================= */
+let calViewDate = new Date();
+const THAI_DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+let currentDayModalDate = null;
+
+function dateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+
+function renderCalLegend(){
+  const set = getActiveExam();
+  const subjects = set ? set.subjects : [...new Set(state.examSets.flatMap(e=>e.subjects))];
+  const legend = document.getElementById('calLegend');
+  let html = subjects.map(s=>subjChip(s)).join('');
+  html += `<span class="legend-note"><span class="subj-dot" style="background:var(--milktea-dark);"></span>🔁 ทบทวน · 📝 วันสอบ</span>`;
+  legend.innerHTML = html;
+}
+
+function dayItemsCombined(key){
+  const topics = state.readingItems.filter(it=>it.scheduledDate===key).map(it=>({type:'topic', label:it.topic, done:it.status==='green', subject:it.subject}));
+  const reviews = state.reviewSessions.filter(r=>r.date===key).map(r=>({type:'review', label:r.text, done:r.done}));
+  return topics.concat(reviews);
+}
+
+function renderCalendar(){
+  const y = calViewDate.getFullYear(), m = calViewDate.getMonth();
+  document.getElementById('calTitle').textContent = `${THAI_MONTHS[m]} ${y+543}`;
+  renderCalLegend();
+  const dowWrap = document.getElementById('calDow');
+  dowWrap.innerHTML = THAI_DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const grid = document.getElementById('calGrid');
+  let html = '';
+  for(let i=0;i<firstDow;i++) html += `<div class="cal-cell empty"></div>`;
+  const todayKey = todayStr();
+  for(let d=1; d<=daysInMonth; d++){
+    const key = dateKey(y,m,d);
+    const isToday = key === todayKey;
+    const examDayMarkers = state.examSets.filter(e=>e.examDate===key);
+    const combined = dayItemsCombined(key);
+    let taskHtml = combined.slice(0,2).map(it=>{
+      if(it.type==='topic'){
+        const c = subjectColor(it.subject);
+        return `<div class="cal-task-dot ${it.done?'done':''}" style="background:${c.bg};color:${c.text};"><span class="mini-dot" style="background:${c.text};"></span>${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
+      }
+      return `<div class="cal-task-dot review ${it.done?'done':''}">🔁 ${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
+    }).join('');
+    if(combined.length>2) taskHtml += `<div class="cal-more">+${combined.length-2} เพิ่มเติม</div>`;
+    const examBadgeHtml = examDayMarkers.length ? `<div class="cal-exam-badge">📝 ${examDayMarkers.map(e=>escapeHtml(e.name)).join(', ')}</div>` : '';
+    html += `<div class="cal-cell ${isToday?'today':''} ${examDayMarkers.length?'examday':''}" data-key="${key}">
+      <div class="cal-daynum">${d}</div>
+      ${examBadgeHtml}
+      <div class="cal-tasks">${taskHtml}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+  grid.querySelectorAll('.cal-cell:not(.empty)').forEach(cell=>{
+    cell.addEventListener('click', ()=>openDayModal(cell.dataset.key));
+  });
+}
+document.getElementById('calPrev').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()-1); renderCalendar(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()+1); renderCalendar(); });
+
+function openDayModal(key){
+  currentDayModalDate = key;
+  const d = new Date(key+'T00:00:00');
+  document.getElementById('dayModalTitle').textContent = `📅 ${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  renderDayExamInfo();
+  renderDayScheduled();
+  renderDayReviewList();
+  const set = getActiveExam();
+  document.getElementById('dayModalExamName').textContent = set ? set.name : '-';
+  document.getElementById('dayAddFields').style.display = set ? '' : 'none';
+  document.getElementById('dayNoActiveExamMsg').style.display = set ? 'none' : '';
+  if(set) populateDaySubjectSelect();
+  document.getElementById('dayModalOverlay').classList.add('active');
+}
+function renderDayExamInfo(){
+  const markers = state.examSets.filter(e=>e.examDate===currentDayModalDate);
+  const el = document.getElementById('dayExamInfo');
+  if(markers.length===0){ el.innerHTML=''; return; }
+  el.innerHTML = markers.map(e=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(e.name)}</div>`).join('');
+}
+function renderDayReviewList(){
+  const items = state.reviewSessions.filter(r=>r.date===currentDayModalDate);
+  const wrap = document.getElementById('dayReviewList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีการทบทวนกำหนดไว้วันนี้</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>`
+    <div class="day-scheduled-row review-row">
+      <input type="checkbox" ${it.done?'checked':''} data-review="${it.id}">
+      <div class="day-scheduled-info">
+        <div class="day-scheduled-topic ${it.done?'done':''}">🔁 ${escapeHtml(it.text)}</div>
+      </div>
+      <button class="icon-btn" data-reviewdel="${it.id}">✕</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-review]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.reviewSessions.find(r=>r.id===cb.dataset.review);
+      item.done = cb.checked;
+      if(item.done && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
+      }
+      saveState(); renderDayReviewList(); renderCalendar();
+    });
+  });
+  wrap.querySelectorAll('[data-reviewdel]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.reviewSessions = state.reviewSessions.filter(r=>r.id!==btn.dataset.reviewdel);
+      saveState(); renderDayReviewList(); renderCalendar();
+    });
+  });
+}
+function renderDayScheduled(){
+  const items = state.readingItems.filter(it=>it.scheduledDate===currentDayModalDate);
+  const wrap = document.getElementById('dayScheduledList');
+  if(items.length===0){
+    wrap.innerHTML = `<div style="font-size:13px;color:var(--brown-soft);padding:8px 0;">ยังไม่มีหัวข้อกำหนดไว้วันนี้ ลองเพิ่มด้านล่างได้เลย 🧋</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>{
+    const examSet = state.examSets.find(e=>e.id===it.examSetId);
+    return `<div class="day-scheduled-row">
+      <input type="checkbox" ${it.status==='green'?'checked':''} data-item="${it.id}">
+      <div class="day-scheduled-info">
+        <div class="day-scheduled-topic ${it.status==='green'?'done':''}">${escapeHtml(it.topic)}</div>
+        <div style="margin-top:3px;">${subjChip(it.subject)} <span style="font-size:10.5px;color:var(--brown-soft);">${examSet?escapeHtml(examSet.name):''}</span></div>
+      </div>
+      <button class="icon-btn" data-unschedule="${it.id}" title="เอาออกจากวันนี้">📤</button>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.readingItems.find(r=>r.id===cb.dataset.item);
+      item.status = cb.checked ? 'green' : 'yellow';
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent();
+    });
+  });
+  wrap.querySelectorAll('[data-unschedule]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.unschedule);
+      item.scheduledDate = null;
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); populateDayTopicChips();
+      showToast('เอาหัวข้อนี้ออกจากวันที่แล้ว (ยังอยู่ในรายการอ่านนะ)');
+    });
+  });
+}
+function populateDaySubjectSelect(){
+  const set = getActiveExam();
+  const subSel = document.getElementById('daySubjectSelect');
+  subSel.innerHTML = (set?.subjects||[]).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('') || '<option value="ทั่วไป">ทั่วไป</option>';
+  populateDayTopicChips();
+}
+function populateDayTopicChips(){
+  const set = getActiveExam();
+  const subject = document.getElementById('daySubjectSelect').value;
+  const chipWrap = document.getElementById('dayQuickChips');
+  if(!set){ chipWrap.innerHTML=''; return; }
+  const existing = state.readingItems.filter(it=>it.examSetId===set.id && it.subject===subject && it.status!=='green');
+  if(existing.length===0){
+    chipWrap.innerHTML = `<span style="font-size:11.5px;color:var(--brown-soft);">ยังไม่มีหัวข้อเดิมของวิชานี้ ลองพิมพ์ใหม่ด้านล่างได้เลย</span>`;
+    return;
+  }
+  chipWrap.innerHTML = existing.map(it=>{
+    const already = it.scheduledDate===currentDayModalDate;
+    return `<button type="button" class="quick-chip" data-quickadd="${it.id}" ${already?'disabled style="opacity:.5;"':''}>${already?'✓ ':'+ '}${escapeHtml(it.topic)}</button>`;
+  }).join('');
+  chipWrap.querySelectorAll('[data-quickadd]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===chip.dataset.quickadd);
+      item.scheduledDate = currentDayModalDate;
+      saveState();
+      renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent();
+      showToast('เพิ่มลงปฏิทินแล้ว 🧋');
+    });
+  });
+}
+document.getElementById('daySubjectSelect').addEventListener('change', populateDayTopicChips);
+document.getElementById('dayAddBtn').addEventListener('click', ()=>{
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ ถึงจะกำหนดหัวข้อได้'); return; }
+  const subject = document.getElementById('daySubjectSelect').value;
+  const newTopicText = document.getElementById('dayNewTopicInput').value.trim();
+  if(!newTopicText){ showToast('พิมพ์ชื่อหัวข้อใหม่ก่อนนะ (หรือแตะหัวข้อเดิมด้านบน)'); return; }
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic:newTopicText, status:'red', expGiven:false, scheduledDate:currentDayModalDate});
+  document.getElementById('dayNewTopicInput').value = '';
+  saveState();
+  renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderReadingFilters(); renderExamSets(); renderDdayContent();
+  showToast('เพิ่มลงปฏิทินแล้ว 🧋');
+});
+document.getElementById('dayReviewAddBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('dayReviewInput');
+  const text = input.value.trim();
+  if(!text){ showToast('พิมพ์ชื่อการทบทวนก่อนนะ'); return; }
+  state.reviewSessions.push({id:uid(), text, date:currentDayModalDate, done:false, expGiven:false});
+  input.value = '';
+  saveState();
+  renderDayReviewList(); renderCalendar();
+  showToast('เพิ่มการทบทวนแล้ว 🔁');
+});
+document.getElementById('dayCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('dayModalOverlay').classList.remove('active');
+});
+
+/* ================= EXAM SETS ================= */
+let editingExamId = null;
+function openExamModal(id){
+  editingExamId = id || null;
+  const set = id ? state.examSets.find(e=>e.id===id) : null;
+  document.getElementById('examModalTitle').textContent = id ? '✏️ แก้ไขชุดสอบ' : '➕ เพิ่มชุดสอบ';
+  document.getElementById('examNameInput').value = set ? set.name : '';
+  document.getElementById('examDateInput').value = set ? set.examDate : '';
+  document.getElementById('examSubjectsInput').value = set ? set.subjects.join(', ') : '';
+  document.getElementById('examModalOverlay').classList.add('active');
+}
+document.getElementById('examCancelBtn').addEventListener('click', ()=>document.getElementById('examModalOverlay').classList.remove('active'));
+document.getElementById('examSaveBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('examNameInput').value.trim();
+  const examDate = document.getElementById('examDateInput').value;
+  const subjects = document.getElementById('examSubjectsInput').value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!name || !examDate){ showToast('ใส่ชื่อและวันสอบด้วยนะ'); return; }
+  let newId = null;
+  if(editingExamId){
+    const set = state.examSets.find(e=>e.id===editingExamId);
+    set.name=name; set.examDate=examDate; set.subjects=subjects;
+  } else {
+    newId = uid();
+    state.examSets.push({id:newId, name, examDate, subjects});
+  }
+  if(!state.ui.activeExamSetId && newId) state.ui.activeExamSetId = newId;
+  saveState();
+  document.getElementById('examModalOverlay').classList.remove('active');
+  renderExamSets(); renderActiveExamArea(); renderReadingFilters(); renderReadingList(); renderCalendar();
+  showToast('บันทึกชุดสอบแล้ว 📚');
+});
+function deleteExam(id){
+  if(!confirm('ลบชุดสอบนี้ และรายการอ่านที่ผูกอยู่ทั้งหมด?')) return;
+  state.examSets = state.examSets.filter(e=>e.id!==id);
+  state.readingItems = state.readingItems.filter(r=>r.examSetId!==id);
+  if(state.ui.activeExamSetId===id) state.ui.activeExamSetId = state.examSets[0]?.id || null;
+  saveState();
+  renderExamSets(); renderActiveExamArea(); renderReadingFilters(); renderReadingList(); renderCalendar();
+}
+function examProgress(examId){
+  const items = state.readingItems.filter(r=>r.examSetId===examId);
+  if(items.length===0) return 0;
+  const done = items.filter(r=>r.status==='green').length;
+  return Math.round((done/items.length)*100);
+}
+function renderExamSets(){
+  const grid = document.getElementById('examGrid');
+  let html = state.examSets.map(set=>{
+    const pct = examProgress(set.id);
+    const itemCount = state.readingItems.filter(r=>r.examSetId===set.id).length;
+    const isActive = set.id === state.ui.activeExamSetId;
+    return `<div class="exam-card ${isActive?'is-active':''}" data-select="${set.id}">
+      ${isActive?'<span class="active-ribbon">🎯 ใช้งานอยู่</span>':''}
+      <div class="edit-x">
+        <button class="icon-btn" data-edit="${set.id}">✎</button>
+        <button class="icon-btn" data-del="${set.id}">✕</button>
+      </div>
+      <div class="exam-name" style="margin-top:${isActive?'16px':'2px'};">${escapeHtml(set.name)}</div>
+      <div class="exam-date">📅 สอบวันที่ ${formatThaiDate(set.examDate)}</div>
+      <div class="exam-tags">${set.subjects.map(s=>subjChip(s)).join('') || '<span class="hint-text">ยังไม่มีวิชา</span>'}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-txt">${pct}% (${itemCount} หัวข้อ)</div>
+    </div>`;
+  }).join('');
+  html += `<div class="add-card" id="addExamCard"><div style="font-size:26px;">➕</div>เพิ่มชุดสอบใหม่</div>`;
+  grid.innerHTML = html;
+  grid.querySelectorAll('[data-select]').forEach(cardEl=>{
+    cardEl.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-edit]') || e.target.closest('[data-del]')) return;
+      setActiveExam(cardEl.dataset.select);
+      renderReadingFilters(); renderCalendar();
+      showToast('ตั้งเป็นชุดสอบที่ใช้งานอยู่แล้ว 🎯');
+    });
+  });
+  grid.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); openExamModal(b.dataset.edit); }));
+  grid.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); deleteExam(b.dataset.del); }));
+  document.getElementById('addExamCard').addEventListener('click', ()=>openExamModal(null));
+}
+
+/* ================= READING LIST ================= */
+function renderReadingFilters(){
+  const fe = document.getElementById('filterExam');
+  const cur = fe.value;
+  fe.innerHTML = `<option value="all">ชุดสอบทั้งหมด</option>` + state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
+  fe.value = state.examSets.find(e=>e.id===cur) ? cur : 'all';
+}
+document.getElementById('filterExam').addEventListener('change', renderReadingList);
+document.getElementById('filterStatus').addEventListener('change', renderReadingList);
+
+function renderReadingList(){
+  const fe = document.getElementById('filterExam').value;
+  const fst = document.getElementById('filterStatus').value;
+  let items = state.readingItems.slice();
+  if(fe!=='all') items = items.filter(i=>i.examSetId===fe);
+  if(fst!=='all') items = items.filter(i=>i.status===fst);
+
+  const groups = {};
+  items.forEach(it=>{
+    if(!groups[it.subject]) groups[it.subject] = [];
+    groups[it.subject].push(it);
+  });
+  const subjectNames = Object.keys(groups);
+
+  const wrap = document.getElementById('readingListWrap');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty-state"><span class="emoji">📖</span>ยังไม่มีหัวข้อในตัวกรองนี้ ลองเพิ่มหรือปรับตัวกรองดูนะ</div>`;
+    return;
+  }
+  const statusMeta = {red:{icon:'🔴',cls:'status-red'}, yellow:{icon:'🟡',cls:'status-yellow'}, green:{icon:'🟢',cls:'status-green'}};
+  wrap.innerHTML = subjectNames.map(subject=>{
+    const c = subjectColor(subject);
+    const doneCount = groups[subject].filter(it=>it.status==='green').length;
+    const rows = groups[subject].map(it=>{
+      const set = state.examSets.find(e=>e.id===it.examSetId);
+      const meta = statusMeta[it.status];
+      return `<div class="read-item" style="border-left-color:${c.text};">
+        <button class="status-btn ${meta.cls}" data-cycle="${it.id}" title="กดเพื่อเปลี่ยนสถานะ">${meta.icon}</button>
+        <div class="read-info">
+          <div class="read-topic">${escapeHtml(it.topic)}</div>
+          <div class="read-meta">
+            <span>${set?escapeHtml(set.name):'-'}</span>
+            <button class="date-chip" data-schedule="${it.id}">${it.scheduledDate ? '📅 '+shortThaiDate(it.scheduledDate) : '📅 กำหนดวัน'}</button>
+          </div>
+        </div>
+        <div class="read-actions">
+          <button class="icon-btn" data-del="${it.id}">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<details class="subject-group" open>
+      <summary>${subjChip(subject)}<span class="group-count">${doneCount}/${groups[subject].length} เสร็จแล้ว</span></summary>
+      ${rows}
+    </details>`;
+  }).join('');
+
+  wrap.querySelectorAll('[data-cycle]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.cycle);
+      const order = ['red','yellow','green'];
+      const nextIdx = (order.indexOf(item.status)+1)%order.length;
+      item.status = order[nextIdx];
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true;
+        gainExp(100);
+        checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+    });
+  });
+  wrap.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.readingItems = state.readingItems.filter(r=>r.id!==btn.dataset.del);
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+    });
+  });
+  wrap.querySelectorAll('[data-schedule]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.schedule);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = item.scheduledDate || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(e){} }
+      function commit(){
+        item.scheduledDate = input.value || null;
+        saveState(); renderReadingList(); renderCalendar();
+      }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+}
+
+/* Add reading item modal */
+function openReadModal(){
+  const set = getActiveExam();
+  if(!set){
+    showToast('เพิ่มชุดสอบก่อนนะ ถึงจะเพิ่มหัวข้ออ่านได้');
+    switchView('exams');
+    return;
+  }
+  document.getElementById('readModalExamName').textContent = set.name;
+  const subSel = document.getElementById('readSubjectSelect');
+  subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
+  document.getElementById('readTopicInput').value = '';
+  document.getElementById('readScheduleDateInput').value = '';
+  document.getElementById('readModalOverlay').classList.add('active');
+}
+document.getElementById('addReadingBtn').addEventListener('click', openReadModal);
+document.getElementById('readCancelBtn').addEventListener('click', ()=>document.getElementById('readModalOverlay').classList.remove('active'));
+document.getElementById('readSaveBtn').addEventListener('click', ()=>{
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ'); return; }
+  const subject = document.getElementById('readSubjectSelect').value;
+  const topic = document.getElementById('readTopicInput').value.trim();
+  const scheduledDate = document.getElementById('readScheduleDateInput').value || null;
+  if(!topic){ showToast('ใส่ชื่อหัวข้อด้วยนะ'); return; }
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic, status:'red', expGiven:false, scheduledDate});
+  saveState();
+  document.getElementById('readModalOverlay').classList.remove('active');
+  renderReadingFilters(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+  showToast(scheduledDate ? 'เพิ่มหัวข้ออ่านและลงปฏิทินแล้ว 📖📅' : 'เพิ่มหัวข้ออ่านแล้ว 📖');
+});
+
+/* ================= STREAK RENDER ================= */
+function renderTopStreak(){
+  document.getElementById('streakCount').textContent = state.user.streak;
+}
+
+/* ================= INIT ================= */
+function init(){
+  checkStreak();
+  ensureActiveExamValid();
+  renderTopStreak();
+  renderPet();
+  renderPomo();
+  renderActiveExamArea();
+  renderCalendar();
+  renderExamSets();
+  renderReadingFilters();
+  renderReadingList();
+  setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]);
+  setInterval(()=>{ setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]); }, 45000);
+  saveState();
+}
+/* ================= NETLIFY IDENTITY (login) ================= */
+let currentUser = null;
+let saveDebounceTimer = null;
+let appInitialized = false;
+
+function showAuthGate(msg){
+  document.getElementById('authGate').classList.add('active');
+  document.getElementById('userPill').style.display = 'none';
+  document.getElementById('authStatusNote').textContent = msg || '';
+}
+function hideAuthGate(){
+  document.getElementById('authGate').classList.remove('active');
+}
+
+async function onLoggedIn(user){
+  currentUser = user;
+  hideAuthGate();
+  document.getElementById('userPill').style.display = 'flex';
+  document.getElementById('userEmailLabel').textContent = user.email || '';
+  document.getElementById('authStatusNote').textContent = 'กำลังโหลดข้อมูล...';
+  await loadRemoteData();
+  if(!appInitialized){
+    appInitialized = true;
+    init();
+  } else {
+    // re-render everything with the freshly loaded data
+    renderTopStreak(); renderPet(); renderActiveExamArea(); renderCalendar();
+    renderExamSets(); renderReadingFilters(); renderReadingList();
+  }
+}
+
+async function loadRemoteData(){
+  try{
+    const token = await currentUser.jwt();
+    const res = await fetch('/api/plan', { headers: { Authorization: 'Bearer '+token } });
+    if(res.ok){
+      const json = await res.json();
+      if(json.data){
+        state = json.data;
+        if(!state.reviewSessions) state.reviewSessions = [];
+        if(!state.ui) state.ui = {activeExamSetId:null};
+        state.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+    }
+  }catch(e){
+    console.error('โหลดข้อมูลจากคลาวด์ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทนไปก่อน', e);
+  }
+}
+
+function saveRemote(){
+  if(!currentUser) return;
+  clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(async ()=>{
+    try{
+      const token = await currentUser.jwt();
+      await fetch('/api/plan', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token },
+        body: JSON.stringify(state)
+      });
+    }catch(e){
+      console.error('บันทึกขึ้นคลาวด์ไม่สำเร็จ', e);
+    }
+  }, 800);
+}
+
+function initIdentity(){
+  if(!window.netlifyIdentity){
+    showAuthGate('โหลดระบบล็อกอินไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้งนะ');
+    return;
+  }
+  netlifyIdentity.on('init', user=>{
+    if(user) onLoggedIn(user); else showAuthGate();
+  });
+  netlifyIdentity.on('login', user=>{
+    onLoggedIn(user);
+    netlifyIdentity.close();
+  });
+  netlifyIdentity.on('logout', ()=>{
+    currentUser = null;
+    showToast('ออกจากระบบแล้ว');
+    showAuthGate();
+  });
+  netlifyIdentity.on('error', err=>{
+    console.error('Identity error', err);
+    showAuthGate('เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ');
+  });
+  netlifyIdentity.init();
+}
+document.getElementById('authLoginBtn').addEventListener('click', ()=>{
+  if(window.netlifyIdentity) netlifyIdentity.open();
+});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if(window.netlifyIdentity) netlifyIdentity.logout();
+});
+
+initIdentity();
+</script>
+</body>
+</html>
