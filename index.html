@@ -542,7 +542,7 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
   </div>
 </div>
 
-<div class="modal-overlay active" id="authGate" style="z-index:500;">
+<div class="modal-overlay active" id="authGate" style="z-index:60;">
   <div class="modal-box auth-gate-box">
     <span class="emoji">🧋🔐</span>
     <div class="modal-title">เข้าสู่ระบบก่อนเริ่มอ่านกันนะ</div>
@@ -1496,12 +1496,23 @@ function initIdentity(){
   });
   netlifyIdentity.on('error', err=>{
     console.error('Identity error', err);
+    document.getElementById('authGate').style.display = '';
     showAuthGate('เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ');
+  });
+  netlifyIdentity.on('close', ()=>{
+    // widget popup closed — if still not logged in, bring our gate card back in front
+    document.getElementById('authGate').style.display = '';
+    if(!currentUser) showAuthGate();
   });
   netlifyIdentity.init();
 }
 document.getElementById('authLoginBtn').addEventListener('click', ()=>{
-  if(window.netlifyIdentity) netlifyIdentity.open();
+  if(window.netlifyIdentity){
+    // hide our own gate card while the Netlify widget popup is open so it doesn't
+    // sit on top of / block the widget's login form
+    document.getElementById('authGate').style.display = 'none';
+    netlifyIdentity.open();
+  }
 });
 document.getElementById('logoutBtn').addEventListener('click', ()=>{
   if(window.netlifyIdentity) netlifyIdentity.logout();
