@@ -315,13 +315,18 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .day-scheduled-row.review-row{background:var(--cream-2);border-radius:12px;padding:8px 10px;border-bottom:none;margin-bottom:6px;}
 .day-empty-note{font-size:12.5px;color:var(--brown-soft);padding:4px 0 10px;}
 .no-active-exam-msg{text-align:center;font-size:13px;color:var(--brown-soft);padding:10px 0;}
+.subject-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+.subject-row input[type=text]{flex:1.3;min-width:0;}
+.subject-row input[type=date]{flex:1.1;min-width:0;}
+.subject-date-badge{display:inline-flex;align-items:center;gap:4px;}
 
 /* ===== BOTTOM MOBILE NAV ===== */
 .mobile-nav{display:none;}
 @media(max-width:640px){
+  body{padding-bottom:160px;}
   .mobile-nav{
     display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;
-    box-shadow:0 -4px 16px rgba(140,108,78,0.15);padding:8px 6px;justify-content:space-around;z-index:50;
+    box-shadow:0 -4px 16px rgba(140,108,78,0.15);padding:8px 6px 56px;justify-content:space-around;z-index:50;
   }
   .mobile-nav button{background:none;display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--brown-soft);gap:2px;font-weight:600;padding:4px;}
   .mobile-nav button.active{color:var(--brown-text);}
@@ -329,7 +334,7 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
   nav.tabbar{display:none;}
   .dash-grid{grid-template-columns:1fr;}
 }
-.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--brown-text);color:#fff8f0;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;text-align:center;}
+.toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:var(--brown-text);color:#fff8f0;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;text-align:center;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-8px);}
 @media(min-width:641px){.toast{bottom:24px;}}
 </style>
@@ -481,9 +486,13 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 <div class="modal-overlay" id="examModalOverlay">
   <div class="modal-box">
     <div class="modal-title" id="examModalTitle">➕ เพิ่มชุดสอบ</div>
-    <div class="form-group"><label>ชื่อชุดสอบ</label><input type="text" id="examNameInput" placeholder="เช่น สอบปลายภาค"></div>
-    <div class="form-group"><label>วันที่สอบ</label><input type="date" id="examDateInput"></div>
-    <div class="form-group"><label>รายวิชา (คั่นด้วยเครื่องหมายจุลภาค ,)</label><textarea id="examSubjectsInput" placeholder="เช่น Neuro, Manipulation, Pharmacology"></textarea></div>
+    <div class="form-group"><label>ชื่อชุดสอบ</label><input type="text" id="examNameInput" placeholder="เช่น สอบกลางภาค"></div>
+    <div class="form-group">
+      <label>รายวิชา + วันสอบของแต่ละวิชา</label>
+      <div class="hint-text" style="margin:-2px 0 8px;">แต่ละวิชาสอบคนละวันได้ ใส่วันของใครของมันเลย</div>
+      <div id="examSubjectRows"></div>
+      <button type="button" class="btn btn-soft" id="addSubjectRowBtn" style="width:100%;">+ เพิ่มวิชา</button>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-soft" id="examCancelBtn">ยกเลิก</button>
       <button class="btn btn-primary" id="examSaveBtn">บันทึก</button>
@@ -559,6 +568,22 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 const STORAGE_KEY = 'studyPlannerPro_v3';
 let state = loadState();
 
+function normalizeExamSets(examSets){
+  // migrates old shape { examDate: "YYYY-MM-DD", subjects: ["A","B"] }
+  // into the new per-subject shape { subjects: [{name, examDate}] }
+  return (examSets||[]).map(set=>{
+    if(set.subjects && set.subjects.length>0 && typeof set.subjects[0] === 'object'){
+      return set; // already new format
+    }
+    const fallbackDate = set.examDate || '';
+    const subjects = (set.subjects||[]).map(name=>({name, examDate:fallbackDate}));
+    const copy = Object.assign({}, set);
+    delete copy.examDate;
+    copy.subjects = subjects;
+    return copy;
+  });
+}
+
 function loadState(){
   const raw = localStorage.getItem(STORAGE_KEY);
   if(raw){
@@ -568,6 +593,7 @@ function loadState(){
       if(!s.ui) s.ui = {activeExamSetId:null};
       if(s.ui.activeExamSetId===undefined) s.ui.activeExamSetId = null;
       if(!s.reviewSessions) s.reviewSessions = [];
+      s.examSets = normalizeExamSets(s.examSets);
       return s;
     }catch(e){ /* fallthrough */ }
   }
@@ -580,6 +606,7 @@ function loadState(){
       old.settings = old.settings || {pomoWork:25,pomoBreak:5};
       old.ui = {activeExamSetId: (old.ui && old.ui.selectedDdayExam) || (old.examSets[0] && old.examSets[0].id) || null};
       old.reviewSessions = [];
+      old.examSets = normalizeExamSets(old.examSets);
       return old;
     }catch(e){}
   }
@@ -940,34 +967,63 @@ function renderDdayContent(){
   const content = document.getElementById('ddayContent');
   const set = getActiveExam();
   if(!set){ content.innerHTML=''; return; }
+  if(set.subjects.length===0){
+    content.innerHTML = `<div class="hint-text" style="text-align:center;padding:10px 0;">ยังไม่มีวิชาในชุดสอบนี้ ไปเพิ่มที่แท็บ "ชุดสอบ" ก่อนนะ</div>`;
+    return;
+  }
   const today = new Date(); today.setHours(0,0,0,0);
-  const examDate = new Date(set.examDate+'T00:00:00');
-  const diffDays = Math.ceil((examDate-today)/86400000);
-  const items = state.readingItems.filter(r=>r.examSetId===set.id);
-  const remaining = items.filter(r=>r.status!=='green').length;
 
-  let ddayLabel, adviceText;
-  if(diffDays > 0){
-    ddayLabel = `D-${diffDays}`;
-    if(remaining===0){
-      adviceText = '🎉 อ่านครบทุกหัวข้อแล้ว! ทบทวนเบาๆ รอวันสอบได้เลย';
-    } else {
-      const perDay = Math.ceil(remaining/diffDays);
-      adviceText = `ต้องอ่านให้ได้วันละ ~${perDay} หัวข้อ ถึงจะครบทันสอบ 💪`;
+  const rows = set.subjects.map(s=>{
+    const items = state.readingItems.filter(r=>r.examSetId===set.id && r.subject===s.name);
+    const remaining = items.filter(r=>r.status!=='green').length;
+    let diffDays = null;
+    if(s.examDate){
+      const examDate = new Date(s.examDate+'T00:00:00');
+      diffDays = Math.ceil((examDate-today)/86400000);
     }
-  } else if(diffDays === 0){
+    return { name:s.name, examDate:s.examDate, diffDays, remaining };
+  });
+  // soonest exam first; subjects with no date go last
+  rows.sort((a,b)=>{
+    if(a.diffDays===null) return 1;
+    if(b.diffDays===null) return -1;
+    return a.diffDays-b.diffDays;
+  });
+
+  const nearest = rows[0];
+  let ddayLabel, adviceText;
+  if(nearest.diffDays===null){
+    ddayLabel = '—';
+    adviceText = `ยังไม่ได้กำหนดวันสอบ "${escapeHtml(nearest.name)}" ไปกำหนดที่แท็บชุดสอบได้เลย`;
+  } else if(nearest.diffDays > 0){
+    ddayLabel = `D-${nearest.diffDays}`;
+    adviceText = nearest.remaining===0
+      ? `🎉 "${escapeHtml(nearest.name)}" อ่านครบแล้ว! ทบทวนเบาๆ รอสอบได้เลย`
+      : `"${escapeHtml(nearest.name)}" ต้องอ่านวันละ ~${Math.ceil(nearest.remaining/nearest.diffDays)} หัวข้อ ถึงจะครบทันสอบ 💪`;
+  } else if(nearest.diffDays === 0){
     ddayLabel = 'วันนี้!';
-    adviceText = remaining>0 ? `เหลืออีก ${remaining} หัวข้อ ทบทวนรอบสุดท้ายสู้ๆ!` : 'พร้อมลุยเต็มที่ สู้ๆนะ! 🌟';
+    adviceText = nearest.remaining>0 ? `"${escapeHtml(nearest.name)}" เหลืออีก ${nearest.remaining} หัวข้อ ทบทวนรอบสุดท้ายสู้ๆ!` : `พร้อมสอบ "${escapeHtml(nearest.name)}" เต็มที่ สู้ๆนะ! 🌟`;
   } else {
     ddayLabel = 'ผ่านไปแล้ว';
-    adviceText = 'สอบชุดนี้ผ่านไปแล้วนะ เก่งมากที่ผ่านมาได้! 🎊';
+    adviceText = `"${escapeHtml(nearest.name)}" สอบผ่านไปแล้ว เก่งมาก! 🎊`;
   }
+
+  const listHtml = rows.map(r=>{
+    const c = subjectColor(r.name);
+    const dLabel = r.diffDays===null ? 'ยังไม่กำหนด' : (r.diffDays>0 ? `D-${r.diffDays}` : (r.diffDays===0 ? 'วันนี้!' : 'ผ่านไปแล้ว'));
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--cream-2);font-size:12.5px;">
+      <span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(r.name)}</span>
+      <span style="color:var(--brown-soft);font-weight:600;">${dLabel} · เหลือ ${r.remaining} หัวข้อ</span>
+    </div>`;
+  }).join('');
+
   content.innerHTML = `
     <div class="dday-grid">
-      <div class="dday-box"><div class="dday-num">${ddayLabel}</div><div class="dday-label">นับถอยหลัง</div></div>
-      <div class="dday-box"><div class="dday-num">${remaining}</div><div class="dday-label">หัวข้อที่เหลือ</div></div>
+      <div class="dday-box"><div class="dday-num">${ddayLabel}</div><div class="dday-label">ใกล้สุด: ${escapeHtml(nearest.name)}</div></div>
+      <div class="dday-box"><div class="dday-num">${rows.reduce((sum,r)=>sum+r.remaining,0)}</div><div class="dday-label">หัวข้อที่เหลือทั้งหมด</div></div>
     </div>
     <div class="dday-advice">${adviceText}</div>
+    ${rows.length>1 ? `<div style="margin-top:12px;">${listHtml}</div>` : ''}
   `;
 }
 
@@ -978,9 +1034,20 @@ let currentDayModalDate = null;
 
 function dateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
 
+// flat list of every {examSetId, examSetName, subject, examDate} pair across all exam sets
+function allSubjectExamDates(){
+  const out = [];
+  state.examSets.forEach(set=>{
+    set.subjects.forEach(s=>{
+      if(s.examDate) out.push({examSetId:set.id, examSetName:set.name, subject:s.name, examDate:s.examDate});
+    });
+  });
+  return out;
+}
+
 function renderCalLegend(){
   const set = getActiveExam();
-  const subjects = set ? set.subjects : [...new Set(state.examSets.flatMap(e=>e.subjects))];
+  const subjects = set ? set.subjects.map(s=>s.name) : [...new Set(state.examSets.flatMap(e=>e.subjects.map(s=>s.name)))];
   const legend = document.getElementById('calLegend');
   let html = subjects.map(s=>subjChip(s)).join('');
   html += `<span class="legend-note"><span class="subj-dot" style="background:var(--milktea-dark);"></span>🔁 ทบทวน · 📝 วันสอบ</span>`;
@@ -1009,7 +1076,7 @@ function renderCalendar(){
   for(let d=1; d<=daysInMonth; d++){
     const key = dateKey(y,m,d);
     const isToday = key === todayKey;
-    const examDayMarkers = state.examSets.filter(e=>e.examDate===key);
+    const examDayMarkers = allSubjectExamDates().filter(m=>m.examDate===key);
     const combined = dayItemsCombined(key);
     let taskHtml = combined.slice(0,2).map(it=>{
       if(it.type==='topic'){
@@ -1019,7 +1086,7 @@ function renderCalendar(){
       return `<div class="cal-task-dot review ${it.done?'done':''}">🔁 ${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
     }).join('');
     if(combined.length>2) taskHtml += `<div class="cal-more">+${combined.length-2} เพิ่มเติม</div>`;
-    const examBadgeHtml = examDayMarkers.length ? `<div class="cal-exam-badge">📝 ${examDayMarkers.map(e=>escapeHtml(e.name)).join(', ')}</div>` : '';
+    const examBadgeHtml = examDayMarkers.length ? `<div class="cal-exam-badge">📝 ${examDayMarkers.map(m=>escapeHtml(m.subject)).join(', ')}</div>` : '';
     html += `<div class="cal-cell ${isToday?'today':''} ${examDayMarkers.length?'examday':''}" data-key="${key}">
       <div class="cal-daynum">${d}</div>
       ${examBadgeHtml}
@@ -1049,10 +1116,10 @@ function openDayModal(key){
   document.getElementById('dayModalOverlay').classList.add('active');
 }
 function renderDayExamInfo(){
-  const markers = state.examSets.filter(e=>e.examDate===currentDayModalDate);
+  const markers = allSubjectExamDates().filter(m=>m.examDate===currentDayModalDate);
   const el = document.getElementById('dayExamInfo');
   if(markers.length===0){ el.innerHTML=''; return; }
-  el.innerHTML = markers.map(e=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(e.name)}</div>`).join('');
+  el.innerHTML = markers.map(m=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(m.subject)} (${escapeHtml(m.examSetName)})</div>`).join('');
 }
 function renderDayReviewList(){
   const items = state.reviewSessions.filter(r=>r.date===currentDayModalDate);
@@ -1129,7 +1196,7 @@ function renderDayScheduled(){
 function populateDaySubjectSelect(){
   const set = getActiveExam();
   const subSel = document.getElementById('daySubjectSelect');
-  subSel.innerHTML = (set?.subjects||[]).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('') || '<option value="ทั่วไป">ทั่วไป</option>';
+  subSel.innerHTML = (set?.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || '<option value="ทั่วไป">ทั่วไป</option>';
   populateDayTopicChips();
 }
 function populateDayTopicChips(){
@@ -1185,28 +1252,55 @@ document.getElementById('dayCloseBtn').addEventListener('click', ()=>{
 
 /* ================= EXAM SETS ================= */
 let editingExamId = null;
+function addSubjectRow(name, date){
+  const wrap = document.getElementById('examSubjectRows');
+  const row = document.createElement('div');
+  row.className = 'subject-row';
+  row.innerHTML = `
+    <input type="text" class="subj-name-input" placeholder="ชื่อวิชา" value="${escapeHtml(name||'')}">
+    <input type="date" class="subj-date-input" value="${date||''}">
+    <button type="button" class="icon-btn" data-remove-row>✕</button>
+  `;
+  row.querySelector('[data-remove-row]').addEventListener('click', ()=> row.remove());
+  wrap.appendChild(row);
+}
+document.getElementById('addSubjectRowBtn').addEventListener('click', ()=> addSubjectRow('',''));
+
 function openExamModal(id){
   editingExamId = id || null;
   const set = id ? state.examSets.find(e=>e.id===id) : null;
   document.getElementById('examModalTitle').textContent = id ? '✏️ แก้ไขชุดสอบ' : '➕ เพิ่มชุดสอบ';
   document.getElementById('examNameInput').value = set ? set.name : '';
-  document.getElementById('examDateInput').value = set ? set.examDate : '';
-  document.getElementById('examSubjectsInput').value = set ? set.subjects.join(', ') : '';
+  document.getElementById('examSubjectRows').innerHTML = '';
+  if(set && set.subjects.length>0){
+    set.subjects.forEach(s=> addSubjectRow(s.name, s.examDate));
+  } else {
+    addSubjectRow('', '');
+  }
   document.getElementById('examModalOverlay').classList.add('active');
 }
 document.getElementById('examCancelBtn').addEventListener('click', ()=>document.getElementById('examModalOverlay').classList.remove('active'));
 document.getElementById('examSaveBtn').addEventListener('click', ()=>{
   const name = document.getElementById('examNameInput').value.trim();
-  const examDate = document.getElementById('examDateInput').value;
-  const subjects = document.getElementById('examSubjectsInput').value.split(',').map(s=>s.trim()).filter(Boolean);
-  if(!name || !examDate){ showToast('ใส่ชื่อและวันสอบด้วยนะ'); return; }
+  const rows = document.querySelectorAll('#examSubjectRows .subject-row');
+  const subjects = [];
+  rows.forEach(row=>{
+    const nm = row.querySelector('.subj-name-input').value.trim();
+    const dt = row.querySelector('.subj-date-input').value || '';
+    if(nm) subjects.push({name:nm, examDate:dt});
+  });
+  if(!name || subjects.length===0){ showToast('ใส่ชื่อชุดสอบ และอย่างน้อย 1 วิชาด้วยนะ'); return; }
   let newId = null;
   if(editingExamId){
     const set = state.examSets.find(e=>e.id===editingExamId);
-    set.name=name; set.examDate=examDate; set.subjects=subjects;
+    const oldNames = set.subjects.map(s=>s.name);
+    const newNames = subjects.map(s=>s.name);
+    // if a subject's name disappeared from the list, drop its reading items' link cleanly? keep items but they'll just show under the old subject name still — safest is to leave readingItems untouched (they store subject as a plain string)
+    set.name = name;
+    set.subjects = subjects;
   } else {
     newId = uid();
-    state.examSets.push({id:newId, name, examDate, subjects});
+    state.examSets.push({id:newId, name, subjects});
   }
   if(!state.ui.activeExamSetId && newId) state.ui.activeExamSetId = newId;
   saveState();
@@ -1228,12 +1322,26 @@ function examProgress(examId){
   const done = items.filter(r=>r.status==='green').length;
   return Math.round((done/items.length)*100);
 }
+function updateSubjectDate(examSetId, subjectName, newDate){
+  const set = state.examSets.find(e=>e.id===examSetId);
+  if(!set) return;
+  const subj = set.subjects.find(s=>s.name===subjectName);
+  if(subj){ subj.examDate = newDate || ''; saveState(); }
+}
 function renderExamSets(){
   const grid = document.getElementById('examGrid');
   let html = state.examSets.map(set=>{
     const pct = examProgress(set.id);
     const itemCount = state.readingItems.filter(r=>r.examSetId===set.id).length;
     const isActive = set.id === state.ui.activeExamSetId;
+    const subjectRows = set.subjects.map(s=>{
+      const c = subjectColor(s.name);
+      const dateLabel = s.examDate ? formatThaiDate(s.examDate) : 'ยังไม่กำหนดวัน';
+      return `<div class="subject-date-badge">
+        <span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(s.name)}</span>
+        <button class="date-chip" data-subj-date="${set.id}|${escapeHtml(s.name)}">📅 ${dateLabel}</button>
+      </div>`;
+    }).join('') || '<span class="hint-text">ยังไม่มีวิชา</span>';
     return `<div class="exam-card ${isActive?'is-active':''}" data-select="${set.id}">
       ${isActive?'<span class="active-ribbon">🎯 ใช้งานอยู่</span>':''}
       <div class="edit-x">
@@ -1241,9 +1349,8 @@ function renderExamSets(){
         <button class="icon-btn" data-del="${set.id}">✕</button>
       </div>
       <div class="exam-name" style="margin-top:${isActive?'16px':'2px'};">${escapeHtml(set.name)}</div>
-      <div class="exam-date">📅 สอบวันที่ ${formatThaiDate(set.examDate)}</div>
-      <div class="exam-tags">${set.subjects.map(s=>subjChip(s)).join('') || '<span class="hint-text">ยังไม่มีวิชา</span>'}</div>
-      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="exam-tags" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:8px;">${subjectRows}</div>
+      <div class="progress-track" style="margin-top:10px;"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="progress-txt">${pct}% (${itemCount} หัวข้อ)</div>
     </div>`;
   }).join('');
@@ -1251,7 +1358,7 @@ function renderExamSets(){
   grid.innerHTML = html;
   grid.querySelectorAll('[data-select]').forEach(cardEl=>{
     cardEl.addEventListener('click', (e)=>{
-      if(e.target.closest('[data-edit]') || e.target.closest('[data-del]')) return;
+      if(e.target.closest('[data-edit]') || e.target.closest('[data-del]') || e.target.closest('[data-subj-date]')) return;
       setActiveExam(cardEl.dataset.select);
       renderReadingFilters(); renderCalendar();
       showToast('ตั้งเป็นชุดสอบที่ใช้งานอยู่แล้ว 🎯');
@@ -1259,6 +1366,26 @@ function renderExamSets(){
   });
   grid.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); openExamModal(b.dataset.edit); }));
   grid.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); deleteExam(b.dataset.del); }));
+  grid.querySelectorAll('[data-subj-date]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const [examSetId, subjectName] = btn.dataset.subjDate.split('|');
+      const set = state.examSets.find(x=>x.id===examSetId);
+      const subj = set.subjects.find(s=>s.name===subjectName);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = subj.examDate || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){
+        updateSubjectDate(examSetId, subjectName, input.value);
+        renderExamSets(); renderActiveExamArea(); renderCalendar();
+      }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
   document.getElementById('addExamCard').addEventListener('click', ()=>openExamModal(null));
 }
 
@@ -1368,7 +1495,7 @@ function openReadModal(){
   }
   document.getElementById('readModalExamName').textContent = set.name;
   const subSel = document.getElementById('readSubjectSelect');
-  subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
+  subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
   document.getElementById('readTopicInput').value = '';
   document.getElementById('readScheduleDateInput').value = '';
   document.getElementById('readModalOverlay').classList.add('active');
@@ -1452,6 +1579,7 @@ async function loadRemoteData(){
         if(!state.reviewSessions) state.reviewSessions = [];
         if(!state.ui) state.ui = {activeExamSetId:null};
         state.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+        state.examSets = normalizeExamSets(state.examSets);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
     }
