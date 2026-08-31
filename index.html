@@ -10,23 +10,23 @@
 <style>
 :root{
   --cream:#FFF8F0;
-  --cream-2:#FFF1E3;
-  --milktea:#C9A882;
-  --milktea-dark:#8A6C4E;
-  --brown-text:#5C4433;
-  --brown-soft:#7A6152;
-  --pink:#FFD6E8;
-  --pink-deep:#FFAFC7;
-  --mint:#C9F0E0;
-  --mint-deep:#9BE0C4;
-  --lavender:#E4D9F9;
-  --lavender-deep:#CBB6F0;
-  --coral:#FFB4A8;
-  --red-status:#FF9E9E;
-  --yellow-status:#FFD98A;
-  --green-status:#9BE0C4;
-  --shadow: 0 8px 24px rgba(140,108,78,0.14);
-  --shadow-sm: 0 3px 10px rgba(140,108,78,0.10);
+  --cream-2:#F5E8D8;
+  --milktea:#B98D5E;
+  --milktea-dark:#6B4226;
+  --brown-text:#4A2F1C;
+  --brown-soft:#8A6647;
+  --pink:#EAD2B4;
+  --pink-deep:#D7A876;
+  --mint:#E4D0AC;
+  --mint-deep:#C9A876;
+  --lavender:#E6D3B8;
+  --lavender-deep:#BD8F5E;
+  --coral:#C98452;
+  --red-status:#E3A38A;
+  --yellow-status:#E8C98F;
+  --green-status:#B9C896;
+  --shadow: 0 8px 24px rgba(90,60,30,0.16);
+  --shadow-sm: 0 3px 10px rgba(90,60,30,0.12);
   --radius-lg: 28px;
   --radius-md: 20px;
   --radius-sm: 14px;
@@ -36,9 +36,9 @@ html,body{margin:0;padding:0;}
 body{
   font-family:'Sarabun',sans-serif;
   background:
-    radial-gradient(circle at 8% 10%, rgba(255,214,232,0.55), transparent 40%),
-    radial-gradient(circle at 92% 15%, rgba(201,240,224,0.55), transparent 40%),
-    radial-gradient(circle at 50% 95%, rgba(228,217,249,0.5), transparent 45%),
+    radial-gradient(circle at 8% 10%, rgba(215,168,118,0.30), transparent 40%),
+    radial-gradient(circle at 92% 15%, rgba(233,208,172,0.45), transparent 40%),
+    radial-gradient(circle at 50% 95%, rgba(201,168,118,0.30), transparent 45%),
     var(--cream);
   color:var(--brown-text);
   min-height:100vh;
@@ -49,29 +49,18 @@ h1,h2,h3,.font-display{font-family:'Mali',cursive;}
 button{font-family:'Sarabun',sans-serif;cursor:pointer;border:none;}
 input,select,textarea{font-family:'Sarabun',sans-serif;}
 
-/* ===== FLOATING BG DECOR ===== */
 .bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.bg-decor span{position:absolute;opacity:0.4;animation:floatY 9s ease-in-out infinite;filter:drop-shadow(0 2px 4px rgba(140,108,78,0.08));}
+.bg-decor span{position:absolute;opacity:0.4;animation:floatY 9s ease-in-out infinite;filter:drop-shadow(0 2px 4px rgba(90,60,30,0.1));}
 @keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(10deg);}}
-header.topbar, nav.tabbar, main, .mobile-nav, .modal-overlay, .toast{position:relative;z-index:1;}
+header.topbar, nav.tabbar, main, .mobile-nav, .modal-overlay, .toast, .quick-add-fab{position:relative;z-index:1;}
 
-/* ===== HEADER ===== */
-header.topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 20px 10px;
-  max-width:1100px;margin:0 auto;
-}
+header.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px;max-width:1100px;margin:0 auto;}
 .brand{display:flex;align-items:center;gap:10px;}
 .brand-emoji{font-size:28px;display:inline-block;animation:wiggle 3.4s ease-in-out infinite;}
 @keyframes wiggle{0%,100%{transform:rotate(-6deg);}50%{transform:rotate(8deg);}}
 .brand-title{font-family:'Mali',cursive;font-weight:700;font-size:20px;color:var(--milktea-dark);}
 .brand-sub{font-size:11px;color:var(--brown-soft);margin-top:-2px;}
-.streak-pill{
-  display:flex;align-items:center;gap:6px;
-  background:linear-gradient(135deg,var(--pink),var(--coral));
-  padding:7px 14px;border-radius:999px;font-weight:600;font-size:13px;
-  box-shadow:var(--shadow-sm); color:var(--brown-text);
-}
+.streak-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--pink-deep),var(--coral));padding:7px 14px;border-radius:999px;font-weight:600;font-size:13px;box-shadow:var(--shadow-sm);color:#3A2412;}
 .header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
 .user-pill{display:none;align-items:center;gap:8px;background:#fff;padding:5px 6px 5px 12px;border-radius:999px;box-shadow:var(--shadow-sm);font-size:12px;font-weight:600;color:var(--brown-soft);}
 .user-pill .user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -80,16 +69,8 @@ header.topbar{
 .auth-gate-box p{font-size:13px;color:var(--brown-soft);margin:8px 0 18px;}
 .sync-note{font-size:10.5px;color:var(--brown-soft);text-align:center;margin-top:10px;}
 
-/* ===== NAV TABS ===== */
-nav.tabbar{
-  max-width:1100px;margin:6px auto 18px;padding:0 20px;
-  display:flex;gap:8px;flex-wrap:wrap;
-}
-.tab-btn{
-  background:rgba(255,255,255,0.6);
-  padding:9px 16px;border-radius:999px;font-weight:600;font-size:13.5px;
-  color:var(--brown-soft); transition:all .2s ease; border:2px solid transparent;
-}
+nav.tabbar{max-width:1100px;margin:6px auto 18px;padding:0 20px;display:flex;gap:8px;flex-wrap:wrap;}
+.tab-btn{background:rgba(255,255,255,0.6);padding:9px 16px;border-radius:999px;font-weight:600;font-size:13.5px;color:var(--brown-soft);transition:all .2s ease;border:2px solid transparent;}
 .tab-btn.active{background:var(--brown-text);color:#fff8f0;box-shadow:var(--shadow-sm);}
 .tab-btn:not(.active):hover{border-color:var(--milktea);}
 
@@ -98,63 +79,50 @@ main{max-width:1100px;margin:0 auto;padding:0 20px;}
 .view.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-.card{
-  background:#fff;border-radius:var(--radius-md);
-  padding:20px; box-shadow:var(--shadow-sm);
-  border:1px solid rgba(140,108,78,0.06);
-  margin-bottom:18px;
-}
+.card{background:#fff;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border:1px solid rgba(90,60,30,0.08);margin-bottom:18px;}
 
-/* ===== ACTIVE EXAM BAR (single global control — replaces repeated exam pickers) ===== */
 .active-exam-card{background:linear-gradient(135deg,#fff, var(--cream-2));}
 .active-exam-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px;}
 .active-exam-label{font-size:12px;font-weight:700;color:var(--brown-soft);display:flex;align-items:center;gap:5px;}
 .active-exam-select{flex:1;min-width:160px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;color:var(--brown-text);font-size:14px;font-weight:600;font-family:'Mali',cursive;}
 .hint-text{font-size:11.5px;color:var(--brown-soft);margin-top:4px;}
 
-/* Onboarding */
 .onboard-card{text-align:center;padding:34px 20px;background:linear-gradient(160deg,var(--pink),var(--lavender));}
 .onboard-card .emoji{font-size:44px;animation:petBounce 2.4s ease-in-out infinite;display:block;margin-bottom:8px;}
 .onboard-card h3{font-family:'Mali',cursive;margin:0 0 6px;}
 .onboard-card p{font-size:13px;color:var(--brown-soft);margin:0 0 16px;}
 
-/* ===== DASHBOARD GRID ===== */
+/* Today panel */
+.today-card{background:linear-gradient(155deg,#fff,var(--cream-2));}
+.today-empty{text-align:center;padding:20px 10px;color:var(--brown-soft);font-size:13px;}
+.today-empty .emoji{font-size:34px;display:block;margin-bottom:6px;}
+.today-group-title{font-size:12.5px;font-weight:700;color:var(--brown-soft);margin:12px 0 6px;display:flex;align-items:center;gap:6px;}
+.today-group-title:first-child{margin-top:0;}
+.today-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--cream-2);}
+.today-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--milktea-dark);flex-shrink:0;}
+.today-row-text{flex:1;font-size:13.5px;font-weight:600;}
+.today-row-text.done{text-decoration:line-through;opacity:.5;}
+.deadline-banner{background:var(--red-status);color:#4A2010;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+
 .dash-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;}
 @media(max-width:840px){.dash-grid{grid-template-columns:1fr;}}
 
-/* Pet card */
-.pet-card{
-  background:linear-gradient(160deg,var(--pink) 0%, var(--lavender) 55%, var(--mint) 100%);
-  border-radius:var(--radius-lg);
-  padding:24px; text-align:center; position:relative; overflow:hidden;
-  box-shadow:var(--shadow); margin-bottom:0;
-}
-.pet-card::before,.pet-card::after{
-  content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);
-}
+.pet-card{background:linear-gradient(160deg,var(--pink) 0%, var(--lavender) 55%, var(--mint) 100%);border-radius:var(--radius-lg);padding:24px;text-align:center;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:0;}
+.pet-card::before,.pet-card::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);}
 .pet-card::before{width:120px;height:120px;top:-40px;left:-30px;}
 .pet-card::after{width:80px;height:80px;bottom:-20px;right:-10px;}
 .sparkle{position:absolute;font-size:15px;opacity:.8;animation:twinkle 2.4s ease-in-out infinite;z-index:1;}
 @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
-.level-badge{
-  display:inline-block;background:rgba(255,255,255,0.75);color:var(--milktea-dark);
-  font-weight:700;font-size:12.5px;padding:4px 12px;border-radius:999px;margin-bottom:10px;
-  font-family:'Mali',cursive; position:relative; z-index:1;
-}
+.level-badge{display:inline-block;background:rgba(255,255,255,0.75);color:var(--milktea-dark);font-weight:700;font-size:12.5px;padding:4px 12px;border-radius:999px;margin-bottom:10px;font-family:'Mali',cursive;position:relative;z-index:1;}
 .pet-stage{position:relative;z-index:1;width:150px;height:150px;margin:0 auto 8px;animation:petBounce 2.6s ease-in-out infinite;}
 @keyframes petBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
 .pet-name{font-family:'Mali',cursive;font-weight:700;font-size:19px;color:var(--brown-text);position:relative;z-index:1;}
-.pet-speech{
-  background:#fff;border-radius:16px;padding:10px 16px;margin:10px auto 4px;
-  max-width:280px;font-size:13.5px;color:var(--brown-soft);position:relative;box-shadow:var(--shadow-sm);
-  min-height:20px; z-index:1;
-}
+.pet-speech{background:#fff;border-radius:16px;padding:10px 16px;margin:10px auto 4px;max-width:280px;font-size:13.5px;color:var(--brown-soft);position:relative;box-shadow:var(--shadow-sm);min-height:20px;z-index:1;}
 .exp-bar-wrap{margin-top:14px;position:relative;z-index:1;}
 .exp-bar-bg{background:rgba(255,255,255,0.6);border-radius:999px;height:14px;overflow:hidden;}
 .exp-bar-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--pink-deep));border-radius:999px;transition:width .5s ease;}
 .exp-label{font-size:11px;color:var(--brown-soft);margin-top:5px;font-weight:600;}
 
-/* bear css art */
 .bear{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);}
 .bear-ear{position:absolute;width:34px;height:34px;background:var(--milktea);border-radius:50%;top:-14px;}
 .bear-ear.l{left:6px;} .bear-ear.r{right:6px;}
@@ -172,14 +140,12 @@ main{max-width:1100px;margin:0 auto;padding:0 20px;}
 .bear-glasses .lens{position:absolute;width:24px;height:16px;border:2.5px solid var(--brown-text);border-radius:50%;background:rgba(255,255,255,0.4);}
 .bear-glasses .lens.l{left:0;} .bear-glasses .lens.r{right:0;}
 .bear-glasses .bridge{position:absolute;top:6px;left:22px;width:26px;height:2.5px;background:var(--brown-text);}
-.bear-cap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:0;height:0;
-  border-left:44px solid transparent;border-right:44px solid transparent;border-bottom:14px solid #6B4A9A;}
-.bear-cap-top{position:absolute;top:-16px;left:50%;transform:translateX(-50%) rotate(45deg);width:34px;height:34px;background:#6B4A9A;border-radius:4px;}
-.bear-cap-btn{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:#FFD98A;border-radius:50%;}
-.bear-egg{width:96px;height:118px;background:linear-gradient(160deg,#FFF3E0,#F6DFC0);border-radius:50% 50% 48% 48%/60% 60% 40% 40%;position:relative;margin:0 auto;}
+.bear-cap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:44px solid transparent;border-right:44px solid transparent;border-bottom:14px solid #6B4226;}
+.bear-cap-top{position:absolute;top:-16px;left:50%;transform:translateX(-50%) rotate(45deg);width:34px;height:34px;background:#6B4226;border-radius:4px;}
+.bear-cap-btn{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:#E8C98F;border-radius:50%;}
+.bear-egg{width:96px;height:118px;background:linear-gradient(160deg,#FFF3E0,#EBD3AC);border-radius:50% 50% 48% 48%/60% 60% 40% 40%;position:relative;margin:0 auto;}
 .bear-egg .crack{position:absolute;width:2px;height:40px;background:var(--milktea);top:20px;left:50%;transform:rotate(8deg);}
 
-/* Focus card (pomodoro + soundscape merged) */
 .focus-card{margin-bottom:0;}
 .pomo-display{font-family:'Mali',cursive;font-size:52px;font-weight:700;text-align:center;color:var(--milktea-dark);margin:6px 0 10px;letter-spacing:2px;}
 .pomo-mode{text-align:center;font-size:12.5px;font-weight:700;color:var(--brown-soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
@@ -190,7 +156,7 @@ main{max-width:1100px;margin:0 auto;padding:0 20px;}
 .btn-primary{background:var(--brown-text);color:#FFF8F0;}
 .btn-soft{background:var(--cream-2);color:var(--brown-text);border:1.5px solid var(--milktea);}
 .btn-pink{background:var(--pink);color:var(--brown-text);}
-.btn-danger{background:var(--red-status);color:#5c2323;}
+.btn-danger{background:var(--red-status);color:#4A2010;}
 details.pomo-settings-details{margin-top:12px;text-align:center;}
 details.pomo-settings-details summary{cursor:pointer;font-size:12px;color:var(--brown-soft);font-weight:700;list-style:none;display:inline-flex;align-items:center;gap:4px;}
 details.pomo-settings-details summary::-webkit-details-marker{display:none;}
@@ -204,33 +170,26 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .sound-btn .emoji{display:block;font-size:22px;margin-bottom:2px;}
 .sound-btn.active{border-color:var(--milktea-dark);background:var(--mint);}
 
-/* D-day (now lives inside the active-exam card) */
 .dday-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
 .dday-box{background:var(--cream-2);border-radius:14px;padding:12px;text-align:center;}
-.dday-num{font-family:'Mali',cursive;font-size:28px;font-weight:700;color:var(--milktea-dark);}
-.dday-label{font-size:11.5px;color:var(--brown-soft);margin-top:2px;}
+.dday-num{font-family:'Mali',cursive;font-size:26px;font-weight:700;color:var(--milktea-dark);}
+.dday-label{font-size:11px;color:var(--brown-soft);margin-top:2px;}
 .dday-advice{margin-top:10px;background:var(--lavender);border-radius:14px;padding:10px 14px;font-size:13px;text-align:center;font-weight:600;}
 
 .section-title{font-family:'Mali',cursive;font-size:18px;font-weight:700;margin:0 0 12px;color:var(--brown-text);display:flex;align-items:center;gap:8px;}
 
-/* ===== SUBJECT COLOR CHIPS (shared look = the "sync" visual language) ===== */
 .subj-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;border:none;cursor:default;}
 .subj-chip.clickable{cursor:pointer;transition:transform .12s ease;}
 .subj-chip.clickable:hover{transform:translateY(-1px);}
 .subj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 
-/* ===== CALENDAR ===== */
 .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .cal-nav-btn{background:var(--cream-2);border-radius:999px;width:34px;height:34px;font-size:16px;color:var(--brown-text);}
 .cal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;}
 .cal-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
 .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
 .cal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--brown-soft);padding-bottom:4px;}
-.cal-cell{
-  aspect-ratio:1/1; border-radius:14px; background:var(--cream-2);
-  padding:5px; display:flex;flex-direction:column;cursor:pointer; position:relative;
-  transition:transform .12s ease; border:2px solid transparent; overflow:hidden;
-}
+.cal-cell{aspect-ratio:1/1;border-radius:14px;background:var(--cream-2);padding:5px;display:flex;flex-direction:column;cursor:pointer;position:relative;transition:transform .12s ease;border:2px solid transparent;overflow:hidden;}
 .cal-cell:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--shadow-sm);}
 .cal-cell.empty{background:transparent;cursor:default;}
 .cal-cell.empty:hover{transform:none;box-shadow:none;}
@@ -242,12 +201,16 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .cal-task-dot.done{text-decoration:line-through;opacity:.5;}
 .cal-task-dot.review{background:var(--lavender);color:var(--milktea-dark);}
 .cal-more{font-size:9px;color:var(--brown-soft);font-weight:700;}
-.cal-exam-badge{background:var(--red-status);color:#7A2323;font-size:8px;font-weight:800;border-radius:6px;padding:1px 4px;margin:2px 0 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.cal-cell.examday{border-color:#E8A93A;border-style:dashed;}
+.cal-urgent-badge{background:var(--red-status);color:#4A2010;font-size:8px;font-weight:800;border-radius:6px;padding:1px 4px;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-cell.examday{border-color:#C98452;border-style:dashed;}
 .cal-cell.examday.today{border-style:solid;border-color:var(--coral);}
 .legend-note{font-size:10.5px;color:var(--brown-soft);display:inline-flex;align-items:center;gap:4px;}
 
-/* ===== EXAM SETS ===== */
+.backlog-row{display:flex;align-items:center;gap:10px;background:var(--cream-2);border-radius:14px;padding:10px 12px;margin-bottom:8px;}
+.backlog-info{flex:1;min-width:0;}
+.backlog-topic{font-weight:600;font-size:13.5px;}
+.backlog-meta{font-size:11px;color:var(--brown-soft);margin-top:2px;}
+
 .grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
 .exam-card{background:#fff;border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm);border-top:6px solid var(--lavender-deep);position:relative;transition:transform .15s ease;cursor:pointer;}
 .exam-card:hover{transform:translateY(-3px);}
@@ -257,7 +220,6 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .icon-btn{background:var(--cream-2);border-radius:999px;width:26px;height:26px;font-size:12px;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;}
 .icon-btn:hover{transform:scale(1.15);}
 .exam-name{font-family:'Mali',cursive;font-weight:700;font-size:17px;margin:2px 0 4px;}
-.exam-date{font-size:12px;color:var(--brown-soft);margin-bottom:8px;}
 .exam-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
 .progress-track{background:var(--cream-2);height:10px;border-radius:999px;overflow:hidden;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--mint-deep),var(--lavender-deep));}
@@ -265,7 +227,6 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .add-card{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed var(--milktea);border-radius:var(--radius-md);min-height:150px;color:var(--milktea-dark);font-weight:700;background:rgba(255,255,255,0.4);transition:transform .15s ease;}
 .add-card:hover{transform:translateY(-3px);}
 
-/* ===== READING LIST ===== */
 .filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
 .filter-row select{padding:8px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13px;color:var(--brown-text);}
 .subject-group{margin-bottom:14px;border-radius:16px;overflow:hidden;}
@@ -286,21 +247,30 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .read-meta{font-size:11.5px;color:var(--brown-soft);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .date-chip{background:var(--cream-2);border-radius:999px;font-size:10.5px;font-weight:700;padding:3px 9px;color:var(--brown-soft);white-space:nowrap;}
 .date-chip:hover{background:var(--mint);}
+.date-chip.deadline-chip{background:var(--red-status);color:#4A2010;}
+.date-chip.deadline-chip:hover{background:#D89078;}
 .date-chip-input{border-radius:999px;font-size:11px;padding:2px 8px;border:1.5px solid var(--milktea);}
 .read-actions{display:flex;gap:6px;}
 .empty-state{text-align:center;padding:40px 20px;color:var(--brown-soft);}
 .empty-state .emoji{font-size:40px;display:block;margin-bottom:6px;animation:petBounce 2.4s ease-in-out infinite;}
 
-/* ===== MODAL ===== */
-.modal-overlay{position:fixed;inset:0;background:rgba(92,68,51,0.35);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;backdrop-filter:blur(2px);}
+.drug-card-wrap{background:#fff;border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow-sm);border-left:5px solid var(--coral);overflow:hidden;}
+.drug-card-wrap summary{list-style:none;cursor:pointer;}
+.drug-card-wrap summary::-webkit-details-marker{display:none;}
+.drug-card-fields{padding:2px 14px 14px 60px;font-size:12.5px;}
+.drug-field{margin-bottom:8px;}
+.drug-field-label{font-weight:700;color:var(--milktea-dark);display:block;margin-bottom:2px;}
+.drug-field-value{color:var(--brown-text);white-space:pre-wrap;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(74,47,28,0.35);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;backdrop-filter:blur(2px);}
 .modal-overlay.active{display:flex;}
-.modal-box{background:#FFF8F0;border-radius:24px;padding:22px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(92,68,51,0.3);}
+.modal-box{background:#FFF8F0;border-radius:24px;padding:22px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(74,47,28,0.32);}
 .modal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;margin-bottom:14px;}
 .modal-subnote{font-size:12px;color:var(--brown-soft);margin:-8px 0 14px;}
 .form-group{margin-bottom:12px;}
 .form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--brown-soft);margin-bottom:5px;}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13.5px;color:var(--brown-text);}
-.form-group textarea{resize:vertical;min-height:50px;}
+.form-group textarea{resize:vertical;min-height:44px;}
 .modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
 .day-add-section{border-top:2px dashed var(--milktea);margin-top:6px;padding-top:14px;}
 .day-scheduled-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--cream-2);}
@@ -311,7 +281,7 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .quick-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px;}
 .quick-chip{background:var(--cream-2);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--brown-text);transition:transform .12s ease;}
 .quick-chip:hover{transform:translateY(-2px);background:var(--mint);}
-.exam-day-alert{background:var(--red-status);color:#7A2323;border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;text-align:center;}
+.exam-day-alert{background:var(--red-status);color:#4A2010;border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;text-align:center;}
 .day-scheduled-row.review-row{background:var(--cream-2);border-radius:12px;padding:8px 10px;border-bottom:none;margin-bottom:6px;}
 .day-empty-note{font-size:12.5px;color:var(--brown-soft);padding:4px 0 10px;}
 .no-active-exam-msg{text-align:center;font-size:13px;color:var(--brown-soft);padding:10px 0;}
@@ -319,34 +289,38 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 .subject-row input[type=text]{flex:1.3;min-width:0;}
 .subject-row input[type=date]{flex:1.1;min-width:0;}
 .subject-date-badge{display:inline-flex;align-items:center;gap:4px;}
+.toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.toggle-row input{width:18px;height:18px;accent-color:var(--coral);}
+.quick-add-choice{display:flex;flex-direction:column;gap:10px;}
+.quick-add-choice button{width:100%;padding:16px;font-size:15px;}
 
-/* ===== BOTTOM MOBILE NAV ===== */
+.quick-add-fab{position:fixed;right:20px;bottom:100px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--pink-deep));color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(74,47,28,0.35);z-index:80;border:none;line-height:1;}
+.quick-add-fab:active{transform:scale(.92);}
+
 .mobile-nav{display:none;}
 @media(max-width:640px){
   body{padding-bottom:160px;}
-  .mobile-nav{
-    display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;
-    box-shadow:0 -4px 16px rgba(140,108,78,0.15);padding:8px 6px 56px;justify-content:space-around;z-index:50;
-  }
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -4px 16px rgba(90,60,30,0.18);padding:8px 6px 56px;justify-content:space-around;z-index:50;}
   .mobile-nav button{background:none;display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--brown-soft);gap:2px;font-weight:600;padding:4px;}
   .mobile-nav button.active{color:var(--brown-text);}
   .mobile-nav .m-emoji{font-size:19px;}
   nav.tabbar{display:none;}
   .dash-grid{grid-template-columns:1fr;}
+  .quick-add-fab{bottom:190px;}
 }
 .toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:var(--brown-text);color:#fff8f0;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;text-align:center;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(-8px);}
-@media(min-width:641px){.toast{bottom:24px;}}
+@media(min-width:641px){.toast{bottom:24px;} .quick-add-fab{bottom:24px;}}
 </style>
 </head>
 <body>
 
 <div class="bg-decor">
-  <span style="left:4%;top:12%;font-size:22px;animation-delay:0s;">🫧</span>
+  <span style="left:4%;top:12%;font-size:22px;animation-delay:0s;">☕</span>
   <span style="left:88%;top:8%;font-size:18px;animation-delay:1.2s;">✨</span>
-  <span style="left:92%;top:60%;font-size:20px;animation-delay:2.4s;">💗</span>
+  <span style="left:92%;top:60%;font-size:20px;animation-delay:2.4s;">🤎</span>
   <span style="left:6%;top:70%;font-size:16px;animation-delay:.6s;">⭐</span>
-  <span style="left:50%;top:4%;font-size:16px;animation-delay:1.8s;">🌸</span>
+  <span style="left:50%;top:4%;font-size:16px;animation-delay:1.8s;">🍯</span>
   <span style="left:20%;top:88%;font-size:18px;animation-delay:3s;">🧋</span>
 </div>
 
@@ -378,7 +352,6 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
   <!-- DASHBOARD -->
   <div class="view active" id="view-dashboard">
 
-    <!-- Onboarding (shown only when there are zero exam sets) -->
     <div class="card onboard-card" id="onboardCard" style="display:none;">
       <span class="emoji">🧸</span>
       <h3>เริ่มต้นกันก่อนนะ!</h3>
@@ -386,7 +359,11 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
       <button class="btn btn-primary" id="onboardCreateBtn">➕ สร้างชุดสอบแรก</button>
     </div>
 
-    <!-- Active exam + D-day (single control used everywhere) -->
+    <div class="card today-card" id="todayCard">
+      <div class="section-title">🌤️ วันนี้ต้องทำอะไร</div>
+      <div id="todayContent"></div>
+    </div>
+
     <div class="card active-exam-card" id="activeExamCard" style="display:none;">
       <div class="active-exam-top">
         <span class="active-exam-label">🎯 ชุดสอบที่ใช้งานอยู่</span>
@@ -425,7 +402,6 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
             <label>พัก (นาที)<input type="number" id="pomoBreakInput" value="5" min="1" max="60"></label>
           </div>
         </details>
-
         <hr class="focus-divider">
         <div class="section-title" style="font-size:15px;">🎧 เสียงพื้นหลังช่วยสมาธิ</div>
         <div class="sound-row">
@@ -439,6 +415,11 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 
   <!-- CALENDAR -->
   <div class="view" id="view-calendar">
+    <div class="card" id="backlogCard">
+      <div class="section-title">📦 Backlog (ยังไม่ได้ลงวันอ่าน)</div>
+      <div class="hint-text" style="margin-bottom:10px;">แตะ "เลือกวันอ่าน" ที่หัวข้อไหน แล้วเลือกวัน จะไปโผล่บนปฏิทินให้เองนะ</div>
+      <div id="backlogList"></div>
+    </div>
     <div class="card" style="margin-bottom:0;">
       <div class="cal-header">
         <button class="cal-nav-btn" id="calPrev">‹</button>
@@ -475,11 +456,40 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
   </div>
 </main>
 
+<button class="quick-add-fab" id="quickAddFab" title="เพิ่มด่วน">+</button>
+
 <div class="mobile-nav">
   <button class="active" data-view="dashboard"><span class="m-emoji">🏠</span>หน้าหลัก</button>
   <button data-view="calendar"><span class="m-emoji">📅</span>ปฏิทิน</button>
   <button data-view="exams"><span class="m-emoji">📚</span>ชุดสอบ</button>
   <button data-view="reading"><span class="m-emoji">✅</span>รายการ</button>
+</div>
+
+<!-- QUICK ADD CHOICE MODAL -->
+<div class="modal-overlay" id="quickAddOverlay">
+  <div class="modal-box">
+    <div class="modal-title">⚡ เพิ่มด่วน</div>
+    <div class="quick-add-choice">
+      <button class="btn btn-primary" id="quickAddTopicBtn">📖 หัวข้ออ่าน (มีการ์ดยาได้ด้วย)</button>
+      <button class="btn btn-soft" id="quickAddReviewBtn">🔁 การทบทวน</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="quickAddCancelBtn" style="width:100%;">ปิด</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK REVIEW MODAL -->
+<div class="modal-overlay" id="quickReviewOverlay">
+  <div class="modal-box">
+    <div class="modal-title">🔁 เพิ่มการทบทวน</div>
+    <div class="form-group"><label>ชื่อการทบทวน</label><input type="text" id="quickReviewTextInput" placeholder="เช่น ทบทวน Neuro รอบ 2"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="quickReviewDateInput"></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="quickReviewCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="quickReviewSaveBtn">บันทึก</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODALS -->
@@ -506,7 +516,17 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
     <div class="modal-subnote">สำหรับชุดสอบ: <strong id="readModalExamName">-</strong></div>
     <div class="form-group"><label>วิชา</label><select id="readSubjectSelect"></select></div>
     <div class="form-group"><label>หัวข้อ</label><input type="text" id="readTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
-    <div class="form-group"><label>กำหนดวันอ่าน (ไม่บังคับ — จะโชว์บนปฏิทินให้ทันที)</label><input type="date" id="readScheduleDateInput"></div>
+    <div class="form-group"><label>🔒 Deadline (วันส่งงาน — แก้ไม่ได้)</label><input type="date" id="readDeadlineInput"></div>
+    <div class="form-group"><label>📅 วันที่วางแผนอ่าน (เลื่อนได้)</label><input type="date" id="readScheduleDateInput"></div>
+    <div class="toggle-row"><input type="checkbox" id="readIsDrugCardToggle"> 💊 นี่คือการ์ดยา (Drug Card)</div>
+    <div id="drugCardFields" style="display:none;">
+      <div class="form-group"><label>กลุ่มยา</label><input type="text" id="drugClassInput" placeholder="เช่น NSAIDs"></div>
+      <div class="form-group"><label>MOA (กลไกการออกฤทธิ์)</label><textarea id="drugMoaInput"></textarea></div>
+      <div class="form-group"><label>Indications</label><textarea id="drugIndicationsInput"></textarea></div>
+      <div class="form-group"><label>Adverse Effects</label><textarea id="drugAdverseInput"></textarea></div>
+      <div class="form-group"><label>Contraindications</label><textarea id="drugContraindicationsInput"></textarea></div>
+      <div class="form-group"><label>จุดต้องจำ</label><textarea id="drugKeyPointsInput"></textarea></div>
+    </div>
     <div class="modal-actions">
       <button class="btn btn-soft" id="readCancelBtn">ยกเลิก</button>
       <button class="btn btn-primary" id="readSaveBtn">บันทึก</button>
@@ -518,13 +538,10 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
   <div class="modal-box">
     <div class="modal-title" id="dayModalTitle">📅 รายการวันที่</div>
     <div id="dayExamInfo"></div>
-
     <div class="section-title" style="font-size:13.5px;margin:4px 0 2px;">✅ หัวข้ออ่านวันนี้</div>
     <div id="dayScheduledList"></div>
-
     <div class="section-title" style="font-size:13.5px;margin:14px 0 2px;">🔁 การทบทวนวันนี้</div>
     <div id="dayReviewList"></div>
-
     <div class="day-add-section">
       <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">➕ เพิ่มหัวข้อลงวันนี้</div>
       <div class="modal-subnote" style="margin-top:0;">ชุดสอบ: <strong id="dayModalExamName">-</strong></div>
@@ -536,14 +553,12 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
         <div class="form-group"><label>หรือพิมพ์หัวข้อใหม่</label><input type="text" id="dayNewTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
       </div>
     </div>
-
     <div class="day-add-section">
       <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">🔁 เพิ่มการทบทวน</div>
       <div class="hint-text" style="margin:-4px 0 8px;">พิมพ์ชื่ออิสระได้เลย ไม่ต้องผูกกับวิชา เช่น "ทบทวนรวมก่อนสอบ"</div>
       <div class="form-group"><input type="text" id="dayReviewInput" placeholder="เช่น ทบทวน Neuro รอบ 2"></div>
       <button class="btn btn-soft" type="button" id="dayReviewAddBtn" style="width:100%;">+ เพิ่มการทบทวน</button>
     </div>
-
     <div class="modal-actions">
       <button class="btn btn-soft" id="dayCloseBtn">ปิด</button>
       <button class="btn btn-primary" id="dayAddBtn">+ เพิ่มลงวันนี้</button>
@@ -565,15 +580,13 @@ details.pomo-settings-details summary::-webkit-details-marker{display:none;}
 
 <script>
 /* ================= STATE ================= */
-const STORAGE_KEY = 'studyPlannerPro_v3';
+const STORAGE_KEY = 'studyPlannerPro_v4';
 let state = loadState();
 
 function normalizeExamSets(examSets){
-  // migrates old shape { examDate: "YYYY-MM-DD", subjects: ["A","B"] }
-  // into the new per-subject shape { subjects: [{name, examDate}] }
   return (examSets||[]).map(set=>{
     if(set.subjects && set.subjects.length>0 && typeof set.subjects[0] === 'object'){
-      return set; // already new format
+      return set;
     }
     const fallbackDate = set.examDate || '';
     const subjects = (set.subjects||[]).map(name=>({name, examDate:fallbackDate}));
@@ -583,32 +596,32 @@ function normalizeExamSets(examSets){
     return copy;
   });
 }
+function normalizeReadingItems(items){
+  return (items||[]).map(it=>{
+    if(it.scheduledDate===undefined) it.scheduledDate = null;
+    if(it.deadline===undefined) it.deadline = null;
+    if(it.isDrugCard===undefined) it.isDrugCard = false;
+    if(it.drugCard===undefined) it.drugCard = null;
+    return it;
+  });
+}
 
 function loadState(){
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if(raw){
+  const tryKeys = [STORAGE_KEY, 'studyPlannerPro_v3', 'studyPlannerPro_v2'];
+  for(const key of tryKeys){
+    const raw = localStorage.getItem(key);
+    if(!raw) continue;
     try{
       const s = JSON.parse(raw);
-      s.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+      s.readingItems = normalizeReadingItems(s.readingItems);
       if(!s.ui) s.ui = {activeExamSetId:null};
       if(s.ui.activeExamSetId===undefined) s.ui.activeExamSetId = null;
       if(!s.reviewSessions) s.reviewSessions = [];
       s.examSets = normalizeExamSets(s.examSets);
+      s.settings = s.settings || {pomoWork:25,pomoBreak:5};
+      if(key!=='studyPlannerPro_v2' && s.ui.activeExamSetId===null && s.examSets[0]) s.ui.activeExamSetId = null;
       return s;
-    }catch(e){ /* fallthrough */ }
-  }
-  // migrate from v2
-  const v2Raw = localStorage.getItem('studyPlannerPro_v2');
-  if(v2Raw){
-    try{
-      const old = JSON.parse(v2Raw);
-      old.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
-      old.settings = old.settings || {pomoWork:25,pomoBreak:5};
-      old.ui = {activeExamSetId: (old.ui && old.ui.selectedDdayExam) || (old.examSets[0] && old.examSets[0].id) || null};
-      old.reviewSessions = [];
-      old.examSets = normalizeExamSets(old.examSets);
-      return old;
-    }catch(e){}
+    }catch(e){ /* try next */ }
   }
   return {
     user:{ exp:0, level:1, streak:0, lastActiveDate:null },
@@ -645,16 +658,16 @@ function ensureActiveExamValid(){
   }
 }
 
-/* ================= SUBJECT COLORS (shared visual language for syncing) ================= */
+/* ================= SUBJECT COLORS (warm brown palette) ================= */
 const SUBJECT_PALETTE = [
-  {bg:'#FFD6E8', text:'#9C4E72'},
-  {bg:'#C9F0E0', text:'#2E7D5B'},
-  {bg:'#E4D9F9', text:'#6B4A9A'},
-  {bg:'#FFE3B0', text:'#9C6B12'},
-  {bg:'#BFE3FF', text:'#2B6FA3'},
-  {bg:'#FFCFC2', text:'#B24B36'},
-  {bg:'#D8E9B2', text:'#5C7A29'},
-  {bg:'#F3C6E8', text:'#9C3E86'}
+  {bg:'#F0D9BE', text:'#8C5A2B'},
+  {bg:'#E8C4A0', text:'#7A4A1E'},
+  {bg:'#DCC1A1', text:'#6B4423'},
+  {bg:'#E0B8A0', text:'#7A3F26'},
+  {bg:'#F2DDB0', text:'#8A6410'},
+  {bg:'#D9B99B', text:'#5C3A1E'},
+  {bg:'#EAC9C0', text:'#7A4438'},
+  {bg:'#DDC7A8', text:'#6E4E22'}
 ];
 function subjectColor(subject){
   let hash = 0;
@@ -662,9 +675,9 @@ function subjectColor(subject){
   for(let i=0;i<str.length;i++) hash = (hash*31 + str.charCodeAt(i)) >>> 0;
   return SUBJECT_PALETTE[hash % SUBJECT_PALETTE.length];
 }
-function subjChip(subject, clickable, extraAttr){
+function subjChip(subject){
   const c = subjectColor(subject);
-  return `<span class="subj-chip ${clickable?'clickable':''}" ${extraAttr||''} style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(subject)}</span>`;
+  return `<span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(subject)}</span>`;
 }
 
 /* ================= TOAST ================= */
@@ -691,7 +704,6 @@ document.querySelectorAll('.tab-btn, .mobile-nav button').forEach(b=>{
 /* ================= EXP / LEVEL / STREAK ================= */
 function expForLevel(level){ return (level-1)*300; }
 function levelFromExp(exp){ return Math.floor(exp/300)+1; }
-
 function gainExp(amount){
   const oldLevel = state.user.level;
   state.user.exp += amount;
@@ -703,7 +715,6 @@ function gainExp(amount){
     setPetSpeech(`เย้! โตขึ้นอีกขั้นแล้วว 🎓 เก่งมากเลย!`);
   }
 }
-
 function todayStr(){
   const d = new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -723,7 +734,6 @@ function checkStreak(){
   state.user.lastActiveDate = today;
   saveState();
 }
-
 const PET_MESSAGES = [
   'สู้ๆนะ วันนี้ก็อ่านให้ครบเป้าหมายกันเถอะ 💪',
   'พักบ้างนะ แล้วค่อยลุยต่อ 🧋',
@@ -776,11 +786,7 @@ let pomoInterval = null;
 let pomoSeconds = state.settings.pomoWork*60;
 let pomoMode = 'work';
 let pomoRunning = false;
-
-function fmtTime(sec){
-  const m = Math.floor(sec/60), s = sec%60;
-  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-}
+function fmtTime(sec){ const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
 function renderPomo(){
   document.getElementById('pomoDisplay').textContent = fmtTime(pomoSeconds);
   document.getElementById('pomoMode').textContent = pomoMode==='work' ? '🎯 โฟกัส' : '☕ พักผ่อน';
@@ -820,13 +826,8 @@ function pomoTick(){
 document.getElementById('pomoStartBtn').addEventListener('click', ()=>{
   pomoRunning = !pomoRunning;
   const btn = document.getElementById('pomoStartBtn');
-  if(pomoRunning){
-    btn.textContent = '⏸ พัก';
-    pomoInterval = setInterval(pomoTick, 1000);
-  } else {
-    btn.textContent = '▶ เริ่ม';
-    clearInterval(pomoInterval);
-  }
+  if(pomoRunning){ btn.textContent = '⏸ พัก'; pomoInterval = setInterval(pomoTick, 1000); }
+  else { btn.textContent = '▶ เริ่ม'; clearInterval(pomoInterval); }
 });
 document.getElementById('pomoResetBtn').addEventListener('click', ()=>{
   clearInterval(pomoInterval); pomoRunning=false;
@@ -848,14 +849,10 @@ document.getElementById('pomoBreakInput').addEventListener('change', e=>{
 document.getElementById('pomoWorkInput').value = state.settings.pomoWork;
 document.getElementById('pomoBreakInput').value = state.settings.pomoBreak;
 
-/* ================= SOUNDSCAPES (WebAudio, no external files) ================= */
+/* ================= SOUNDSCAPES ================= */
 let audioCtx = null;
 const activeSounds = {};
-
-function getCtx(){
-  if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  return audioCtx;
-}
+function getCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
 function makeNoiseBuffer(ctx){
   const bufferSize = ctx.sampleRate*4;
   const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -863,9 +860,7 @@ function makeNoiseBuffer(ctx){
   let b0=0,b1=0,b2=0;
   for(let i=0;i<bufferSize;i++){
     const white = Math.random()*2-1;
-    b0 = 0.99*b0 + white*0.1;
-    b1 = 0.97*b1 + white*0.06;
-    b2 = white*0.02;
+    b0 = 0.99*b0 + white*0.1; b1 = 0.97*b1 + white*0.06; b2 = white*0.02;
     data[i] = b0+b1+b2;
   }
   return buffer;
@@ -878,7 +873,6 @@ function startSound(name){
   const gain = ctx.createGain();
   const filter = ctx.createBiquadFilter();
   let lfo = null, lfoGain=null;
-
   if(name==='rain'){
     filter.type='bandpass'; filter.frequency.value=2200; filter.Q.value=0.7;
     gain.gain.value = 0.16;
@@ -911,18 +905,13 @@ function stopSound(name){
 document.querySelectorAll('.sound-btn').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     const name = btn.dataset.sound;
-    if(activeSounds[name]){
-      stopSound(name); btn.classList.remove('active');
-    } else {
-      startSound(name); btn.classList.add('active');
-    }
+    if(activeSounds[name]){ stopSound(name); btn.classList.remove('active'); }
+    else { startSound(name); btn.classList.add('active'); }
   });
 });
 
 /* ================= HELPERS ================= */
-function escapeHtml(str){
-  const div = document.createElement('div'); div.textContent = str||''; return div.innerHTML;
-}
+function escapeHtml(str){ const div = document.createElement('div'); div.textContent = str||''; return div.innerHTML; }
 const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 function formatThaiDate(dateStr){
@@ -934,6 +923,97 @@ function shortThaiDate(dateStr){
   const d = new Date(dateStr+'T00:00:00');
   return `${d.getDate()} ${THAI_MONTHS_SHORT[d.getMonth()]}`;
 }
+
+/* ================= TODAY PANEL ================= */
+function renderTodayPanel(){
+  const today = todayStr();
+  const topics = state.readingItems.filter(it=>it.scheduledDate===today);
+  const reviews = state.reviewSessions.filter(r=>r.date===today);
+  const deadlinesToday = state.readingItems.filter(it=>it.deadline===today && it.scheduledDate!==today);
+  const content = document.getElementById('todayContent');
+
+  if(topics.length===0 && reviews.length===0 && deadlinesToday.length===0){
+    content.innerHTML = `<div class="today-empty"><span class="emoji">🎉</span>วันนี้ไม่มีอะไรต้องทำ พักผ่อนได้เลย!</div>`;
+    return;
+  }
+
+  let html = '';
+  if(deadlinesToday.length>0){
+    html += deadlinesToday.map(it=>`<div class="deadline-banner">🔒 ครบกำหนดส่งวันนี้: ${escapeHtml(it.topic)} (${escapeHtml(it.subject)})</div>`).join('');
+  }
+  if(topics.length>0){
+    html += `<div class="today-group-title">📖 หัวข้ออ่านวันนี้</div>`;
+    html += topics.map(it=>{
+      const lockTag = it.deadline===today ? ' 🔒' : '';
+      return `<div class="today-row">
+        <input type="checkbox" ${it.status==='green'?'checked':''} data-today-topic="${it.id}">
+        <span class="today-row-text ${it.status==='green'?'done':''}">${escapeHtml(it.topic)}${lockTag}</span>
+      </div>`;
+    }).join('');
+  }
+  if(reviews.length>0){
+    html += `<div class="today-group-title">🔁 ทบทวนวันนี้</div>`;
+    html += reviews.map(r=>`<div class="today-row">
+      <input type="checkbox" ${r.done?'checked':''} data-today-review="${r.id}">
+      <span class="today-row-text ${r.done?'done':''}">${escapeHtml(r.text)}</span>
+    </div>`).join('');
+  }
+  content.innerHTML = html;
+
+  content.querySelectorAll('[data-today-topic]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.readingItems.find(r=>r.id===cb.dataset.todayTopic);
+      item.status = cb.checked ? 'green' : 'yellow';
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderTodayPanel(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+    });
+  });
+  content.querySelectorAll('[data-today-review]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.reviewSessions.find(r=>r.id===cb.dataset.todayReview);
+      item.done = cb.checked;
+      if(item.done && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
+      }
+      saveState(); renderTodayPanel(); renderCalendar();
+    });
+  });
+}
+
+/* ================= QUICK ADD ================= */
+document.getElementById('quickAddFab').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.add('active');
+});
+document.getElementById('quickAddCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+});
+document.getElementById('quickAddTopicBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+  openReadModal();
+});
+document.getElementById('quickAddReviewBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+  document.getElementById('quickReviewTextInput').value = '';
+  document.getElementById('quickReviewDateInput').value = todayStr();
+  document.getElementById('quickReviewOverlay').classList.add('active');
+});
+document.getElementById('quickReviewCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('quickReviewOverlay').classList.remove('active');
+});
+document.getElementById('quickReviewSaveBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('quickReviewTextInput').value.trim();
+  const date = document.getElementById('quickReviewDateInput').value || todayStr();
+  if(!text){ showToast('พิมพ์ชื่อการทบทวนก่อนนะ'); return; }
+  state.reviewSessions.push({id:uid(), text, date, done:false, expGiven:false});
+  saveState();
+  document.getElementById('quickReviewOverlay').classList.remove('active');
+  renderTodayPanel(); renderCalendar();
+  showToast('เพิ่มการทบทวนแล้ว 🔁');
+});
 
 /* ================= ACTIVE EXAM AREA (dashboard) ================= */
 function renderActiveExamArea(){
@@ -947,11 +1027,9 @@ function renderActiveExamArea(){
   }
   onboard.style.display = 'none';
   card.style.display = '';
-
   const sel = document.getElementById('activeExamSelect');
   sel.innerHTML = state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
   sel.value = state.ui.activeExamSetId;
-
   renderDdayContent();
 }
 document.getElementById('activeExamSelect').addEventListener('change', e=>{
@@ -972,7 +1050,6 @@ function renderDdayContent(){
     return;
   }
   const today = new Date(); today.setHours(0,0,0,0);
-
   const rows = set.subjects.map(s=>{
     const items = state.readingItems.filter(r=>r.examSetId===set.id && r.subject===s.name);
     const remaining = items.filter(r=>r.status!=='green').length;
@@ -983,13 +1060,11 @@ function renderDdayContent(){
     }
     return { name:s.name, examDate:s.examDate, diffDays, remaining };
   });
-  // soonest exam first; subjects with no date go last
   rows.sort((a,b)=>{
     if(a.diffDays===null) return 1;
     if(b.diffDays===null) return -1;
     return a.diffDays-b.diffDays;
   });
-
   const nearest = rows[0];
   let ddayLabel, adviceText;
   if(nearest.diffDays===null){
@@ -1007,7 +1082,6 @@ function renderDdayContent(){
     ddayLabel = 'ผ่านไปแล้ว';
     adviceText = `"${escapeHtml(nearest.name)}" สอบผ่านไปแล้ว เก่งมาก! 🎊`;
   }
-
   const listHtml = rows.map(r=>{
     const c = subjectColor(r.name);
     const dLabel = r.diffDays===null ? 'ยังไม่กำหนด' : (r.diffDays>0 ? `D-${r.diffDays}` : (r.diffDays===0 ? 'วันนี้!' : 'ผ่านไปแล้ว'));
@@ -1016,7 +1090,6 @@ function renderDdayContent(){
       <span style="color:var(--brown-soft);font-weight:600;">${dLabel} · เหลือ ${r.remaining} หัวข้อ</span>
     </div>`;
   }).join('');
-
   content.innerHTML = `
     <div class="dday-grid">
       <div class="dday-box"><div class="dday-num">${ddayLabel}</div><div class="dday-label">ใกล้สุด: ${escapeHtml(nearest.name)}</div></div>
@@ -1027,14 +1100,12 @@ function renderDdayContent(){
   `;
 }
 
-/* ================= CALENDAR (synced directly to readingItems.scheduledDate) ================= */
+/* ================= CALENDAR ================= */
 let calViewDate = new Date();
 const THAI_DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
 let currentDayModalDate = null;
-
 function dateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
 
-// flat list of every {examSetId, examSetName, subject, examDate} pair across all exam sets
 function allSubjectExamDates(){
   const out = [];
   state.examSets.forEach(set=>{
@@ -1044,29 +1115,25 @@ function allSubjectExamDates(){
   });
   return out;
 }
-
 function renderCalLegend(){
   const set = getActiveExam();
   const subjects = set ? set.subjects.map(s=>s.name) : [...new Set(state.examSets.flatMap(e=>e.subjects.map(s=>s.name)))];
   const legend = document.getElementById('calLegend');
   let html = subjects.map(s=>subjChip(s)).join('');
-  html += `<span class="legend-note"><span class="subj-dot" style="background:var(--milktea-dark);"></span>🔁 ทบทวน · 📝 วันสอบ</span>`;
+  html += `<span class="legend-note">🔁 ทบทวน · 📝 วันสอบ · 🔒 Deadline</span>`;
   legend.innerHTML = html;
 }
-
 function dayItemsCombined(key){
   const topics = state.readingItems.filter(it=>it.scheduledDate===key).map(it=>({type:'topic', label:it.topic, done:it.status==='green', subject:it.subject}));
   const reviews = state.reviewSessions.filter(r=>r.date===key).map(r=>({type:'review', label:r.text, done:r.done}));
   return topics.concat(reviews);
 }
-
 function renderCalendar(){
   const y = calViewDate.getFullYear(), m = calViewDate.getMonth();
   document.getElementById('calTitle').textContent = `${THAI_MONTHS[m]} ${y+543}`;
   renderCalLegend();
   const dowWrap = document.getElementById('calDow');
   dowWrap.innerHTML = THAI_DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
-
   const firstDow = new Date(y,m,1).getDay();
   const daysInMonth = new Date(y,m+1,0).getDate();
   const grid = document.getElementById('calGrid');
@@ -1076,8 +1143,12 @@ function renderCalendar(){
   for(let d=1; d<=daysInMonth; d++){
     const key = dateKey(y,m,d);
     const isToday = key === todayKey;
-    const examDayMarkers = allSubjectExamDates().filter(m=>m.examDate===key);
+    const examDayMarkers = allSubjectExamDates().filter(mm=>mm.examDate===key);
+    const deadlineMarkers = state.readingItems.filter(it=>it.deadline===key);
     const combined = dayItemsCombined(key);
+    let urgentHtml = '';
+    examDayMarkers.slice(0,1).forEach(mrk=>{ urgentHtml += `<div class="cal-urgent-badge">📝 ${escapeHtml(mrk.subject)}</div>`; });
+    deadlineMarkers.slice(0,1).forEach(dl=>{ urgentHtml += `<div class="cal-urgent-badge">🔒 ${escapeHtml(dl.topic)}</div>`; });
     let taskHtml = combined.slice(0,2).map(it=>{
       if(it.type==='topic'){
         const c = subjectColor(it.subject);
@@ -1086,10 +1157,10 @@ function renderCalendar(){
       return `<div class="cal-task-dot review ${it.done?'done':''}">🔁 ${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
     }).join('');
     if(combined.length>2) taskHtml += `<div class="cal-more">+${combined.length-2} เพิ่มเติม</div>`;
-    const examBadgeHtml = examDayMarkers.length ? `<div class="cal-exam-badge">📝 ${examDayMarkers.map(m=>escapeHtml(m.subject)).join(', ')}</div>` : '';
-    html += `<div class="cal-cell ${isToday?'today':''} ${examDayMarkers.length?'examday':''}" data-key="${key}">
+    const hasUrgent = examDayMarkers.length>0 || deadlineMarkers.length>0;
+    html += `<div class="cal-cell ${isToday?'today':''} ${hasUrgent?'examday':''}" data-key="${key}">
       <div class="cal-daynum">${d}</div>
-      ${examBadgeHtml}
+      ${urgentHtml}
       <div class="cal-tasks">${taskHtml}</div>
     </div>`;
   }
@@ -1097,9 +1168,54 @@ function renderCalendar(){
   grid.querySelectorAll('.cal-cell:not(.empty)').forEach(cell=>{
     cell.addEventListener('click', ()=>openDayModal(cell.dataset.key));
   });
+  renderBacklog();
 }
 document.getElementById('calPrev').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()-1); renderCalendar(); });
 document.getElementById('calNext').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()+1); renderCalendar(); });
+
+/* ================= BACKLOG ================= */
+function renderBacklog(){
+  const items = state.readingItems.filter(it=>!it.scheduledDate);
+  const wrap = document.getElementById('backlogList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="hint-text">ไม่มีหัวข้อค้างอยู่ ทุกอย่างลงวันหมดแล้ว 🎉</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>{
+    const set = state.examSets.find(e=>e.id===it.examSetId);
+    const deadlineTxt = it.deadline ? `🔒 ${shortThaiDate(it.deadline)}` : '';
+    return `<div class="backlog-row">
+      <div class="backlog-info">
+        <div class="backlog-topic">${it.isDrugCard?'💊 ':''}${escapeHtml(it.topic)}</div>
+        <div class="backlog-meta">${subjChip(it.subject)} ${set?escapeHtml(set.name):''} ${deadlineTxt}</div>
+      </div>
+      <button class="date-chip" data-backlog-schedule="${it.id}">📅 เลือกวันอ่าน</button>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-backlog-schedule]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.backlogSchedule);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = todayStr();
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(e){} }
+      function commit(){
+        if(input.value){
+          item.scheduledDate = input.value;
+          saveState();
+          renderBacklog(); renderCalendar(); renderReadingList(); renderTodayPanel();
+          showToast('ลงปฏิทินแล้ว 🧋');
+        } else {
+          renderBacklog();
+        }
+      }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+}
 
 function openDayModal(key){
   currentDayModalDate = key;
@@ -1117,49 +1233,17 @@ function openDayModal(key){
 }
 function renderDayExamInfo(){
   const markers = allSubjectExamDates().filter(m=>m.examDate===currentDayModalDate);
+  const deadlineMarkers = state.readingItems.filter(it=>it.deadline===currentDayModalDate);
   const el = document.getElementById('dayExamInfo');
-  if(markers.length===0){ el.innerHTML=''; return; }
-  el.innerHTML = markers.map(m=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(m.subject)} (${escapeHtml(m.examSetName)})</div>`).join('');
-}
-function renderDayReviewList(){
-  const items = state.reviewSessions.filter(r=>r.date===currentDayModalDate);
-  const wrap = document.getElementById('dayReviewList');
-  if(items.length===0){
-    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีการทบทวนกำหนดไว้วันนี้</div>`;
-    return;
-  }
-  wrap.innerHTML = items.map(it=>`
-    <div class="day-scheduled-row review-row">
-      <input type="checkbox" ${it.done?'checked':''} data-review="${it.id}">
-      <div class="day-scheduled-info">
-        <div class="day-scheduled-topic ${it.done?'done':''}">🔁 ${escapeHtml(it.text)}</div>
-      </div>
-      <button class="icon-btn" data-reviewdel="${it.id}">✕</button>
-    </div>
-  `).join('');
-  wrap.querySelectorAll('[data-review]').forEach(cb=>{
-    cb.addEventListener('change', ()=>{
-      const item = state.reviewSessions.find(r=>r.id===cb.dataset.review);
-      item.done = cb.checked;
-      if(item.done && !item.expGiven){
-        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
-        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
-      }
-      saveState(); renderDayReviewList(); renderCalendar();
-    });
-  });
-  wrap.querySelectorAll('[data-reviewdel]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      state.reviewSessions = state.reviewSessions.filter(r=>r.id!==btn.dataset.reviewdel);
-      saveState(); renderDayReviewList(); renderCalendar();
-    });
-  });
+  let html = markers.map(m=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(m.subject)} (${escapeHtml(m.examSetName)})</div>`).join('');
+  html += deadlineMarkers.map(dl=>`<div class="exam-day-alert">🔒 ครบกำหนดส่ง: ${escapeHtml(dl.topic)}</div>`).join('');
+  el.innerHTML = html;
 }
 function renderDayScheduled(){
   const items = state.readingItems.filter(it=>it.scheduledDate===currentDayModalDate);
   const wrap = document.getElementById('dayScheduledList');
   if(items.length===0){
-    wrap.innerHTML = `<div style="font-size:13px;color:var(--brown-soft);padding:8px 0;">ยังไม่มีหัวข้อกำหนดไว้วันนี้ ลองเพิ่มด้านล่างได้เลย 🧋</div>`;
+    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีหัวข้อกำหนดไว้วันนี้ ลองเพิ่มด้านล่างได้เลย 🧋</div>`;
     return;
   }
   wrap.innerHTML = items.map(it=>{
@@ -1167,7 +1251,7 @@ function renderDayScheduled(){
     return `<div class="day-scheduled-row">
       <input type="checkbox" ${it.status==='green'?'checked':''} data-item="${it.id}">
       <div class="day-scheduled-info">
-        <div class="day-scheduled-topic ${it.status==='green'?'done':''}">${escapeHtml(it.topic)}</div>
+        <div class="day-scheduled-topic ${it.status==='green'?'done':''}">${it.isDrugCard?'💊 ':''}${escapeHtml(it.topic)}</div>
         <div style="margin-top:3px;">${subjChip(it.subject)} <span style="font-size:10.5px;color:var(--brown-soft);">${examSet?escapeHtml(examSet.name):''}</span></div>
       </div>
       <button class="icon-btn" data-unschedule="${it.id}" title="เอาออกจากวันนี้">📤</button>
@@ -1181,15 +1265,15 @@ function renderDayScheduled(){
         item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
         setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
       }
-      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent();
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent(); renderTodayPanel();
     });
   });
   wrap.querySelectorAll('[data-unschedule]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const item = state.readingItems.find(r=>r.id===btn.dataset.unschedule);
       item.scheduledDate = null;
-      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); populateDayTopicChips();
-      showToast('เอาหัวข้อนี้ออกจากวันที่แล้ว (ยังอยู่ในรายการอ่านนะ)');
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); populateDayTopicChips(); renderTodayPanel();
+      showToast('เอาหัวข้อนี้ออกจากวันที่แล้ว (ไปอยู่ Backlog แทน)');
     });
   });
 }
@@ -1218,7 +1302,7 @@ function populateDayTopicChips(){
       const item = state.readingItems.find(r=>r.id===chip.dataset.quickadd);
       item.scheduledDate = currentDayModalDate;
       saveState();
-      renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent();
+      renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent(); renderTodayPanel();
       showToast('เพิ่มลงปฏิทินแล้ว 🧋');
     });
   });
@@ -1230,10 +1314,10 @@ document.getElementById('dayAddBtn').addEventListener('click', ()=>{
   const subject = document.getElementById('daySubjectSelect').value;
   const newTopicText = document.getElementById('dayNewTopicInput').value.trim();
   if(!newTopicText){ showToast('พิมพ์ชื่อหัวข้อใหม่ก่อนนะ (หรือแตะหัวข้อเดิมด้านบน)'); return; }
-  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic:newTopicText, status:'red', expGiven:false, scheduledDate:currentDayModalDate});
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic:newTopicText, status:'red', expGiven:false, scheduledDate:currentDayModalDate, deadline:null, isDrugCard:false, drugCard:null});
   document.getElementById('dayNewTopicInput').value = '';
   saveState();
-  renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderReadingFilters(); renderExamSets(); renderDdayContent();
+  renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderReadingFilters(); renderExamSets(); renderDdayContent(); renderTodayPanel();
   showToast('เพิ่มลงปฏิทินแล้ว 🧋');
 });
 document.getElementById('dayReviewAddBtn').addEventListener('click', ()=>{
@@ -1243,12 +1327,46 @@ document.getElementById('dayReviewAddBtn').addEventListener('click', ()=>{
   state.reviewSessions.push({id:uid(), text, date:currentDayModalDate, done:false, expGiven:false});
   input.value = '';
   saveState();
-  renderDayReviewList(); renderCalendar();
+  renderDayReviewList(); renderCalendar(); renderTodayPanel();
   showToast('เพิ่มการทบทวนแล้ว 🔁');
 });
 document.getElementById('dayCloseBtn').addEventListener('click', ()=>{
   document.getElementById('dayModalOverlay').classList.remove('active');
 });
+function renderDayReviewList(){
+  const items = state.reviewSessions.filter(r=>r.date===currentDayModalDate);
+  const wrap = document.getElementById('dayReviewList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีการทบทวนกำหนดไว้วันนี้</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>`
+    <div class="day-scheduled-row review-row">
+      <input type="checkbox" ${it.done?'checked':''} data-review="${it.id}">
+      <div class="day-scheduled-info">
+        <div class="day-scheduled-topic ${it.done?'done':''}">🔁 ${escapeHtml(it.text)}</div>
+      </div>
+      <button class="icon-btn" data-reviewdel="${it.id}">✕</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-review]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.reviewSessions.find(r=>r.id===cb.dataset.review);
+      item.done = cb.checked;
+      if(item.done && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
+      }
+      saveState(); renderDayReviewList(); renderCalendar(); renderTodayPanel();
+    });
+  });
+  wrap.querySelectorAll('[data-reviewdel]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.reviewSessions = state.reviewSessions.filter(r=>r.id!==btn.dataset.reviewdel);
+      saveState(); renderDayReviewList(); renderCalendar(); renderTodayPanel();
+    });
+  });
+}
 
 /* ================= EXAM SETS ================= */
 let editingExamId = null;
@@ -1265,18 +1383,14 @@ function addSubjectRow(name, date){
   wrap.appendChild(row);
 }
 document.getElementById('addSubjectRowBtn').addEventListener('click', ()=> addSubjectRow('',''));
-
 function openExamModal(id){
   editingExamId = id || null;
   const set = id ? state.examSets.find(e=>e.id===id) : null;
   document.getElementById('examModalTitle').textContent = id ? '✏️ แก้ไขชุดสอบ' : '➕ เพิ่มชุดสอบ';
   document.getElementById('examNameInput').value = set ? set.name : '';
   document.getElementById('examSubjectRows').innerHTML = '';
-  if(set && set.subjects.length>0){
-    set.subjects.forEach(s=> addSubjectRow(s.name, s.examDate));
-  } else {
-    addSubjectRow('', '');
-  }
+  if(set && set.subjects.length>0){ set.subjects.forEach(s=> addSubjectRow(s.name, s.examDate)); }
+  else { addSubjectRow('', ''); }
   document.getElementById('examModalOverlay').classList.add('active');
 }
 document.getElementById('examCancelBtn').addEventListener('click', ()=>document.getElementById('examModalOverlay').classList.remove('active'));
@@ -1293,11 +1407,7 @@ document.getElementById('examSaveBtn').addEventListener('click', ()=>{
   let newId = null;
   if(editingExamId){
     const set = state.examSets.find(e=>e.id===editingExamId);
-    const oldNames = set.subjects.map(s=>s.name);
-    const newNames = subjects.map(s=>s.name);
-    // if a subject's name disappeared from the list, drop its reading items' link cleanly? keep items but they'll just show under the old subject name still — safest is to leave readingItems untouched (they store subject as a plain string)
-    set.name = name;
-    set.subjects = subjects;
+    set.name = name; set.subjects = subjects;
   } else {
     newId = uid();
     state.examSets.push({id:newId, name, subjects});
@@ -1399,6 +1509,19 @@ function renderReadingFilters(){
 document.getElementById('filterExam').addEventListener('change', renderReadingList);
 document.getElementById('filterStatus').addEventListener('change', renderReadingList);
 
+function renderDrugCardHtml(it){
+  const fields = [
+    ['กลุ่มยา', it.drugCard?.drugClass],
+    ['MOA', it.drugCard?.moa],
+    ['Indications', it.drugCard?.indications],
+    ['Adverse Effects', it.drugCard?.adverse],
+    ['Contraindications', it.drugCard?.contraindications],
+    ['จุดต้องจำ', it.drugCard?.keyPoints]
+  ].filter(([,v])=>v && v.trim());
+  if(fields.length===0) return '<div class="hint-text">ยังไม่ได้กรอกรายละเอียดยา</div>';
+  return fields.map(([label,val])=>`<div class="drug-field"><span class="drug-field-label">${label}</span><span class="drug-field-value">${escapeHtml(val)}</span></div>`).join('');
+}
+
 function renderReadingList(){
   const fe = document.getElementById('filterExam').value;
   const fst = document.getElementById('filterStatus').value;
@@ -1407,10 +1530,7 @@ function renderReadingList(){
   if(fst!=='all') items = items.filter(i=>i.status===fst);
 
   const groups = {};
-  items.forEach(it=>{
-    if(!groups[it.subject]) groups[it.subject] = [];
-    groups[it.subject].push(it);
-  });
+  items.forEach(it=>{ if(!groups[it.subject]) groups[it.subject] = []; groups[it.subject].push(it); });
   const subjectNames = Object.keys(groups);
 
   const wrap = document.getElementById('readingListWrap');
@@ -1425,18 +1545,30 @@ function renderReadingList(){
     const rows = groups[subject].map(it=>{
       const set = state.examSets.find(e=>e.id===it.examSetId);
       const meta = statusMeta[it.status];
+      const deadlineChip = `<button class="date-chip deadline-chip" data-deadline="${it.id}">🔒 ${it.deadline ? shortThaiDate(it.deadline) : 'Deadline'}</button>`;
+      const plannedChip = `<button class="date-chip" data-schedule="${it.id}">${it.scheduledDate ? '📅 '+shortThaiDate(it.scheduledDate) : '📅 กำหนดวัน'}</button>`;
+      if(it.isDrugCard){
+        return `<details class="drug-card-wrap">
+          <summary>
+            <div class="read-item" style="border-left-color:${c.text};margin-bottom:0;box-shadow:none;">
+              <button class="status-btn ${meta.cls}" data-cycle="${it.id}" title="กดเพื่อเปลี่ยนสถานะ">${meta.icon}</button>
+              <div class="read-info">
+                <div class="read-topic">💊 ${escapeHtml(it.topic)}</div>
+                <div class="read-meta"><span>${set?escapeHtml(set.name):'-'}</span>${plannedChip}${deadlineChip}</div>
+              </div>
+              <div class="read-actions"><button class="icon-btn" data-del="${it.id}">✕</button></div>
+            </div>
+          </summary>
+          <div class="drug-card-fields">${renderDrugCardHtml(it)}</div>
+        </details>`;
+      }
       return `<div class="read-item" style="border-left-color:${c.text};">
         <button class="status-btn ${meta.cls}" data-cycle="${it.id}" title="กดเพื่อเปลี่ยนสถานะ">${meta.icon}</button>
         <div class="read-info">
           <div class="read-topic">${escapeHtml(it.topic)}</div>
-          <div class="read-meta">
-            <span>${set?escapeHtml(set.name):'-'}</span>
-            <button class="date-chip" data-schedule="${it.id}">${it.scheduledDate ? '📅 '+shortThaiDate(it.scheduledDate) : '📅 กำหนดวัน'}</button>
-          </div>
+          <div class="read-meta"><span>${set?escapeHtml(set.name):'-'}</span>${plannedChip}${deadlineChip}</div>
         </div>
-        <div class="read-actions">
-          <button class="icon-btn" data-del="${it.id}">✕</button>
-        </div>
+        <div class="read-actions"><button class="icon-btn" data-del="${it.id}">✕</button></div>
       </div>`;
     }).join('');
     return `<details class="subject-group" open>
@@ -1446,46 +1578,61 @@ function renderReadingList(){
   }).join('');
 
   wrap.querySelectorAll('[data-cycle]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
       const item = state.readingItems.find(r=>r.id===btn.dataset.cycle);
       const order = ['red','yellow','green'];
       const nextIdx = (order.indexOf(item.status)+1)%order.length;
       item.status = order[nextIdx];
       if(item.status==='green' && !item.expGiven){
-        item.expGiven = true;
-        gainExp(100);
-        checkStreak(); renderTopStreak();
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
         setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
       }
-      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel();
     });
   });
   wrap.querySelectorAll('[data-del]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
       state.readingItems = state.readingItems.filter(r=>r.id!==btn.dataset.del);
-      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel(); renderBacklog();
     });
   });
   wrap.querySelectorAll('[data-schedule]').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); e.preventDefault();
       const item = state.readingItems.find(r=>r.id===btn.dataset.schedule);
       const input = document.createElement('input');
       input.type = 'date'; input.className = 'date-chip-input';
       input.value = item.scheduledDate || '';
       btn.replaceWith(input);
       input.focus();
-      if(input.showPicker){ try{ input.showPicker(); }catch(e){} }
-      function commit(){
-        item.scheduledDate = input.value || null;
-        saveState(); renderReadingList(); renderCalendar();
-      }
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){ item.scheduledDate = input.value || null; saveState(); renderReadingList(); renderCalendar(); renderTodayPanel(); }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+  wrap.querySelectorAll('[data-deadline]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); e.preventDefault();
+      const item = state.readingItems.find(r=>r.id===btn.dataset.deadline);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = item.deadline || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){ item.deadline = input.value || null; saveState(); renderReadingList(); renderCalendar(); renderTodayPanel(); }
       input.addEventListener('change', commit);
       input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
     });
   });
 }
 
-/* Add reading item modal */
+document.getElementById('readIsDrugCardToggle').addEventListener('change', e=>{
+  document.getElementById('drugCardFields').style.display = e.target.checked ? '' : 'none';
+});
 function openReadModal(){
   const set = getActiveExam();
   if(!set){
@@ -1498,6 +1645,12 @@ function openReadModal(){
   subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
   document.getElementById('readTopicInput').value = '';
   document.getElementById('readScheduleDateInput').value = '';
+  document.getElementById('readDeadlineInput').value = '';
+  document.getElementById('readIsDrugCardToggle').checked = false;
+  document.getElementById('drugCardFields').style.display = 'none';
+  ['drugClassInput','drugMoaInput','drugIndicationsInput','drugAdverseInput','drugContraindicationsInput','drugKeyPointsInput'].forEach(id=>{
+    document.getElementById(id).value = '';
+  });
   document.getElementById('readModalOverlay').classList.add('active');
 }
 document.getElementById('addReadingBtn').addEventListener('click', openReadModal);
@@ -1508,49 +1661,40 @@ document.getElementById('readSaveBtn').addEventListener('click', ()=>{
   const subject = document.getElementById('readSubjectSelect').value;
   const topic = document.getElementById('readTopicInput').value.trim();
   const scheduledDate = document.getElementById('readScheduleDateInput').value || null;
+  const deadline = document.getElementById('readDeadlineInput').value || null;
+  const isDrugCard = document.getElementById('readIsDrugCardToggle').checked;
   if(!topic){ showToast('ใส่ชื่อหัวข้อด้วยนะ'); return; }
-  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic, status:'red', expGiven:false, scheduledDate});
+  let drugCard = null;
+  if(isDrugCard){
+    drugCard = {
+      drugClass: document.getElementById('drugClassInput').value.trim(),
+      moa: document.getElementById('drugMoaInput').value.trim(),
+      indications: document.getElementById('drugIndicationsInput').value.trim(),
+      adverse: document.getElementById('drugAdverseInput').value.trim(),
+      contraindications: document.getElementById('drugContraindicationsInput').value.trim(),
+      keyPoints: document.getElementById('drugKeyPointsInput').value.trim()
+    };
+  }
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic, status:'red', expGiven:false, scheduledDate, deadline, isDrugCard, drugCard});
   saveState();
   document.getElementById('readModalOverlay').classList.remove('active');
-  renderReadingFilters(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
-  showToast(scheduledDate ? 'เพิ่มหัวข้ออ่านและลงปฏิทินแล้ว 📖📅' : 'เพิ่มหัวข้ออ่านแล้ว 📖');
+  renderReadingFilters(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel(); renderBacklog();
+  showToast(scheduledDate ? 'เพิ่มหัวข้ออ่านและลงปฏิทินแล้ว 📖📅' : 'เพิ่มหัวข้ออ่านแล้ว (อยู่ใน Backlog) 📖📦');
 });
 
 /* ================= STREAK RENDER ================= */
-function renderTopStreak(){
-  document.getElementById('streakCount').textContent = state.user.streak;
-}
+function renderTopStreak(){ document.getElementById('streakCount').textContent = state.user.streak; }
 
-/* ================= INIT ================= */
-function init(){
-  checkStreak();
-  ensureActiveExamValid();
-  renderTopStreak();
-  renderPet();
-  renderPomo();
-  renderActiveExamArea();
-  renderCalendar();
-  renderExamSets();
-  renderReadingFilters();
-  renderReadingList();
-  setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]);
-  setInterval(()=>{ setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]); }, 45000);
-  saveState();
-}
 /* ================= NETLIFY IDENTITY (login) ================= */
 let currentUser = null;
 let saveDebounceTimer = null;
 let appInitialized = false;
-
 function showAuthGate(msg){
   document.getElementById('authGate').classList.add('active');
   document.getElementById('userPill').style.display = 'none';
   document.getElementById('authStatusNote').textContent = msg || '';
 }
-function hideAuthGate(){
-  document.getElementById('authGate').classList.remove('active');
-}
-
+function hideAuthGate(){ document.getElementById('authGate').classList.remove('active'); }
 async function onLoggedIn(user){
   currentUser = user;
   hideAuthGate();
@@ -1558,16 +1702,12 @@ async function onLoggedIn(user){
   document.getElementById('userEmailLabel').textContent = user.email || '';
   document.getElementById('authStatusNote').textContent = 'กำลังโหลดข้อมูล...';
   await loadRemoteData();
-  if(!appInitialized){
-    appInitialized = true;
-    init();
-  } else {
-    // re-render everything with the freshly loaded data
+  if(!appInitialized){ appInitialized = true; init(); }
+  else {
     renderTopStreak(); renderPet(); renderActiveExamArea(); renderCalendar();
-    renderExamSets(); renderReadingFilters(); renderReadingList();
+    renderExamSets(); renderReadingFilters(); renderReadingList(); renderTodayPanel();
   }
 }
-
 async function loadRemoteData(){
   try{
     const token = await currentUser.jwt();
@@ -1578,7 +1718,7 @@ async function loadRemoteData(){
         state = json.data;
         if(!state.reviewSessions) state.reviewSessions = [];
         if(!state.ui) state.ui = {activeExamSetId:null};
-        state.readingItems.forEach(it=>{ if(it.scheduledDate===undefined) it.scheduledDate = null; });
+        state.readingItems = normalizeReadingItems(state.readingItems);
         state.examSets = normalizeExamSets(state.examSets);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
@@ -1587,7 +1727,6 @@ async function loadRemoteData(){
     console.error('โหลดข้อมูลจากคลาวด์ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทนไปก่อน', e);
   }
 }
-
 function saveRemote(){
   if(!currentUser) return;
   clearTimeout(saveDebounceTimer);
@@ -1599,36 +1738,20 @@ function saveRemote(){
         headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token },
         body: JSON.stringify(state)
       });
-    }catch(e){
-      console.error('บันทึกขึ้นคลาวด์ไม่สำเร็จ', e);
-    }
+    }catch(e){ console.error('บันทึกขึ้นคลาวด์ไม่สำเร็จ', e); }
   }, 800);
 }
-
 function initIdentity(){
-  if(!window.netlifyIdentity){
-    showAuthGate('โหลดระบบล็อกอินไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้งนะ');
-    return;
-  }
-  netlifyIdentity.on('init', user=>{
-    if(user) onLoggedIn(user); else showAuthGate();
-  });
-  netlifyIdentity.on('login', user=>{
-    onLoggedIn(user);
-    netlifyIdentity.close();
-  });
-  netlifyIdentity.on('logout', ()=>{
-    currentUser = null;
-    showToast('ออกจากระบบแล้ว');
-    showAuthGate();
-  });
+  if(!window.netlifyIdentity){ showAuthGate('โหลดระบบล็อกอินไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้งนะ'); return; }
+  netlifyIdentity.on('init', user=>{ if(user) onLoggedIn(user); else showAuthGate(); });
+  netlifyIdentity.on('login', user=>{ onLoggedIn(user); netlifyIdentity.close(); });
+  netlifyIdentity.on('logout', ()=>{ currentUser = null; showToast('ออกจากระบบแล้ว'); showAuthGate(); });
   netlifyIdentity.on('error', err=>{
     console.error('Identity error', err);
     document.getElementById('authGate').style.display = '';
     showAuthGate('เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ');
   });
   netlifyIdentity.on('close', ()=>{
-    // widget popup closed — if still not logged in, bring our gate card back in front
     document.getElementById('authGate').style.display = '';
     if(!currentUser) showAuthGate();
   });
@@ -1636,8 +1759,6 @@ function initIdentity(){
 }
 document.getElementById('authLoginBtn').addEventListener('click', ()=>{
   if(window.netlifyIdentity){
-    // hide our own gate card while the Netlify widget popup is open so it doesn't
-    // sit on top of / block the widget's login form
     document.getElementById('authGate').style.display = 'none';
     netlifyIdentity.open();
   }
@@ -1646,6 +1767,23 @@ document.getElementById('logoutBtn').addEventListener('click', ()=>{
   if(window.netlifyIdentity) netlifyIdentity.logout();
 });
 
+/* ================= INIT ================= */
+function init(){
+  checkStreak();
+  ensureActiveExamValid();
+  renderTopStreak();
+  renderPet();
+  renderPomo();
+  renderTodayPanel();
+  renderActiveExamArea();
+  renderCalendar();
+  renderExamSets();
+  renderReadingFilters();
+  renderReadingList();
+  setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]);
+  setInterval(()=>{ setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]); }, 45000);
+  saveState();
+}
 initIdentity();
 </script>
 </body>
