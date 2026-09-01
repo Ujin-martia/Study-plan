@@ -53,35 +53,24 @@
     <div class="min-h-screen flex items-center justify-center text-brown-light text-sm">กำลังเริ่มระบบ...</div>
   </div>
 
-  <!-- Supabase JS v2, UMD build — works with a plain <script> tag, no bundler/module needed -->
-  <script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+  <!-- Netlify Identity — login/signup, built into your Netlify site.
+       No external account needed: just enable it once in your Netlify
+       dashboard (Site configuration → Identity → Enable Identity). -->
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 
   <!-- ============================================================
-       ทั้งแอปอยู่ในไฟล์นี้ไฟล์เดียว — โค้ดทั้งหมดอยู่ใน <script> ข้างล่างนี้
-       แก้ Supabase URL/Key ได้ที่ด้านบนสุดของ <script> (ค้นหาคำว่า CONFIG)
+       ทั้งแอปอยู่ในไฟล์นี้ไฟล์เดียว ไม่มีไฟล์อื่นอีกแล้ว
+       ข้อมูลเก็บใน localStorage ของเบราว์เซอร์นี้เท่านั้น (ไม่ sync ข้ามเครื่อง)
        ============================================================ -->
   <script>
-
-
 // ============================================================
-// CONFIG — แก้ 2 บรรทัดข้างล่างนี้ให้เป็นค่าจากโปรเจกต์ Supabase ของตัวเอง
-// ============================================================
-window.SH_CONFIG = {
-  SUPABASE_URL: "https://YOUR-PROJECT.supabase.co",
-  SUPABASE_ANON_KEY: "YOUR-ANON-PUBLIC-KEY",
-};
-
-// ============================================================
-// StudyHub — core (namespace, utils, auth, router, shell, login)
-// Plain classic script — works via file:// (no ES modules).
-// Page modules attach themselves to window.SH.pages.*
+// StudyHub — Netlify Identity + localStorage version
+// No external accounts, no SQL, no API keys.
+// Data lives only on this device (per browser).
 // ============================================================
 (function () {
   const SH = (window.SH = window.SH || {});
   SH.pages = SH.pages || {};
-
-  // Supabase client (UMD global `supabase` comes from the CDN script tag)
-  SH.client = supabase.createClient(window.SH_CONFIG.SUPABASE_URL, window.SH_CONFIG.SUPABASE_ANON_KEY);
 
   const app = document.getElementById("app");
 
@@ -119,6 +108,12 @@ window.SH_CONFIG = {
     location.hash = hash;
   };
 
+  SH.uid = function () {
+    return window.crypto && crypto.randomUUID
+      ? crypto.randomUUID()
+      : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+  };
+
   SH.STATUS_ORDER = ["ยังไม่อ่าน", "กำลังอ่าน", "อ่านแล้ว", "ทวนแล้ว", "พร้อมสอบ"];
   SH.STATUS_COLOR = {
     ยังไม่อ่าน: "bg-status-notread text-brown-dark",
@@ -153,36 +148,49 @@ window.SH_CONFIG = {
       <div class="bg-white rounded-2xl shadow-cozy p-10 text-center">
         <div class="text-4xl mb-3">🧋</div>
         <h1 class="text-xl font-display font-semibold text-brown-dark mb-2">${SH.esc(title)}</h1>
-        <p class="text-sm text-brown-light">โมดูลนี้อยู่ใน Phase ถัดไปของการพัฒนา — schema พร้อมแล้วใน Supabase, รอต่อ UI</p>
+        <p class="text-sm text-brown-light">โมดูลนี้อยู่ใน Phase ถัดไปของการพัฒนา</p>
       </div>
     </div>`;
   };
 
   // ------------------------------------------------------------
-  // Auth
+  // Data layer — one JSON blob in localStorage, per logged-in user
   // ------------------------------------------------------------
-  let currentSession = null;
+  SH.storageKey = null;
+  SH.data = null;
 
-  async function signInWithPassword(email, password) {
-    const { error } = await SH.client.auth.signInWithPassword({ email, password });
-    return error ? error.message : null;
+  function emptyData() {
+    return { exams: [], topics: [], tasks: [], examTraps: [], reviewQueue: [], specialTests: [], flashcards: [] };
   }
-  async function signUp(email, password, fullName) {
-    const { error } = await SH.client.auth.signUp({
-      email, password, options: { data: { full_name: fullName } },
-    });
-    return error ? error.message : null;
-  }
-  async function signOut() {
-    await SH.client.auth.signOut();
-  }
+
+  SH.loadData = function () {
+    const raw = localStorage.getItem(SH.storageKey);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        return Object.assign(emptyData(), parsed);
+      } catch (e) {
+        console.error("Corrupt local data, starting fresh", e);
+      }
+    }
+    return emptyData();
+  };
+
+  SH.saveData = function () {
+    try {
+      localStorage.setItem(SH.storageKey, JSON.stringify(SH.data));
+    } catch (e) {
+      alert("บันทึกไม่สำเร็จ — พื้นที่เก็บข้อมูลในเบราว์เซอร์อาจเต็ม (มักเกิดจากรูปภาพเยอะเกินไป)");
+      console.error(e);
+    }
+  };
 
   // ------------------------------------------------------------
   // Router
   // ------------------------------------------------------------
   SH.route = async function () {
-    if (!currentSession) {
-      renderLogin();
+    if (!SH.data) {
+      renderLoggedOut();
       return;
     }
     const hash = location.hash.replace(/^#/, "") || "/";
@@ -221,7 +229,6 @@ window.SH_CONFIG = {
     app.innerHTML = shell(activeNav);
     wireLayoutEvents();
     const container = document.getElementById("page-content");
-    container.innerHTML = `<div class="p-6 text-sm text-brown-light">กำลังโหลด...</div>`;
     await pageFn(container, ...pageArgs);
   };
 
@@ -249,6 +256,7 @@ window.SH_CONFIG = {
   };
 
   function shell(activeNav) {
+    const user = window.netlifyIdentity && netlifyIdentity.currentUser();
     return `
     <div class="min-h-screen flex bg-cream-bg">
       <aside class="hidden md:flex w-56 flex-col bg-white border-r border-milktea-light shadow-cozy p-4">
@@ -265,11 +273,12 @@ window.SH_CONFIG = {
           ).join("")}
         </nav>
         <div class="pt-4 border-t border-milktea-light text-xs text-brown-light px-2">
-          <div class="truncate mb-2">${SH.esc(currentSession && currentSession.user ? currentSession.user.email : "")}</div>
+          <div class="truncate mb-2">${SH.esc(user && user.email ? user.email : "")}</div>
           <button id="signout-btn" class="flex items-center gap-2 text-brown hover:text-brown-dark">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
             ออกจากระบบ
           </button>
+          <div class="mt-2 text-[10px] leading-snug text-brown-light/70">ข้อมูลเก็บในเครื่องนี้เท่านั้น</div>
         </div>
       </aside>
       <main class="flex-1 min-w-0" id="page-content"></main>
@@ -278,115 +287,95 @@ window.SH_CONFIG = {
 
   function wireLayoutEvents() {
     const btn = document.getElementById("signout-btn");
-    if (btn) btn.addEventListener("click", async () => { await signOut(); });
+    if (btn) btn.addEventListener("click", () => { netlifyIdentity.logout(); });
   }
 
   // ------------------------------------------------------------
-  // Login page
+  // Logged-out screen
   // ------------------------------------------------------------
-  function renderLogin() {
+  function renderLoggedOut() {
     app.innerHTML = `
     <div class="min-h-screen flex items-center justify-center bg-cream-bg px-4">
-      <div class="w-full max-w-sm bg-white rounded-3xl shadow-cozy-lg p-8">
-        <div class="text-center mb-6">
-          <div class="text-4xl mb-2">🧋</div>
-          <h1 class="text-2xl font-display font-semibold text-brown-dark">StudyHub</h1>
-          <p class="text-sm text-brown-light mt-1">คลังอ่านหนังสือน่ารัก ๆ สำหรับนักศึกษา PT</p>
-        </div>
-        <form id="auth-form" class="space-y-3">
-          <div id="fullname-wrap" class="hidden">
-            <input type="text" id="full_name" placeholder="ชื่อ-นามสกุล" class="w-full px-4 py-2.5 rounded-xl border border-milktea-light bg-cream-card focus:outline-none focus:ring-2 focus:ring-brown-light" />
-          </div>
-          <input type="email" id="email" placeholder="อีเมล" required class="w-full px-4 py-2.5 rounded-xl border border-milktea-light bg-cream-card focus:outline-none focus:ring-2 focus:ring-brown-light" />
-          <input type="password" id="password" placeholder="รหัสผ่าน" required minlength="6" class="w-full px-4 py-2.5 rounded-xl border border-milktea-light bg-cream-card focus:outline-none focus:ring-2 focus:ring-brown-light" />
-          <p id="auth-error" class="text-sm text-status-ready hidden"></p>
-          <button type="submit" id="auth-submit" class="w-full py-2.5 rounded-full bg-brown text-white font-medium shadow-cozy hover:bg-brown-dark transition-colors disabled:opacity-60">เข้าสู่ระบบ</button>
-        </form>
-        <button id="mode-toggle" class="w-full text-center text-sm text-brown-light mt-4 hover:text-brown">ยังไม่มีบัญชี? สมัครสมาชิก</button>
-        <p id="config-warning" class="text-xs text-status-ready mt-4 text-center hidden">
-          ⚠️ ยังไม่ได้ใส่ Supabase URL/Key ในไฟล์ config.js — แก้ก่อนถึงจะล็อกอินได้
+      <div class="w-full max-w-sm bg-white rounded-3xl shadow-cozy-lg p-8 text-center">
+        <div class="text-4xl mb-2">🧋</div>
+        <h1 class="text-2xl font-display font-semibold text-brown-dark">StudyHub</h1>
+        <p class="text-sm text-brown-light mt-1 mb-6">คลังอ่านหนังสือน่ารัก ๆ สำหรับนักศึกษา PT</p>
+        <button id="open-login" class="w-full py-2.5 rounded-full bg-brown text-white font-medium shadow-cozy hover:bg-brown-dark transition-colors">
+          เข้าสู่ระบบ / สมัครสมาชิก
+        </button>
+        <p id="identity-warning" class="text-xs text-status-ready mt-4 hidden">
+          ⚠️ เว็บนี้ยังไม่ได้เปิดใช้งาน Identity — ไปที่ Netlify → Site configuration → Identity → Enable Identity ก่อนนะคะ
         </p>
       </div>
     </div>`;
 
-    if (window.SH_CONFIG.SUPABASE_URL.includes("YOUR-PROJECT")) {
-      document.getElementById("config-warning").classList.remove("hidden");
-    }
-
-    let mode = "signin";
-    const form = document.getElementById("auth-form");
-    const fullnameWrap = document.getElementById("fullname-wrap");
-    const fullnameInput = document.getElementById("full_name");
-    const submitBtn = document.getElementById("auth-submit");
-    const errEl = document.getElementById("auth-error");
-
-    document.getElementById("mode-toggle").addEventListener("click", () => {
-      mode = mode === "signin" ? "signup" : "signin";
-      fullnameWrap.classList.toggle("hidden", mode !== "signup");
-      fullnameInput.required = mode === "signup";
-      submitBtn.textContent = mode === "signin" ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
-      document.getElementById("mode-toggle").textContent =
-        mode === "signin" ? "ยังไม่มีบัญชี? สมัครสมาชิก" : "มีบัญชีแล้ว? เข้าสู่ระบบ";
-    });
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      errEl.classList.add("hidden");
-      submitBtn.disabled = true;
-      submitBtn.textContent = "กำลังโหลด...";
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const error =
-        mode === "signin"
-          ? await signInWithPassword(email, password)
-          : await signUp(email, password, fullnameInput.value);
-      submitBtn.disabled = false;
-      submitBtn.textContent = mode === "signin" ? "เข้าสู่ระบบ" : "สมัครสมาชิก";
-      if (error) {
-        errEl.textContent = error;
-        errEl.classList.remove("hidden");
+    document.getElementById("open-login").addEventListener("click", () => {
+      if (!window.netlifyIdentity) {
+        document.getElementById("identity-warning").classList.remove("hidden");
+        return;
       }
+      netlifyIdentity.open();
     });
   }
 
   // ------------------------------------------------------------
-  // Boot (called from boot.js after all page scripts are loaded)
+  // Boot — wire up Netlify Identity
   // ------------------------------------------------------------
   SH.boot = function () {
-    SH.client.auth.onAuthStateChange((_event, session) => {
-      currentSession = session;
+    if (!window.netlifyIdentity) {
+      renderLoggedOut();
+      document.getElementById("identity-warning") && document.getElementById("identity-warning").classList.remove("hidden");
+      return;
+    }
+
+    function afterLogin(user) {
+      SH.storageKey = "studyhub:" + user.id;
+      SH.data = SH.loadData();
       SH.route();
+    }
+
+    netlifyIdentity.on("init", (user) => {
+      if (user) afterLogin(user);
+      else renderLoggedOut();
     });
 
-    SH.client.auth.getSession().then(({ data }) => {
-      currentSession = data.session;
-      SH.route();
-    }).catch((err) => {
-      app.innerHTML = `<div class="min-h-screen flex items-center justify-center p-6 text-center text-sm text-status-ready max-w-md mx-auto">
-        เชื่อมต่อ Supabase ไม่สำเร็จ — ตรวจสอบ SUPABASE_URL / SUPABASE_ANON_KEY ในไฟล์ config.js<br/><br/>
-        <span class="text-brown-light">${SH.esc(err && err.message ? err.message : String(err))}</span>
-      </div>`;
+    netlifyIdentity.on("login", (user) => {
+      netlifyIdentity.close();
+      afterLogin(user);
     });
 
+    netlifyIdentity.on("logout", () => {
+      SH.storageKey = null;
+      SH.data = null;
+      renderLoggedOut();
+    });
+
+    netlifyIdentity.init();
     window.addEventListener("hashchange", SH.route);
   };
 })();
 
-
-window.SH = window.SH || {};
-window.SH.pages = window.SH.pages || {};
-
+// ============================================================
+// PAGE: Dashboard
+// ============================================================
 window.SH.pages.renderDashboard = async function (container) {
-  const [{ data: exams }, { data: tasks }, dueReviews] = await Promise.all([
-    SH.client.from("exams").select("*").order("exam_date", { ascending: true }),
-    SH.client.from("tasks").select("*").order("deadline", { ascending: true, nullsFirst: false }),
-    fetchDueReviews(),
-  ]);
-
+  const D = SH.data;
   const today = new Date();
-  const upcomingExams = (exams ?? []).filter((e) => SH.daysUntil(e.exam_date) >= 0).slice(0, 3);
-  const todaysTasks = (tasks ?? []).filter((t) => t.status === "To-Do" && t.planned_date === SH.todayStr());
-  const backlogTasks = (tasks ?? []).filter((t) => t.status === "To-Do" && !t.planned_date && !t.deadline);
+  const upcomingExams = D.exams
+    .slice()
+    .sort((a, b) => a.exam_date.localeCompare(b.exam_date))
+    .filter((e) => SH.daysUntil(e.exam_date) >= 0)
+    .slice(0, 3);
+  const todaysTasks = D.tasks.filter((t) => t.status === "To-Do" && t.planned_date === SH.todayStr());
+  const backlogTasks = D.tasks.filter((t) => t.status === "To-Do" && !t.planned_date && !t.deadline);
+  const todayStr = SH.todayStr();
+  const dueReviews = D.reviewQueue
+    .filter((r) => r.status === "Pending" && r.next_review_date <= todayStr)
+    .map((r) => {
+      const topic = D.topics.find((t) => t.id === r.topic_id);
+      const exam = topic ? D.exams.find((e) => e.id === topic.exam_id) : null;
+      return { id: r.id, topic_title: topic ? topic.title : "หัวข้อ", exam_title: exam ? exam.title : "" };
+    });
 
   container.innerHTML = `
   <div class="p-6 max-w-4xl mx-auto space-y-6 pb-24">
@@ -464,7 +453,7 @@ window.SH.pages.renderDashboard = async function (container) {
     <section class="bg-white rounded-2xl shadow-cozy overflow-hidden">
       <button id="backlog-toggle" class="w-full flex items-center justify-between p-5 font-display font-medium text-brown-dark">
         <span>Backlog (${backlogTasks.length})</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="backlog-chevron"><path d="m6 9 6 6 6-6"/></svg>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
       </button>
       <div id="backlog-body" class="hidden px-5 pb-5">
         ${
@@ -487,20 +476,22 @@ window.SH.pages.renderDashboard = async function (container) {
   </div>
   `;
 
-  document.getElementById("quick-task-form").addEventListener("submit", async (e) => {
+  document.getElementById("quick-task-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const input = document.getElementById("quick-task-title");
     const title = input.value.trim();
     if (!title) return;
-    const { data: userData } = await SH.client.auth.getUser();
-    await SH.client.from("tasks").insert({ title, user_id: userData.user.id });
+    D.tasks.push({ id: SH.uid(), title, status: "To-Do", deadline: null, planned_date: null, linked_topic_id: null });
+    SH.saveData();
     SH.route();
   });
 
   container.querySelectorAll("[data-task-toggle]").forEach((el) => {
-    el.addEventListener("change", async () => {
+    el.addEventListener("change", () => {
       const id = el.getAttribute("data-task-toggle");
-      await SH.client.from("tasks").update({ status: el.checked ? "Done" : "To-Do" }).eq("id", id);
+      const task = D.tasks.find((t) => t.id === id);
+      if (task) task.status = el.checked ? "Done" : "To-Do";
+      SH.saveData();
       SH.route();
     });
   });
@@ -510,38 +501,16 @@ window.SH.pages.renderDashboard = async function (container) {
   });
 
   document.getElementById("quick-add-btn").addEventListener("click", () => {
-    SH.go("/exams"); // simplest quick-add entry point for now: jump to exams to add a topic/task
+    SH.go("/exams");
   });
-}
-
-async function fetchDueReviews() {
-  const today = SH.todayStr();
-  const { data, error } = await SH.client
-    .from("review_queue")
-    .select("id, next_review_date, interval_days, topic_id, topics(title, exams(title))")
-    .eq("status", "Pending")
-    .lte("next_review_date", today)
-    .order("next_review_date", { ascending: true });
-  if (error) {
-    console.error(error);
-    return [];
-  }
-  return (data ?? []).map((r) => ({
-    id: r.id,
-    topic_title: r.topics?.title ?? "หัวข้อ",
-    exam_title: r.topics?.exams?.title ?? "",
-  }));
-}
-
-
-window.SH = window.SH || {};
-window.SH.pages = window.SH.pages || {};
+};
 
 // ============================================================
-// Exams List
+// PAGE: Exams List
 // ============================================================
 window.SH.pages.renderExamsList = async function (container) {
-  const { data: exams } = await SH.client.from("exams").select("*").order("exam_date", { ascending: true });
+  const D = SH.data;
+  const exams = D.exams.slice().sort((a, b) => a.exam_date.localeCompare(b.exam_date));
 
   container.innerHTML = `
   <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
@@ -563,13 +532,13 @@ window.SH.pages.renderExamsList = async function (container) {
     </form>
 
     <div class="grid sm:grid-cols-2 gap-3">
-      ${(exams ?? [])
+      ${exams
         .map(
           (exam) => `
         <a href="#/exams/${exam.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
           <div class="text-xs text-brown-light">${SH.esc(exam.type)}</div>
           <div class="font-display font-medium text-brown-dark">${SH.esc(exam.subject_name)}</div>
-          <div class="text-xs text-brown-light mt-1">${SH.esc(exam.subject_code ?? "")} · ${SH.formatDate(exam.exam_date)}</div>
+          <div class="text-xs text-brown-light mt-1">${SH.esc(exam.subject_code || "")} · ${SH.formatDate(exam.exam_date)}</div>
         </a>`
         )
         .join("")}
@@ -580,12 +549,11 @@ window.SH.pages.renderExamsList = async function (container) {
     document.getElementById("exam-form").classList.toggle("hidden");
   });
 
-  document.getElementById("exam-form").addEventListener("submit", async (e) => {
+  document.getElementById("exam-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const { data: userData } = await SH.client.auth.getUser();
     const target = document.getElementById("f-target").value;
-    await SH.client.from("exams").insert({
-      user_id: userData.user.id,
+    D.exams.push({
+      id: SH.uid(),
       type: document.getElementById("f-type").value,
       title: document.getElementById("f-title").value,
       subject_code: document.getElementById("f-code").value || null,
@@ -593,21 +561,17 @@ window.SH.pages.renderExamsList = async function (container) {
       exam_date: document.getElementById("f-date").value,
       target_score: target ? Number(target) : null,
     });
+    SH.saveData();
     SH.route();
   });
-}
+};
 
 // ============================================================
-// Exam Workspace — multi-level topic tree
+// PAGE: Exam Workspace — multi-level topic tree
 // ============================================================
 window.SH.pages.renderExamWorkspace = async function (container, examId) {
-  const { data: topics } = await SH.client
-    .from("topics")
-    .select("*")
-    .eq("exam_id", examId)
-    .order("order_index", { ascending: true });
-
-  const flat = topics ?? [];
+  const D = SH.data;
+  const flat = D.topics.filter((t) => t.exam_id === examId);
   const tree = buildTree(flat);
   const coveragePct = flat.length
     ? Math.round((flat.filter((t) => ["อ่านแล้ว", "ทวนแล้ว", "พร้อมสอบ"].includes(t.status)).length / flat.length) * 100)
@@ -634,36 +598,41 @@ window.SH.pages.renderExamWorkspace = async function (container, examId) {
     </div>
   </div>`;
 
-  document.getElementById("add-topic-form").addEventListener("submit", async (e) => {
+  document.getElementById("add-topic-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const input = document.getElementById("new-topic-title");
     const title = input.value.trim();
     if (!title) return;
-    await SH.client.from("topics").insert({ exam_id: examId, title, parent_id: null });
+    D.topics.push({
+      id: SH.uid(), exam_id: examId, parent_id: null, title, order_index: 0,
+      status: "ยังไม่อ่าน", confidence_level: 1, summary_text: "", image_urls: [], planned_study_date: null,
+    });
+    SH.saveData();
     SH.route();
   });
 
-  // Status change (delegated)
   container.querySelectorAll("[data-status-select]").forEach((sel) => {
-    sel.addEventListener("change", async () => {
+    sel.addEventListener("change", () => {
       const id = sel.getAttribute("data-status-select");
-      await SH.client.from("topics").update({ status: sel.value }).eq("id", id);
+      const topic = D.topics.find((t) => t.id === id);
+      if (topic) topic.status = sel.value;
+      SH.saveData();
       SH.route();
     });
   });
 
-  // Confidence hearts (delegated)
   container.querySelectorAll("[data-heart-value]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
       const wrap = btn.closest("[data-topic-hearts]");
       const id = wrap.getAttribute("data-topic-hearts");
       const value = Number(btn.getAttribute("data-heart-value"));
-      await SH.client.from("topics").update({ confidence_level: value }).eq("id", id);
+      const topic = D.topics.find((t) => t.id === id);
+      if (topic) topic.confidence_level = value;
+      SH.saveData();
       SH.route();
     });
   });
 
-  // Expand/collapse (no server round-trip needed)
   container.querySelectorAll("[data-toggle-expand]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-toggle-expand");
@@ -676,20 +645,23 @@ window.SH.pages.renderExamWorkspace = async function (container, examId) {
     });
   });
 
-  // Add sub-topic (simple prompt — keeps nested-tree UI manageable without a modal system)
   container.querySelectorAll("[data-add-child]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
       const parentId = btn.getAttribute("data-add-child");
       const title = prompt("ชื่อหัวข้อย่อย:");
       if (!title || !title.trim()) return;
-      await SH.client.from("topics").insert({ exam_id: examId, title: title.trim(), parent_id: parentId });
+      D.topics.push({
+        id: SH.uid(), exam_id: examId, parent_id: parentId, title: title.trim(), order_index: 0,
+        status: "ยังไม่อ่าน", confidence_level: 1, summary_text: "", image_urls: [], planned_study_date: null,
+      });
+      SH.saveData();
       SH.route();
     });
   });
-}
+};
 
 function buildTree(topics) {
-  const byId = new Map(topics.map((t) => [t.id, { ...t, children: [] }]));
+  const byId = new Map(topics.map((t) => [t.id, Object.assign({}, t, { children: [] })]));
   const roots = [];
   byId.forEach((t) => {
     if (t.parent_id && byId.has(t.parent_id)) byId.get(t.parent_id).children.push(t);
@@ -740,18 +712,16 @@ function progressCard(label, pct, colorClass) {
 }
 
 // ============================================================
-// Topic Detail
+// PAGE: Topic Detail
 // ============================================================
 window.SH.pages.renderTopicDetail = async function (container, examId, topicId) {
-  const [{ data: topic }, { data: traps }] = await Promise.all([
-    SH.client.from("topics").select("*").eq("id", topicId).single(),
-    SH.client.from("exam_traps").select("*").eq("topic_id", topicId).order("created_at", { ascending: false }),
-  ]);
-
+  const D = SH.data;
+  const topic = D.topics.find((t) => t.id === topicId);
   if (!topic) {
     container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบหัวข้อนี้</div>`;
     return;
   }
+  const traps = D.examTraps.filter((t) => t.topic_id === topicId).slice().reverse();
 
   container.innerHTML = `
   <div class="p-6 max-w-3xl mx-auto space-y-5 pb-24">
@@ -762,7 +732,7 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
 
     <section class="bg-white rounded-2xl shadow-cozy p-5">
       <h2 class="font-display font-medium text-brown-dark mb-2">สรุปเนื้อหา</h2>
-      <textarea id="summary-text" rows="8" placeholder="เขียนสรุปย่อของหัวข้อนี้..." class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light">${SH.esc(topic.summary_text ?? "")}</textarea>
+      <textarea id="summary-text" rows="8" placeholder="เขียนสรุปย่อของหัวข้อนี้..." class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light">${SH.esc(topic.summary_text || "")}</textarea>
 
       <div class="mt-3">
         <label class="inline-flex items-center gap-2 text-sm text-brown-light cursor-pointer hover:text-brown">
@@ -770,8 +740,13 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
           แนบรูปภาพ
           <input type="file" id="image-upload" accept="image/*" class="hidden" />
         </label>
+        <p class="text-xs text-brown-light/70 mt-1">รูปเก็บในเครื่องนี้เท่านั้น ใส่เยอะเกินไปอาจทำให้พื้นที่เก็บข้อมูลเต็ม</p>
         <div id="image-grid" class="grid grid-cols-3 gap-2 mt-3">
-          ${(topic.image_urls ?? []).map((url) => `<img src="${SH.esc(url)}" class="rounded-xl object-cover h-24 w-full" />`).join("")}
+          ${(topic.image_urls || []).map((url, i) => `
+            <div class="relative">
+              <img src="${SH.esc(url)}" class="rounded-xl object-cover h-24 w-full" />
+              <button data-remove-image="${i}" class="absolute top-1 right-1 bg-white/90 rounded-full w-5 h-5 flex items-center justify-center text-status-ready text-xs">✕</button>
+            </div>`).join("")}
         </div>
       </div>
     </section>
@@ -781,8 +756,8 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F0B57A" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a1.5 1.5 0 0 0 1.3 2.3h17.8a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0z"/></svg>
         จุดที่ชอบสับสน
       </h2>
-      <div id="traps-list" class="space-y-2 mb-3">
-        ${(traps ?? [])
+      <div class="space-y-2 mb-3">
+        ${traps
           .map(
             (t) => `
           <div class="bg-cream-card rounded-xl p-3">
@@ -800,60 +775,60 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
     </section>
   </div>`;
 
-  // Autosave summary on blur
-  document.getElementById("summary-text").addEventListener("blur", async (e) => {
-    await SH.client.from("topics").update({ summary_text: e.target.value }).eq("id", topic.id);
+  document.getElementById("summary-text").addEventListener("blur", (e) => {
+    topic.summary_text = e.target.value;
+    SH.saveData();
   });
 
-  // Confidence hearts
   container.querySelectorAll("[data-heart-value]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const value = Number(btn.getAttribute("data-heart-value"));
-      await SH.client.from("topics").update({ confidence_level: value }).eq("id", topic.id);
+    btn.addEventListener("click", () => {
+      topic.confidence_level = Number(btn.getAttribute("data-heart-value"));
+      SH.saveData();
       SH.route();
     });
   });
 
-  // Image upload
-  document.getElementById("image-upload").addEventListener("change", async (e) => {
-    const file = e.target.files?.[0];
+  document.getElementById("image-upload").addEventListener("change", (e) => {
+    const file = e.target.files && e.target.files[0];
     if (!file) return;
-    const { data: userData } = await SH.client.auth.getUser();
-    const path = `${userData.user.id}/${topic.id}/${Date.now()}-${file.name}`;
-    const { error: uploadError } = await SH.client.storage.from("study-images").upload(path, file);
-    if (uploadError) {
-      alert("อัปโหลดไม่สำเร็จ: " + uploadError.message);
-      return;
-    }
-    const { data: pub } = SH.client.storage.from("study-images").getPublicUrl(path);
-    const newUrls = [...(topic.image_urls ?? []), pub.publicUrl];
-    await SH.client.from("topics").update({ image_urls: newUrls }).eq("id", topic.id);
-    SH.route();
+    const reader = new FileReader();
+    reader.onload = () => {
+      topic.image_urls = topic.image_urls || [];
+      topic.image_urls.push(reader.result); // base64 data URL, stored inline
+      SH.saveData();
+      SH.route();
+    };
+    reader.readAsDataURL(file);
   });
 
-  // Add exam trap
-  document.getElementById("add-trap-btn").addEventListener("click", async () => {
+  container.querySelectorAll("[data-remove-image]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idx = Number(btn.getAttribute("data-remove-image"));
+      topic.image_urls.splice(idx, 1);
+      SH.saveData();
+      SH.route();
+    });
+  });
+
+  document.getElementById("add-trap-btn").addEventListener("click", () => {
     const title = document.getElementById("trap-title").value.trim();
     const detail = document.getElementById("trap-detail").value.trim();
     if (!title) return;
-    await SH.client.from("exam_traps").insert({ topic_id: topic.id, context_title: title, trap_detail: detail });
+    D.examTraps.push({ id: SH.uid(), topic_id: topic.id, context_title: title, trap_detail: detail });
+    SH.saveData();
     SH.route();
   });
-}
-
-
-window.SH = window.SH || {};
-window.SH.pages = window.SH.pages || {};
+};
 
 // ============================================================
-// Special Test Library — list + filter + add form
+// PAGE: Special Test Library
 // ============================================================
 let currentRegion = "All";
 
 window.SH.pages.renderSpecialTests = async function (container) {
-  let query = SH.client.from("special_tests").select("*").order("test_name", { ascending: true });
-  if (currentRegion !== "All") query = query.eq("body_region", currentRegion);
-  const { data: tests } = await query;
+  const D = SH.data;
+  let tests = D.specialTests.slice().sort((a, b) => a.test_name.localeCompare(b.test_name));
+  if (currentRegion !== "All") tests = tests.filter((t) => t.body_region === currentRegion);
 
   container.innerHTML = `
   <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
@@ -865,14 +840,12 @@ window.SH.pages.renderSpecialTests = async function (container) {
       <button id="toggle-test-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ เพิ่ม Test</button>
     </div>
 
-    <div id="region-chips" class="flex flex-wrap gap-2">
+    <div class="flex flex-wrap gap-2">
       ${["All", ...SH.BODY_REGIONS]
         .map(
           (r) => `
         <button data-region="${r}" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-          currentRegion === r
-            ? "bg-brown text-white border-brown"
-            : "bg-white text-brown-light border-milktea-light hover:bg-cream-card"
+          currentRegion === r ? "bg-brown text-white border-brown" : "bg-white text-brown-light border-milktea-light hover:bg-cream-card"
         }">${r === "All" ? "ทั้งหมด" : r}</button>`
         )
         .join("")}
@@ -887,10 +860,10 @@ window.SH.pages.renderSpecialTests = async function (container) {
     </form>
 
     ${
-      (tests ?? []).length === 0
+      tests.length === 0
         ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มี Special Test ในหมวดนี้ — เพิ่มอันแรกเลย!</div>`
         : `<div class="grid sm:grid-cols-2 gap-3">
-            ${(tests ?? [])
+            ${tests
               .map(
                 (t) => `
               <a href="#/special-tests/${t.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
@@ -923,16 +896,14 @@ window.SH.pages.renderSpecialTests = async function (container) {
     });
   });
 
-  document.getElementById("test-form").addEventListener("submit", async (e) => {
+  document.getElementById("test-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const { data: userData } = await SH.client.auth.getUser();
     const val = (id) => document.getElementById(id).value.trim();
     const numOrNull = (id) => (val(id) ? Number(val(id)) : null);
-
     if (!val("f-test-name")) return;
 
-    await SH.client.from("special_tests").insert({
-      user_id: userData.user.id,
+    D.specialTests.push({
+      id: SH.uid(),
       test_name: val("f-test-name"),
       body_region: document.getElementById("f-body-region").value,
       purpose: val("f-purpose") || null,
@@ -944,11 +915,11 @@ window.SH.pages.renderSpecialTests = async function (container) {
       sensitivity: numOrNull("f-sensitivity"),
       specificity: numOrNull("f-specificity"),
       differential_diagnosis: val("f-ddx") || null,
-      image_url: null,
     });
+    SH.saveData();
     SH.route();
   });
-}
+};
 
 function testFormFieldsHtml() {
   const inputCls =
@@ -1012,12 +983,13 @@ function testFormFieldsHtml() {
 }
 
 // ============================================================
-// Special Test Detail — with Quiz Me mode
+// PAGE: Special Test Detail — with Quiz Me mode
 // ============================================================
 let quizMode = false;
 
 window.SH.pages.renderSpecialTestDetail = async function (container, testId) {
-  const { data: test } = await SH.client.from("special_tests").select("*").eq("id", testId).single();
+  const D = SH.data;
+  const test = D.specialTests.find((t) => t.id === testId);
   if (!test) {
     container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบ Special Test นี้</div>`;
     return;
@@ -1072,13 +1044,14 @@ window.SH.pages.renderSpecialTestDetail = async function (container, testId) {
     SH.route();
   });
 
-  document.getElementById("delete-test-btn").addEventListener("click", async () => {
+  document.getElementById("delete-test-btn").addEventListener("click", () => {
     if (!confirm("ลบ Special Test นี้?")) return;
-    await SH.client.from("special_tests").delete().eq("id", test.id);
+    D.specialTests = D.specialTests.filter((t) => t.id !== test.id);
+    SH.data.specialTests = D.specialTests;
+    SH.saveData();
     SH.go("/special-tests");
   });
 
-  // Per-field reveal toggle (only present on masked fields)
   container.querySelectorAll("[data-reveal-toggle]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const fieldId = btn.getAttribute("data-reveal-toggle");
@@ -1088,13 +1061,13 @@ window.SH.pages.renderSpecialTestDetail = async function (container, testId) {
       btn.querySelector("[data-reveal-label]").textContent = revealed ? "ซ่อน" : "เฉลย";
     });
   });
-}
+};
 
 let fieldCounter = 0;
 function maskedField(label, value, masked) {
   fieldCounter++;
   const id = fieldCounter;
-  const display = value ?? "—";
+  const display = value === null || value === undefined || value === "" ? "—" : value;
   return `
   <div>
     <div class="flex items-center justify-between mb-1">
@@ -1114,16 +1087,15 @@ function maskedField(label, value, masked) {
   </div>`;
 }
 
-
-window.SH = window.SH || {};
-window.SH.pages = window.SH.pages || {};
-
-let cardTypeFilter = "All"; // "All" | "Basic" | "Compare"
+// ============================================================
+// PAGE: Flashcards (Basic + Compare)
+// ============================================================
+let cardTypeFilter = "All";
 
 window.SH.pages.renderFlashcards = async function (container) {
-  let query = SH.client.from("flashcards").select("*").in("card_type", ["Basic", "Compare"]).order("created_at", { ascending: false });
-  if (cardTypeFilter !== "All") query = query.eq("card_type", cardTypeFilter);
-  const { data: cards } = await query;
+  const D = SH.data;
+  let cards = D.flashcards.filter((c) => c.card_type === "Basic" || c.card_type === "Compare");
+  if (cardTypeFilter !== "All") cards = cards.filter((c) => c.card_type === cardTypeFilter);
 
   container.innerHTML = `
   <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
@@ -1157,7 +1129,6 @@ window.SH.pages.renderFlashcards = async function (container) {
         <label class="text-xs font-medium text-brown-light mb-1 block">หมวดหมู่</label>
         <input id="f-category" placeholder="เช่น Neuro, Ortho" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
       </div>
-
       <div id="basic-fields" class="space-y-3">
         <div>
           <label class="text-xs font-medium text-brown-light mb-1 block">คำถาม (หน้าการ์ด)</label>
@@ -1168,7 +1139,6 @@ window.SH.pages.renderFlashcards = async function (container) {
           <textarea id="f-back" rows="2" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm"></textarea>
         </div>
       </div>
-
       <div id="compare-fields" class="hidden space-y-3">
         <div class="grid sm:grid-cols-2 gap-3">
           <input id="f-entity-a" placeholder="สิ่งที่ 1 (เช่น ACL tear)" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
@@ -1179,7 +1149,6 @@ window.SH.pages.renderFlashcards = async function (container) {
           <textarea id="f-matrix" rows="4" placeholder="Mechanism | Pivot shift | Valgus stress&#10;Special test | Lachman | Valgus stress test" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm font-mono"></textarea>
         </div>
       </div>
-
       <div class="flex gap-2 pt-2">
         <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
         <button type="button" id="cancel-card-form" class="px-5 py-2 rounded-full text-brown-light text-sm">ยกเลิก</button>
@@ -1187,9 +1156,9 @@ window.SH.pages.renderFlashcards = async function (container) {
     </form>
 
     ${
-      (cards ?? []).length === 0
+      cards.length === 0
         ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มีการ์ด — เพิ่มอันแรกเลย!</div>`
-        : `<div class="grid sm:grid-cols-2 gap-3" id="cards-grid">${(cards ?? []).map(cardHtml).join("")}</div>`
+        : `<div class="grid sm:grid-cols-2 gap-3">${cards.map(cardHtml).join("")}</div>`
     }
   </div>`;
 
@@ -1199,13 +1168,11 @@ window.SH.pages.renderFlashcards = async function (container) {
   document.getElementById("cancel-card-form").addEventListener("click", () => {
     document.getElementById("card-form").classList.add("hidden");
   });
-
   document.getElementById("f-card-type").addEventListener("change", (e) => {
     const isCompare = e.target.value === "Compare";
     document.getElementById("basic-fields").classList.toggle("hidden", isCompare);
     document.getElementById("compare-fields").classList.toggle("hidden", !isCompare);
   });
-
   container.querySelectorAll("[data-type-filter]").forEach((btn) => {
     btn.addEventListener("click", () => {
       cardTypeFilter = btn.getAttribute("data-type-filter");
@@ -1213,9 +1180,8 @@ window.SH.pages.renderFlashcards = async function (container) {
     });
   });
 
-  document.getElementById("card-form").addEventListener("submit", async (e) => {
+  document.getElementById("card-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const { data: userData } = await SH.client.auth.getUser();
     const type = document.getElementById("f-card-type").value;
     const category = document.getElementById("f-category").value.trim() || null;
 
@@ -1223,9 +1189,7 @@ window.SH.pages.renderFlashcards = async function (container) {
       const front = document.getElementById("f-front").value.trim();
       const back = document.getElementById("f-back").value.trim();
       if (!front) return;
-      await SH.client.from("flashcards").insert({
-        user_id: userData.user.id, card_type: "Basic", category, front, back,
-      });
+      D.flashcards.push({ id: SH.uid(), card_type: "Basic", category, front, back });
     } else {
       const entityA = document.getElementById("f-entity-a").value.trim();
       const entityB = document.getElementById("f-entity-b").value.trim();
@@ -1236,15 +1200,12 @@ window.SH.pages.renderFlashcards = async function (container) {
         const parts = line.split("|").map((s) => s.trim());
         if (parts.length === 3 && parts[0]) matrix[parts[0]] = [parts[1] || "", parts[2] || ""];
       });
-      await SH.client.from("flashcards").insert({
-        user_id: userData.user.id, card_type: "Compare", category,
-        compare_entity_a: entityA, compare_entity_b: entityB, comparison_matrix: matrix,
-      });
+      D.flashcards.push({ id: SH.uid(), card_type: "Compare", category, compare_entity_a: entityA, compare_entity_b: entityB, comparison_matrix: matrix });
     }
+    SH.saveData();
     SH.route();
   });
 
-  // Flip Basic cards on click
   container.querySelectorAll("[data-flip-card]").forEach((el) => {
     el.addEventListener("click", (e) => {
       if (e.target.closest("[data-delete-card]")) return;
@@ -1257,13 +1218,14 @@ window.SH.pages.renderFlashcards = async function (container) {
     });
   });
 
-  // Delete
   container.querySelectorAll("[data-delete-card]").forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const id = btn.getAttribute("data-delete-card");
       if (!confirm("ลบการ์ดนี้?")) return;
-      await SH.client.from("flashcards").delete().eq("id", id);
+      D.flashcards = D.flashcards.filter((c) => c.id !== id);
+      SH.data.flashcards = D.flashcards;
+      SH.saveData();
       SH.route();
     });
   });
@@ -1295,7 +1257,6 @@ function cardHtml(card) {
       </table>
     </div>`;
   }
-
   return `
   <div data-flip-card class="bg-white rounded-2xl shadow-cozy p-4 relative cursor-pointer min-h-[100px]">
     <button data-delete-card="${card.id}" class="absolute top-3 right-3 text-brown-light hover:text-status-ready">
@@ -1308,21 +1269,20 @@ function cardHtml(card) {
   </div>`;
 }
 
-
-window.SH = window.SH || {};
-window.SH.pages = window.SH.pages || {};
-
+// ============================================================
+// PAGE: Drug Library (separate from Flashcards)
+// ============================================================
 let drugSearch = "";
 
-// ============================================================
-// Drug Library — list + search + add form
-// ============================================================
 window.SH.pages.renderDrugLibrary = async function (container) {
-  let query = SH.client.from("flashcards").select("*").eq("card_type", "Drug").order("drug_name", { ascending: true });
+  const D = SH.data;
+  let drugs = D.flashcards.filter((c) => c.card_type === "Drug").sort((a, b) => (a.drug_name || "").localeCompare(b.drug_name || ""));
   if (drugSearch.trim()) {
-    query = query.or(`drug_name.ilike.%${drugSearch.trim()}%,drug_class.ilike.%${drugSearch.trim()}%`);
+    const q = drugSearch.trim().toLowerCase();
+    drugs = drugs.filter(
+      (d) => (d.drug_name || "").toLowerCase().includes(q) || (d.drug_class || "").toLowerCase().includes(q)
+    );
   }
-  const { data: drugs } = await query;
 
   container.innerHTML = `
   <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
@@ -1345,10 +1305,10 @@ window.SH.pages.renderDrugLibrary = async function (container) {
     </form>
 
     ${
-      (drugs ?? []).length === 0
+      drugs.length === 0
         ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มียาในคลัง — เพิ่มตัวแรกเลย!</div>`
         : `<div class="grid sm:grid-cols-2 gap-3">
-            ${(drugs ?? [])
+            ${drugs
               .map(
                 (d) => `
               <a href="#/drugs/${d.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
@@ -1376,17 +1336,15 @@ window.SH.pages.renderDrugLibrary = async function (container) {
     searchTimer = setTimeout(() => {
       drugSearch = val;
       SH.route();
-    }, 350);
+    }, 300);
   });
 
-  document.getElementById("drug-form").addEventListener("submit", async (e) => {
+  document.getElementById("drug-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const { data: userData } = await SH.client.auth.getUser();
     const val = (id) => document.getElementById(id).value.trim();
     if (!val("f-drug-name")) return;
-
-    await SH.client.from("flashcards").insert({
-      user_id: userData.user.id,
+    D.flashcards.push({
+      id: SH.uid(),
       card_type: "Drug",
       drug_name: val("f-drug-name"),
       drug_class: val("f-drug-class") || null,
@@ -1396,6 +1354,7 @@ window.SH.pages.renderDrugLibrary = async function (container) {
       contraindications: val("f-contra") || null,
       key_takeaways: val("f-key") || null,
     });
+    SH.saveData();
     SH.route();
   });
 };
@@ -1438,13 +1397,14 @@ function drugFormFieldsHtml() {
 }
 
 // ============================================================
-// Drug Detail — with Quiz Me mode
+// PAGE: Drug Detail — with Quiz Me mode
 // ============================================================
 let drugQuizMode = false;
 let drugFieldCounter = 0;
 
 window.SH.pages.renderDrugDetail = async function (container, drugId) {
-  const { data: drug } = await SH.client.from("flashcards").select("*").eq("id", drugId).single();
+  const D = SH.data;
+  const drug = D.flashcards.find((c) => c.id === drugId);
   if (!drug) {
     container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบยานี้</div>`;
     return;
@@ -1456,7 +1416,6 @@ window.SH.pages.renderDrugDetail = async function (container, drugId) {
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
       กลับไปคลังยา
     </a>
-
     <div class="flex items-start justify-between">
       <div>
         ${drug.drug_class ? `<div class="text-xs text-brown-light">${SH.esc(drug.drug_class)}</div>` : ""}
@@ -1466,14 +1425,12 @@ window.SH.pages.renderDrugDetail = async function (container, drugId) {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
       </button>
     </div>
-
     <button id="drug-quiz-toggle" class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-cozy transition-colors ${
       drugQuizMode ? "bg-status-ready text-white" : "bg-milktea-caramel text-brown-dark"
     }">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.2 1 2.3h6c0-1.1.4-1.9 1-2.3A7 7 0 0 0 12 2z"/><path d="M9 18h6M10 22h4"/></svg>
       ${drugQuizMode ? "ออกจาก Quiz Me" : "Quiz Me — ทดสอบตัวเอง"}
     </button>
-
     <div class="bg-white rounded-2xl shadow-cozy p-5 space-y-4">
       ${drugMaskedField("กลไกการออกฤทธิ์ (MOA)", drug.moa, drugQuizMode)}
       ${drugMaskedField("ข้อบ่งใช้ (Indications)", drug.indications, drugQuizMode)}
@@ -1488,9 +1445,11 @@ window.SH.pages.renderDrugDetail = async function (container, drugId) {
     SH.route();
   });
 
-  document.getElementById("delete-drug-btn").addEventListener("click", async () => {
+  document.getElementById("delete-drug-btn").addEventListener("click", () => {
     if (!confirm("ลบยานี้ออกจากคลัง?")) return;
-    await SH.client.from("flashcards").delete().eq("id", drug.id);
+    D.flashcards = D.flashcards.filter((c) => c.id !== drug.id);
+    SH.data.flashcards = D.flashcards;
+    SH.saveData();
     SH.go("/drugs");
   });
 
@@ -1508,7 +1467,7 @@ window.SH.pages.renderDrugDetail = async function (container, drugId) {
 function drugMaskedField(label, value, masked) {
   drugFieldCounter++;
   const id = drugFieldCounter;
-  const display = value ?? "—";
+  const display = value === null || value === undefined || value === "" ? "—" : value;
   return `
   <div>
     <div class="flex items-center justify-between mb-1">
@@ -1528,11 +1487,7 @@ function drugMaskedField(label, value, masked) {
   </div>`;
 }
 
-
-// ============================================================
-// BOOT
-// ============================================================
-window.SH.boot();
+    window.SH.boot();
   </script>
 </body>
 </html>
