@@ -1,1509 +1,1926 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>StudyHub 🧋 — คลังอ่านหนังสือ PT</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link
-  href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap"
-  rel="stylesheet"
-/>
-
-<!-- Tailwind via Play CDN — no build step needed -->
-<script>
-  tailwind = { config: {
-    theme: {
-      extend: {
-        colors: {
-          brown: { DEFAULT: '#7C5C43', dark: '#5D4433', light: '#8D6E63' },
-          milktea: { DEFAULT: '#D7CCC8', light: '#EFEBE9', caramel: '#F5E6D3' },
-          cream: { DEFAULT: '#FAF6F0', bg: '#FFFDF9', card: '#FFF9F2' },
-          status: {
-            notread: '#D9D2C7',
-            reading: '#F3D98B',
-            read: '#B7C9A0',
-            reviewed: '#F0B57A',
-            ready: '#E89B9B',
-          },
-        },
-        fontFamily: {
-          display: ['Kanit', 'system-ui', 'sans-serif'],
-          body: ['Sarabun', 'system-ui', 'sans-serif'],
-        },
-        boxShadow: {
-          cozy: '0 4px 20px -4px rgba(124, 92, 67, 0.15)',
-          'cozy-lg': '0 8px 30px -6px rgba(124, 92, 67, 0.2)',
-        },
-      },
-    },
-  }};
-</script>
-<script src="https://cdn.tailwindcss.com"></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🧸 Study Planner Pro — หมีนมชานม</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <style>
-  body { -webkit-font-smoothing: antialiased; }
-  ::-webkit-scrollbar { width: 8px; }
-  ::-webkit-scrollbar-thumb { background: #D7CCC8; border-radius: 999px; }
-  .blurred { filter: blur(6px); user-select: none; }
+:root{
+  --cream:#FFF8F0;
+  --cream-2:#F5E8D8;
+  --milktea:#B98D5E;
+  --milktea-dark:#6B4226;
+  --brown-text:#4A2F1C;
+  --brown-soft:#8A6647;
+  --pink:#EAD2B4;
+  --pink-deep:#D7A876;
+  --mint:#E4D0AC;
+  --mint-deep:#C9A876;
+  --lavender:#E6D3B8;
+  --lavender-deep:#BD8F5E;
+  --coral:#C98452;
+  --red-status:#E3A38A;
+  --yellow-status:#E8C98F;
+  --green-status:#B9C896;
+  --shadow: 0 8px 24px rgba(90,60,30,0.16);
+  --shadow-sm: 0 3px 10px rgba(90,60,30,0.12);
+  --radius-lg: 28px;
+  --radius-md: 20px;
+  --radius-sm: 14px;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  font-family:'Sarabun',sans-serif;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(215,168,118,0.30), transparent 40%),
+    radial-gradient(circle at 92% 15%, rgba(233,208,172,0.45), transparent 40%),
+    radial-gradient(circle at 50% 95%, rgba(201,168,118,0.30), transparent 45%),
+    var(--cream);
+  color:var(--brown-text);
+  min-height:100vh;
+  padding-bottom:90px;
+  position:relative;
+}
+h1,h2,h3,.font-display{font-family:'Mali',cursive;}
+button{font-family:'Sarabun',sans-serif;cursor:pointer;border:none;}
+input,select,textarea{font-family:'Sarabun',sans-serif;}
+
+.bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.bg-decor span{position:absolute;opacity:0.4;animation:floatY 9s ease-in-out infinite;filter:drop-shadow(0 2px 4px rgba(90,60,30,0.1));}
+@keyframes floatY{0%,100%{transform:translateY(0) rotate(0deg);}50%{transform:translateY(-22px) rotate(10deg);}}
+header.topbar, nav.tabbar, main, .mobile-nav, .modal-overlay, .toast, .quick-add-fab{position:relative;z-index:1;}
+
+header.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 20px 10px;max-width:1100px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-emoji{font-size:28px;display:inline-block;animation:wiggle 3.4s ease-in-out infinite;}
+@keyframes wiggle{0%,100%{transform:rotate(-6deg);}50%{transform:rotate(8deg);}}
+.brand-title{font-family:'Mali',cursive;font-weight:700;font-size:20px;color:var(--milktea-dark);}
+.brand-sub{font-size:11px;color:var(--brown-soft);margin-top:-2px;}
+.streak-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--pink-deep),var(--coral));padding:7px 14px;border-radius:999px;font-weight:600;font-size:13px;box-shadow:var(--shadow-sm);color:#3A2412;}
+.header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.user-pill{display:none;align-items:center;gap:8px;background:#fff;padding:5px 6px 5px 12px;border-radius:999px;box-shadow:var(--shadow-sm);font-size:12px;font-weight:600;color:var(--brown-soft);}
+.user-pill .user-email{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.auth-gate-box{text-align:center;}
+.auth-gate-box .emoji{font-size:44px;margin-bottom:8px;animation:petBounce 2.4s ease-in-out infinite;}
+.auth-gate-box p{font-size:13px;color:var(--brown-soft);margin:8px 0 18px;}
+.sync-note{font-size:10.5px;color:var(--brown-soft);text-align:center;margin-top:10px;}
+
+nav.tabbar{max-width:1100px;margin:6px auto 18px;padding:0 20px;display:flex;gap:8px;flex-wrap:wrap;}
+.tab-btn{background:rgba(255,255,255,0.6);padding:9px 16px;border-radius:999px;font-weight:600;font-size:13.5px;color:var(--brown-soft);transition:all .2s ease;border:2px solid transparent;}
+.tab-btn.active{background:var(--brown-text);color:#fff8f0;box-shadow:var(--shadow-sm);}
+.tab-btn:not(.active):hover{border-color:var(--milktea);}
+
+main{max-width:1100px;margin:0 auto;padding:0 20px;}
+.view{display:none;animation:fadeIn .35s ease;}
+.view.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.card{background:#fff;border-radius:var(--radius-md);padding:20px;box-shadow:var(--shadow-sm);border:1px solid rgba(90,60,30,0.08);margin-bottom:18px;}
+
+.active-exam-card{background:linear-gradient(135deg,#fff, var(--cream-2));}
+.active-exam-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:2px;}
+.active-exam-label{font-size:12px;font-weight:700;color:var(--brown-soft);display:flex;align-items:center;gap:5px;}
+.active-exam-select{flex:1;min-width:160px;padding:9px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;color:var(--brown-text);font-size:14px;font-weight:600;font-family:'Mali',cursive;}
+.hint-text{font-size:11.5px;color:var(--brown-soft);margin-top:4px;}
+
+.onboard-card{text-align:center;padding:34px 20px;background:linear-gradient(160deg,var(--pink),var(--lavender));}
+.onboard-card .emoji{font-size:44px;animation:petBounce 2.4s ease-in-out infinite;display:block;margin-bottom:8px;}
+.onboard-card h3{font-family:'Mali',cursive;margin:0 0 6px;}
+.onboard-card p{font-size:13px;color:var(--brown-soft);margin:0 0 16px;}
+
+/* Today panel */
+.today-card{background:linear-gradient(155deg,#fff,var(--cream-2));}
+.today-empty{text-align:center;padding:20px 10px;color:var(--brown-soft);font-size:13px;}
+.today-empty .emoji{font-size:34px;display:block;margin-bottom:6px;}
+.today-group-title{font-size:12.5px;font-weight:700;color:var(--brown-soft);margin:12px 0 6px;display:flex;align-items:center;gap:6px;}
+.today-group-title:first-child{margin-top:0;}
+.today-row{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--cream-2);}
+.today-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--milktea-dark);flex-shrink:0;}
+.today-row-text{flex:1;font-size:13.5px;font-weight:600;}
+.today-row-text.done{text-decoration:line-through;opacity:.5;}
+.deadline-banner{background:var(--red-status);color:#4A2010;border-radius:12px;padding:8px 12px;font-size:12.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+
+.dash-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px;}
+@media(max-width:840px){.dash-grid{grid-template-columns:1fr;}}
+
+.pet-card{background:linear-gradient(160deg,var(--pink) 0%, var(--lavender) 55%, var(--mint) 100%);border-radius:var(--radius-lg);padding:24px;text-align:center;position:relative;overflow:hidden;box-shadow:var(--shadow);margin-bottom:0;}
+.pet-card::before,.pet-card::after{content:'';position:absolute;border-radius:50%;background:rgba(255,255,255,0.35);}
+.pet-card::before{width:120px;height:120px;top:-40px;left:-30px;}
+.pet-card::after{width:80px;height:80px;bottom:-20px;right:-10px;}
+.sparkle{position:absolute;font-size:15px;opacity:.8;animation:twinkle 2.4s ease-in-out infinite;z-index:1;}
+@keyframes twinkle{0%,100%{opacity:.25;transform:scale(.8);}50%{opacity:1;transform:scale(1.15);}}
+.level-badge{display:inline-block;background:rgba(255,255,255,0.75);color:var(--milktea-dark);font-weight:700;font-size:12.5px;padding:4px 12px;border-radius:999px;margin-bottom:10px;font-family:'Mali',cursive;position:relative;z-index:1;}
+.pet-stage{position:relative;z-index:1;width:150px;height:150px;margin:0 auto 8px;animation:petBounce 2.6s ease-in-out infinite;}
+@keyframes petBounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+.pet-name{font-family:'Mali',cursive;font-weight:700;font-size:19px;color:var(--brown-text);position:relative;z-index:1;}
+.pet-speech{background:#fff;border-radius:16px;padding:10px 16px;margin:10px auto 4px;max-width:280px;font-size:13.5px;color:var(--brown-soft);position:relative;box-shadow:var(--shadow-sm);min-height:20px;z-index:1;}
+.exp-bar-wrap{margin-top:14px;position:relative;z-index:1;}
+.exp-bar-bg{background:rgba(255,255,255,0.6);border-radius:999px;height:14px;overflow:hidden;}
+.exp-bar-fill{height:100%;background:linear-gradient(90deg,var(--coral),var(--pink-deep));border-radius:999px;transition:width .5s ease;}
+.exp-label{font-size:11px;color:var(--brown-soft);margin-top:5px;font-weight:600;}
+
+.bear{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);}
+.bear-ear{position:absolute;width:34px;height:34px;background:var(--milktea);border-radius:50%;top:-14px;}
+.bear-ear.l{left:6px;} .bear-ear.r{right:6px;}
+.bear-ear-in{position:absolute;width:16px;height:16px;background:var(--pink-deep);border-radius:50%;top:9px;left:9px;}
+.bear-head{width:118px;height:104px;background:var(--milktea);border-radius:50% 50% 46% 46%/54% 54% 46% 46%;position:relative;}
+.bear-snout{position:absolute;width:56px;height:44px;background:#FBEDD8;border-radius:50%;left:50%;top:52%;transform:translate(-50%,0);}
+.bear-nose{position:absolute;width:14px;height:10px;background:var(--brown-text);border-radius:50%;left:50%;top:12px;transform:translateX(-50%);}
+.bear-mouth{position:absolute;width:16px;height:8px;border-bottom:3px solid var(--brown-text);border-radius:0 0 50% 50%;left:50%;top:24px;transform:translateX(-50%);}
+.bear-eye{position:absolute;width:8px;height:10px;background:var(--brown-text);border-radius:50%;top:38px;}
+.bear-eye.l{left:28px;} .bear-eye.r{right:28px;}
+.bear-blush{position:absolute;width:16px;height:9px;background:var(--pink-deep);border-radius:50%;opacity:.7;top:50px;}
+.bear-blush.l{left:8px;} .bear-blush.r{right:8px;}
+.bear-scarf{position:absolute;width:120px;height:20px;background:var(--coral);left:-1px;top:88px;border-radius:8px;}
+.bear-glasses{position:absolute;width:70px;height:16px;top:35px;left:24px;}
+.bear-glasses .lens{position:absolute;width:24px;height:16px;border:2.5px solid var(--brown-text);border-radius:50%;background:rgba(255,255,255,0.4);}
+.bear-glasses .lens.l{left:0;} .bear-glasses .lens.r{right:0;}
+.bear-glasses .bridge{position:absolute;top:6px;left:22px;width:26px;height:2.5px;background:var(--brown-text);}
+.bear-cap{position:absolute;top:-30px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:44px solid transparent;border-right:44px solid transparent;border-bottom:14px solid #6B4226;}
+.bear-cap-top{position:absolute;top:-16px;left:50%;transform:translateX(-50%) rotate(45deg);width:34px;height:34px;background:#6B4226;border-radius:4px;}
+.bear-cap-btn{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:#E8C98F;border-radius:50%;}
+.bear-egg{width:96px;height:118px;background:linear-gradient(160deg,#FFF3E0,#EBD3AC);border-radius:50% 50% 48% 48%/60% 60% 40% 40%;position:relative;margin:0 auto;}
+.bear-egg .crack{position:absolute;width:2px;height:40px;background:var(--milktea);top:20px;left:50%;transform:rotate(8deg);}
+
+.focus-card{margin-bottom:0;}
+.pomo-display{font-family:'Mali',cursive;font-size:52px;font-weight:700;text-align:center;color:var(--milktea-dark);margin:6px 0 10px;letter-spacing:2px;}
+.pomo-mode{text-align:center;font-size:12.5px;font-weight:700;color:var(--brown-soft);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.pomo-controls{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+.btn{padding:10px 18px;border-radius:999px;font-weight:600;font-size:13.5px;transition:transform .15s ease, box-shadow .15s ease;box-shadow:var(--shadow-sm);}
+.btn:hover{transform:translateY(-2px) rotate(-1deg);}
+.btn:active{transform:scale(.94);}
+.btn-primary{background:var(--brown-text);color:#FFF8F0;}
+.btn-soft{background:var(--cream-2);color:var(--brown-text);border:1.5px solid var(--milktea);}
+.btn-pink{background:var(--pink);color:var(--brown-text);}
+.btn-danger{background:var(--red-status);color:#4A2010;}
+details.pomo-settings-details{margin-top:12px;text-align:center;}
+details.pomo-settings-details summary{cursor:pointer;font-size:12px;color:var(--brown-soft);font-weight:700;list-style:none;display:inline-flex;align-items:center;gap:4px;}
+details.pomo-settings-details summary::-webkit-details-marker{display:none;}
+.pomo-settings{display:flex;gap:10px;justify-content:center;margin-top:10px;font-size:12px;color:var(--brown-soft);}
+.pomo-settings label{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.pomo-settings input{width:60px;padding:5px 8px;border-radius:10px;border:1.5px solid var(--milktea);text-align:center;}
+.focus-divider{border:none;border-top:2px dashed var(--cream-2);margin:18px 0 14px;}
+.sound-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.sound-btn{padding:12px 14px;border-radius:16px;background:var(--cream-2);font-size:13px;font-weight:600;text-align:center;min-width:78px;border:2px solid transparent;transition:transform .15s ease;}
+.sound-btn:hover{transform:translateY(-2px);}
+.sound-btn .emoji{display:block;font-size:22px;margin-bottom:2px;}
+.sound-btn.active{border-color:var(--milktea-dark);background:var(--mint);}
+
+.dday-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+.dday-box{background:var(--cream-2);border-radius:14px;padding:12px;text-align:center;}
+.dday-num{font-family:'Mali',cursive;font-size:26px;font-weight:700;color:var(--milktea-dark);}
+.dday-label{font-size:11px;color:var(--brown-soft);margin-top:2px;}
+.dday-advice{margin-top:10px;background:var(--lavender);border-radius:14px;padding:10px 14px;font-size:13px;text-align:center;font-weight:600;}
+
+.section-title{font-family:'Mali',cursive;font-size:18px;font-weight:700;margin:0 0 12px;color:var(--brown-text);display:flex;align-items:center;gap:8px;}
+
+.subj-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;border:none;cursor:default;}
+.subj-chip.clickable{cursor:pointer;transition:transform .12s ease;}
+.subj-chip.clickable:hover{transform:translateY(-1px);}
+.subj-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-nav-btn{background:var(--cream-2);border-radius:999px;width:34px;height:34px;font-size:16px;color:var(--brown-text);}
+.cal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;}
+.cal-legend{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.cal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--brown-soft);padding-bottom:4px;}
+.cal-cell{aspect-ratio:1/1;border-radius:14px;background:var(--cream-2);padding:5px;display:flex;flex-direction:column;cursor:pointer;position:relative;transition:transform .12s ease;border:2px solid transparent;overflow:hidden;}
+.cal-cell:hover{transform:translateY(-2px) scale(1.03);box-shadow:var(--shadow-sm);}
+.cal-cell.empty{background:transparent;cursor:default;}
+.cal-cell.empty:hover{transform:none;box-shadow:none;}
+.cal-cell.today{border-color:var(--coral);background:var(--pink);}
+.cal-daynum{font-size:12px;font-weight:700;color:var(--brown-text);}
+.cal-tasks{margin-top:2px;display:flex;flex-direction:column;gap:2px;overflow:hidden;}
+.cal-task-dot{font-size:8.5px;font-weight:700;border-radius:6px;padding:1px 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:3px;}
+.cal-task-dot .mini-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.cal-task-dot.done{text-decoration:line-through;opacity:.5;}
+.cal-task-dot.review{background:var(--lavender);color:var(--milktea-dark);}
+.cal-more{font-size:9px;color:var(--brown-soft);font-weight:700;}
+.cal-urgent-badge{background:var(--red-status);color:#4A2010;font-size:8px;font-weight:800;border-radius:6px;padding:1px 4px;margin:0 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cal-cell.examday{border-color:#C98452;border-style:dashed;}
+.cal-cell.examday.today{border-style:solid;border-color:var(--coral);}
+.legend-note{font-size:10.5px;color:var(--brown-soft);display:inline-flex;align-items:center;gap:4px;}
+
+.backlog-row{display:flex;align-items:center;gap:10px;background:var(--cream-2);border-radius:14px;padding:10px 12px;margin-bottom:8px;}
+.backlog-info{flex:1;min-width:0;}
+.backlog-topic{font-weight:600;font-size:13.5px;}
+.backlog-meta{font-size:11px;color:var(--brown-soft);margin-top:2px;}
+
+.grid-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.exam-card{background:#fff;border-radius:var(--radius-md);padding:18px;box-shadow:var(--shadow-sm);border-top:6px solid var(--lavender-deep);position:relative;transition:transform .15s ease;cursor:pointer;}
+.exam-card:hover{transform:translateY(-3px);}
+.exam-card.is-active{border-top-color:var(--coral);box-shadow:0 0 0 2px var(--coral), var(--shadow-sm);}
+.active-ribbon{position:absolute;top:10px;left:10px;background:var(--coral);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:999px;}
+.exam-card .edit-x{position:absolute;top:10px;right:10px;display:flex;gap:6px;}
+.icon-btn{background:var(--cream-2);border-radius:999px;width:26px;height:26px;font-size:12px;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;}
+.icon-btn:hover{transform:scale(1.15);}
+.exam-name{font-family:'Mali',cursive;font-weight:700;font-size:17px;margin:2px 0 4px;}
+.exam-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
+.progress-track{background:var(--cream-2);height:10px;border-radius:999px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--mint-deep),var(--lavender-deep));}
+.progress-txt{font-size:11px;color:var(--brown-soft);margin-top:5px;font-weight:600;}
+.add-card{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed var(--milktea);border-radius:var(--radius-md);min-height:150px;color:var(--milktea-dark);font-weight:700;background:rgba(255,255,255,0.4);transition:transform .15s ease;}
+.add-card:hover{transform:translateY(-3px);}
+
+.filter-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.filter-row select{padding:8px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13px;color:var(--brown-text);}
+.subject-group{margin-bottom:14px;border-radius:16px;overflow:hidden;}
+.subject-group summary{list-style:none;cursor:pointer;padding:4px 0 10px;display:flex;align-items:center;gap:8px;}
+.subject-group summary::-webkit-details-marker{display:none;}
+.subject-group summary::before{content:'▾';font-size:11px;color:var(--brown-soft);transition:transform .15s ease;}
+.subject-group:not([open]) summary::before{transform:rotate(-90deg);}
+.group-count{font-size:11px;color:var(--brown-soft);font-weight:600;}
+.read-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow-sm);border-left:5px solid var(--milktea);transition:transform .12s ease;}
+.read-item:hover{transform:translateX(2px);}
+.status-btn{width:34px;height:34px;border-radius:50%;font-size:16px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:transform .15s ease;}
+.status-btn:hover{transform:scale(1.1) rotate(-6deg);}
+.status-red{background:var(--red-status);}
+.status-yellow{background:var(--yellow-status);}
+.status-green{background:var(--green-status);}
+.read-info{flex:1;min-width:0;}
+.read-topic{font-weight:600;font-size:14px;}
+.read-meta{font-size:11.5px;color:var(--brown-soft);margin-top:3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.date-chip{background:var(--cream-2);border-radius:999px;font-size:10.5px;font-weight:700;padding:3px 9px;color:var(--brown-soft);white-space:nowrap;}
+.date-chip:hover{background:var(--mint);}
+.date-chip.deadline-chip{background:var(--red-status);color:#4A2010;}
+.date-chip.deadline-chip:hover{background:#D89078;}
+.date-chip-input{border-radius:999px;font-size:11px;padding:2px 8px;border:1.5px solid var(--milktea);}
+.read-actions{display:flex;gap:6px;}
+.empty-state{text-align:center;padding:40px 20px;color:var(--brown-soft);}
+.empty-state .emoji{font-size:40px;display:block;margin-bottom:6px;animation:petBounce 2.4s ease-in-out infinite;}
+
+.drug-card-wrap{background:#fff;border-radius:16px;margin-bottom:10px;box-shadow:var(--shadow-sm);border-left:5px solid var(--coral);overflow:hidden;}
+.drug-card-wrap summary{list-style:none;cursor:pointer;}
+.drug-card-wrap summary::-webkit-details-marker{display:none;}
+.drug-card-fields{padding:2px 14px 14px 60px;font-size:12.5px;}
+.drug-field{margin-bottom:8px;}
+.drug-field-label{font-weight:700;color:var(--milktea-dark);display:block;margin-bottom:2px;}
+.drug-field-value{color:var(--brown-text);white-space:pre-wrap;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(74,47,28,0.35);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;backdrop-filter:blur(2px);}
+.modal-overlay.active{display:flex;}
+.modal-box{background:#FFF8F0;border-radius:24px;padding:22px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;box-shadow:0 20px 50px rgba(74,47,28,0.32);}
+.modal-title{font-family:'Mali',cursive;font-weight:700;font-size:19px;margin-bottom:14px;}
+.modal-subnote{font-size:12px;color:var(--brown-soft);margin:-8px 0 14px;}
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:12.5px;font-weight:600;color:var(--brown-soft);margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--milktea);background:#fff;font-size:13.5px;color:var(--brown-text);}
+.form-group textarea{resize:vertical;min-height:44px;}
+.modal-actions{display:flex;gap:10px;margin-top:16px;justify-content:flex-end;}
+.day-add-section{border-top:2px dashed var(--milktea);margin-top:6px;padding-top:14px;}
+.day-scheduled-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--cream-2);}
+.day-scheduled-row input[type=checkbox]{width:19px;height:19px;accent-color:var(--milktea-dark);flex-shrink:0;}
+.day-scheduled-info{flex:1;min-width:0;}
+.day-scheduled-topic{font-size:13.5px;font-weight:600;}
+.day-scheduled-topic.done{text-decoration:line-through;opacity:.55;}
+.quick-chip-row{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 14px;}
+.quick-chip{background:var(--cream-2);border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;color:var(--brown-text);transition:transform .12s ease;}
+.quick-chip:hover{transform:translateY(-2px);background:var(--mint);}
+.exam-day-alert{background:var(--red-status);color:#4A2010;border-radius:14px;padding:10px 14px;font-size:13px;font-weight:700;margin-bottom:12px;text-align:center;}
+.day-scheduled-row.review-row{background:var(--cream-2);border-radius:12px;padding:8px 10px;border-bottom:none;margin-bottom:6px;}
+.day-empty-note{font-size:12.5px;color:var(--brown-soft);padding:4px 0 10px;}
+.no-active-exam-msg{text-align:center;font-size:13px;color:var(--brown-soft);padding:10px 0;}
+.subject-row{display:flex;gap:6px;margin-bottom:8px;align-items:center;}
+.subject-row input[type=text]{flex:1.3;min-width:0;}
+.subject-row input[type=date]{flex:1.1;min-width:0;}
+.subject-date-badge{display:inline-flex;align-items:center;gap:4px;}
+.toggle-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;font-weight:600;}
+.toggle-row input{width:18px;height:18px;accent-color:var(--coral);}
+.quick-add-choice{display:flex;flex-direction:column;gap:10px;}
+.quick-add-choice button{width:100%;padding:16px;font-size:15px;}
+
+.quick-add-fab{position:fixed;right:20px;bottom:100px;width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,var(--coral),var(--pink-deep));color:#fff;font-size:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(74,47,28,0.35);z-index:80;border:none;line-height:1;}
+.quick-add-fab:active{transform:scale(.92);}
+
+.mobile-nav{display:none;}
+@media(max-width:640px){
+  body{padding-bottom:160px;}
+  .mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;box-shadow:0 -4px 16px rgba(90,60,30,0.18);padding:8px 6px 56px;justify-content:space-around;z-index:50;}
+  .mobile-nav button{background:none;display:flex;flex-direction:column;align-items:center;font-size:10px;color:var(--brown-soft);gap:2px;font-weight:600;padding:4px;}
+  .mobile-nav button.active{color:var(--brown-text);}
+  .mobile-nav .m-emoji{font-size:19px;}
+  nav.tabbar{display:none;}
+  .dash-grid{grid-template-columns:1fr;}
+  .quick-add-fab{bottom:190px;}
+}
+.toast{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);background:var(--brown-text);color:#fff8f0;padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:var(--shadow);z-index:200;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-8px);}
+@media(min-width:641px){.toast{bottom:24px;} .quick-add-fab{bottom:24px;}}
 </style>
 </head>
-<body class="bg-cream-bg font-body text-brown-dark">
-  <div id="app">
-    <div class="min-h-screen flex items-center justify-center text-brown-light text-sm">กำลังเริ่มระบบ...</div>
+<body>
+
+<div class="bg-decor">
+  <span style="left:4%;top:12%;font-size:22px;animation-delay:0s;">☕</span>
+  <span style="left:88%;top:8%;font-size:18px;animation-delay:1.2s;">✨</span>
+  <span style="left:92%;top:60%;font-size:20px;animation-delay:2.4s;">🤎</span>
+  <span style="left:6%;top:70%;font-size:16px;animation-delay:.6s;">⭐</span>
+  <span style="left:50%;top:4%;font-size:16px;animation-delay:1.8s;">🍯</span>
+  <span style="left:20%;top:88%;font-size:18px;animation-delay:3s;">🧋</span>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-emoji">🧋</div>
+    <div>
+      <div class="brand-title">Study Planner Pro</div>
+      <div class="brand-sub">แพลนอ่านหนังสือกับหมีนมชานม</div>
+    </div>
   </div>
+  <div class="header-right">
+    <div class="streak-pill">🔥 <span id="streakCount">0</span> วันติด</div>
+    <div class="user-pill" id="userPill">
+      <span class="user-email" id="userEmailLabel"></span>
+      <button class="icon-btn" id="logoutBtn" title="ออกจากระบบ">🚪</button>
+    </div>
+  </div>
+</header>
 
-  <!-- Netlify Identity — login/signup, built into your Netlify site.
-       No external account needed: just enable it once in your Netlify
-       dashboard (Site configuration → Identity → Enable Identity). -->
-  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<nav class="tabbar">
+  <button class="tab-btn active" data-view="dashboard">🏠 แดชบอร์ด</button>
+  <button class="tab-btn" data-view="calendar">📅 ปฏิทิน</button>
+  <button class="tab-btn" data-view="exams">📚 ชุดสอบ</button>
+  <button class="tab-btn" data-view="reading">✅ รายการอ่าน</button>
+  <button class="tab-btn" data-view="drugcards">💊 การ์ดยา</button>
+</nav>
 
-  <!-- ============================================================
-       ทั้งแอปอยู่ในไฟล์นี้ไฟล์เดียว ไม่มีไฟล์อื่นอีกแล้ว
-       ข้อมูลเก็บใน localStorage ของเบราว์เซอร์นี้เท่านั้น (ไม่ sync ข้ามเครื่อง)
-       ============================================================ -->
-  <script>
-// ============================================================
-// StudyHub — Netlify Identity + localStorage version
-// No external accounts, no SQL, no API keys.
-// Data lives only on this device (per browser).
-// ============================================================
-(function () {
-  const SH = (window.SH = window.SH || {});
-  SH.pages = SH.pages || {};
+<main>
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
 
-  const app = document.getElementById("app");
+    <div class="card onboard-card" id="onboardCard" style="display:none;">
+      <span class="emoji">🧸</span>
+      <h3>เริ่มต้นกันก่อนนะ!</h3>
+      <p>สร้าง "ชุดสอบ" แรกของเธอ เช่น สอบบอร์ด PT แล้วใส่รายวิชาที่ต้องอ่าน ทุกอย่างในแอปจะเชื่อมกับชุดสอบนี้ให้เองอัตโนมัติ</p>
+      <button class="btn btn-primary" id="onboardCreateBtn">➕ สร้างชุดสอบแรก</button>
+    </div>
 
-  // ------------------------------------------------------------
-  // Utils
-  // ------------------------------------------------------------
-  SH.esc = function (str) {
-    if (str === null || str === undefined) return "";
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;");
-  };
+    <div class="card today-card" id="todayCard">
+      <div class="section-title">🌤️ วันนี้ต้องทำอะไร</div>
+      <div id="todayContent"></div>
+    </div>
 
-  SH.formatDate = function (iso) {
-    if (!iso) return "";
-    const d = new Date(iso);
-    return d.toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" });
-  };
-
-  SH.daysUntil = function (iso) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const target = new Date(iso);
-    target.setHours(0, 0, 0, 0);
-    return Math.round((target - today) / 86400000);
-  };
-
-  SH.todayStr = function () {
-    return new Date().toISOString().slice(0, 10);
-  };
-
-  SH.go = function (hash) {
-    location.hash = hash;
-  };
-
-  SH.uid = function () {
-    return window.crypto && crypto.randomUUID
-      ? crypto.randomUUID()
-      : "id-" + Date.now() + "-" + Math.random().toString(16).slice(2);
-  };
-
-  SH.STATUS_ORDER = ["ยังไม่อ่าน", "กำลังอ่าน", "อ่านแล้ว", "ทวนแล้ว", "พร้อมสอบ"];
-  SH.STATUS_COLOR = {
-    ยังไม่อ่าน: "bg-status-notread text-brown-dark",
-    กำลังอ่าน: "bg-status-reading text-brown-dark",
-    อ่านแล้ว: "bg-status-read text-white",
-    ทวนแล้ว: "bg-status-reviewed text-white",
-    พร้อมสอบ: "bg-status-ready text-white",
-  };
-  SH.BODY_REGIONS = [
-    "Cervical", "Shoulder", "Elbow", "Wrist/Hand",
-    "Thoracic/Lumbar", "Hip", "Knee", "Ankle/Foot",
-  ];
-
-  SH.heartRow = function (value, size, interactive) {
-    size = size || 16;
-    let out = `<div class="flex items-center gap-0.5">`;
-    for (let n = 1; n <= 5; n++) {
-      const filled = n <= value;
-      out += `<button type="button" ${interactive ? `data-heart-value="${n}"` : "disabled"} class="${interactive ? "" : "cursor-default"}">
-        <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled ? "#E89B9B" : "none"}" stroke="${filled ? "#E89B9B" : "#D7CCC8"}" stroke-width="2">
-          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-        </svg>
-      </button>`;
-    }
-    out += `</div>`;
-    return out;
-  };
-
-  SH.comingSoonHtml = function (title) {
-    return `
-    <div class="p-6 max-w-3xl mx-auto">
-      <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-10 text-center">
-        <div class="text-4xl mb-3">🧋</div>
-        <h1 class="text-xl font-display font-semibold text-brown-dark mb-2">${SH.esc(title)}</h1>
-        <p class="text-sm text-brown-light">โมดูลนี้อยู่ใน Phase ถัดไปของการพัฒนา</p>
+    <div class="card active-exam-card" id="activeExamCard" style="display:none;">
+      <div class="active-exam-top">
+        <span class="active-exam-label">🎯 ชุดสอบที่ใช้งานอยู่</span>
       </div>
-    </div>`;
-  };
+      <select class="active-exam-select" id="activeExamSelect"></select>
+      <div class="hint-text">รายการที่เพิ่มใหม่ในปฏิทิน/รายการอ่าน จะผูกกับชุดสอบนี้โดยอัตโนมัติ</div>
+      <div id="ddayContent"></div>
+    </div>
 
-  // ------------------------------------------------------------
-  // Data layer — one JSON blob in localStorage, per logged-in user
-  // ------------------------------------------------------------
-  SH.storageKey = null;
-  SH.data = null;
-
-  function emptyData() {
-    return { exams: [], topics: [], tasks: [], examTraps: [], reviewQueue: [], specialTests: [], flashcards: [] };
-  }
-
-  SH.loadData = function () {
-    const raw = localStorage.getItem(SH.storageKey);
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        return Object.assign(emptyData(), parsed);
-      } catch (e) {
-        console.error("Corrupt local data, starting fresh", e);
-      }
-    }
-    return emptyData();
-  };
-
-  SH.saveData = function () {
-    try {
-      localStorage.setItem(SH.storageKey, JSON.stringify(SH.data));
-    } catch (e) {
-      alert("บันทึกไม่สำเร็จ — พื้นที่เก็บข้อมูลในเบราว์เซอร์อาจเต็ม (มักเกิดจากรูปภาพเยอะเกินไป)");
-      console.error(e);
-    }
-  };
-
-  // ------------------------------------------------------------
-  // Router
-  // ------------------------------------------------------------
-  SH.route = async function () {
-    if (!SH.data) {
-      renderLoggedOut();
-      return;
-    }
-    const hash = location.hash.replace(/^#/, "") || "/";
-    const parts = hash.split("/").filter(Boolean);
-
-    let activeNav = "/";
-    let pageFn = null;
-    let pageArgs = [];
-
-    if (parts.length === 0) {
-      pageFn = SH.pages.renderDashboard;
-    } else if (parts[0] === "exams" && parts.length === 1) {
-      activeNav = "/exams"; pageFn = SH.pages.renderExamsList;
-    } else if (parts[0] === "exams" && parts.length === 2) {
-      activeNav = "/exams"; pageFn = SH.pages.renderExamWorkspace; pageArgs = [parts[1]];
-    } else if (parts[0] === "exams" && parts.length === 4 && parts[2] === "topics") {
-      activeNav = "/exams"; pageFn = SH.pages.renderTopicDetail; pageArgs = [parts[1], parts[3]];
-    } else if (parts[0] === "special-tests" && parts.length === 1) {
-      activeNav = "/special-tests"; pageFn = SH.pages.renderSpecialTests;
-    } else if (parts[0] === "special-tests" && parts.length === 2) {
-      activeNav = "/special-tests"; pageFn = SH.pages.renderSpecialTestDetail; pageArgs = [parts[1]];
-    } else if (parts[0] === "flashcards") {
-      activeNav = "/flashcards"; pageFn = SH.pages.renderFlashcards;
-    } else if (parts[0] === "drugs" && parts.length === 1) {
-      activeNav = "/drugs"; pageFn = SH.pages.renderDrugLibrary;
-    } else if (parts[0] === "drugs" && parts.length === 2) {
-      activeNav = "/drugs"; pageFn = SH.pages.renderDrugDetail; pageArgs = [parts[1]];
-    } else if (parts[0] === "aha-notes") {
-      activeNav = "/aha-notes"; pageFn = (c) => { c.innerHTML = SH.comingSoonHtml("Aha / Wow Notes"); };
-    } else if (parts[0] === "mistakes") {
-      activeNav = "/mistakes"; pageFn = (c) => { c.innerHTML = SH.comingSoonHtml("Mistake Book"); };
-    } else {
-      pageFn = (c) => { c.innerHTML = `<div class="p-6 text-brown-light">ไม่พบหน้านี้</div>`; };
-    }
-
-    app.innerHTML = shell(activeNav);
-    wireLayoutEvents();
-    const container = document.getElementById("page-content");
-    await pageFn(container, ...pageArgs);
-  };
-
-  // ------------------------------------------------------------
-  // Layout shell
-  // ------------------------------------------------------------
-  const NAV = [
-    { to: "/", label: "หน้าหลัก", icon: "home" },
-    { to: "/exams", label: "คลังสอบ", icon: "book" },
-    { to: "/special-tests", label: "Special Tests", icon: "stethoscope" },
-    { to: "/flashcards", label: "Flashcards", icon: "layers" },
-    { to: "/drugs", label: "คลังยา", icon: "pill" },
-    { to: "/aha-notes", label: "Aha Notes", icon: "lightbulb" },
-    { to: "/mistakes", label: "Mistake Book", icon: "list-checks" },
-  ];
-
-  const ICONS = {
-    home: `<path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/>`,
-    book: `<path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v16H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20"/>`,
-    stethoscope: `<path d="M4.8 2.3v6.5a5.2 5.2 0 0 0 10.4 0V2.3"/><path d="M10 15.5a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-2"/><circle cx="20" cy="6" r="2"/>`,
-    layers: `<path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>`,
-    pill: `<path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7z"/><path d="m8.5 8.5 7 7"/>`,
-    lightbulb: `<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.2 1 2.3h6c0-1.1.4-1.9 1-2.3A7 7 0 0 0 12 2z"/>`,
-    "list-checks": `<path d="m3 7 2 2 4-4"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 18h8"/>`,
-  };
-
-  function shell(activeNav) {
-    const user = window.netlifyIdentity && netlifyIdentity.currentUser();
-    return `
-    <div class="min-h-screen flex bg-cream-bg">
-      <aside class="hidden md:flex w-56 flex-col bg-white border-r border-milktea-light shadow-cozy border border-milktea-light/70 p-4">
-        <div class="text-xl font-display font-semibold text-brown mb-6 px-2">StudyHub 🧋</div>
-        <nav class="flex-1 space-y-1">
-          ${NAV.map(
-            (n) => `
-            <a href="#${n.to === "/" ? "" : n.to}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
-              activeNav === n.to ? "bg-milktea-caramel text-brown-dark" : "text-brown-light hover:bg-cream-card"
-            }">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n.icon]}</svg>
-              ${n.label}
-            </a>`
-          ).join("")}
-        </nav>
-        <div class="pt-4 border-t border-milktea-light text-xs text-brown-light px-2">
-          <div class="truncate mb-2">${SH.esc(user && user.email ? user.email : "")}</div>
-          <button id="signout-btn" class="flex items-center gap-2 text-brown hover:text-brown-dark">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>
-            ออกจากระบบ
-          </button>
-          <div class="mt-2 text-[10px] leading-snug text-brown-light/70">ข้อมูลเก็บในเครื่องนี้เท่านั้น</div>
+    <div class="dash-grid">
+      <div class="pet-card">
+        <span class="sparkle" style="left:14px;top:18px;">✨</span>
+        <span class="sparkle" style="right:18px;top:30px;animation-delay:1s;">⭐</span>
+        <span class="level-badge">Lv. <span id="petLevel">1</span></span>
+        <div class="pet-stage" id="petStage"></div>
+        <div class="pet-name" id="petName">น้องชานม</div>
+        <div class="pet-speech" id="petSpeech">มาอ่านหนังสือด้วยกันนะ~ 🧸</div>
+        <div class="exp-bar-wrap">
+          <div class="exp-bar-bg"><div class="exp-bar-fill" id="expFill" style="width:0%"></div></div>
+          <div class="exp-label"><span id="expNow">0</span> / <span id="expNext">300</span> EXP</div>
         </div>
-      </aside>
-      <main class="flex-1 min-w-0" id="page-content"></main>
-
-      <!-- Mobile bottom nav — the sidebar above is desktop-only (hidden below md).
-           This is the phone-friendly equivalent, fixed to the bottom of the screen. -->
-      <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-milktea-light shadow-cozy-lg flex overflow-x-auto">
-        ${NAV.map(
-          (n) => `
-          <a href="#${n.to === "/" ? "" : n.to}" class="flex-1 min-w-[64px] flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
-            activeNav === n.to ? "text-brown" : "text-brown-light"
-          }">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${
-              activeNav === n.to ? "2.5" : "2"
-            }" stroke-linecap="round" stroke-linejoin="round">${ICONS[n.icon]}</svg>
-            ${n.label}
-          </a>`
-        ).join("")}
-      </nav>
-    </div>`;
-  }
-
-  function wireLayoutEvents() {
-    const btn = document.getElementById("signout-btn");
-    if (btn) btn.addEventListener("click", () => { netlifyIdentity.logout(); });
-  }
-
-  // ------------------------------------------------------------
-  // Logged-out screen
-  // ------------------------------------------------------------
-  function renderLoggedOut() {
-    app.innerHTML = `
-    <div class="min-h-screen flex items-center justify-center bg-cream-bg px-4">
-      <div class="w-full max-w-sm bg-white rounded-3xl shadow-cozy-lg border border-milktea-light/70 p-8 text-center">
-        <div class="text-4xl mb-2">🧋</div>
-        <h1 class="text-2xl font-display font-semibold text-brown-dark">StudyHub</h1>
-        <p class="text-sm text-brown-light mt-1 mb-6">คลังอ่านหนังสือน่ารัก ๆ สำหรับนักศึกษา PT</p>
-        <button id="open-login" class="w-full py-2.5 rounded-full bg-brown text-white font-medium shadow-cozy hover:bg-brown-dark transition-colors">
-          เข้าสู่ระบบ / สมัครสมาชิก
-        </button>
-        <p id="identity-warning" class="text-xs text-status-ready mt-4 hidden">
-          ⚠️ เว็บนี้ยังไม่ได้เปิดใช้งาน Identity — ไปที่ Netlify → Site configuration → Identity → Enable Identity ก่อนนะคะ
-        </p>
       </div>
-    </div>`;
 
-    document.getElementById("open-login").addEventListener("click", () => {
-      if (!window.netlifyIdentity) {
-        document.getElementById("identity-warning").classList.remove("hidden");
-        return;
-      }
-      netlifyIdentity.open();
-    });
-  }
-
-  // ------------------------------------------------------------
-  // Boot — wire up Netlify Identity
-  // ------------------------------------------------------------
-  SH.boot = function () {
-    if (!window.netlifyIdentity) {
-      renderLoggedOut();
-      document.getElementById("identity-warning") && document.getElementById("identity-warning").classList.remove("hidden");
-      return;
-    }
-
-    function afterLogin(user) {
-      SH.storageKey = "studyhub:" + user.id;
-      SH.data = SH.loadData();
-      SH.route();
-    }
-
-    netlifyIdentity.on("init", (user) => {
-      if (user) afterLogin(user);
-      else renderLoggedOut();
-    });
-
-    netlifyIdentity.on("login", (user) => {
-      netlifyIdentity.close();
-      afterLogin(user);
-    });
-
-    netlifyIdentity.on("logout", () => {
-      SH.storageKey = null;
-      SH.data = null;
-      renderLoggedOut();
-    });
-
-    netlifyIdentity.init();
-    window.addEventListener("hashchange", SH.route);
-  };
-})();
-
-// ============================================================
-// PAGE: Dashboard
-// ============================================================
-window.SH.pages.renderDashboard = async function (container) {
-  const D = SH.data;
-  const today = new Date();
-  const upcomingExams = D.exams
-    .slice()
-    .sort((a, b) => a.exam_date.localeCompare(b.exam_date))
-    .filter((e) => SH.daysUntil(e.exam_date) >= 0)
-    .slice(0, 3);
-  const todaysTasks = D.tasks.filter((t) => t.status === "To-Do" && t.planned_date === SH.todayStr());
-  const backlogTasks = D.tasks.filter((t) => t.status === "To-Do" && !t.planned_date && !t.deadline);
-  const todayStr = SH.todayStr();
-  const dueReviews = D.reviewQueue
-    .filter((r) => r.status === "Pending" && r.next_review_date <= todayStr)
-    .map((r) => {
-      const topic = D.topics.find((t) => t.id === r.topic_id);
-      const exam = topic ? D.exams.find((e) => e.id === topic.exam_id) : null;
-      return { id: r.id, topic_title: topic ? topic.title : "หัวข้อ", exam_title: exam ? exam.title : "" };
-    });
-
-  container.innerHTML = `
-  <div class="p-6 max-w-4xl mx-auto space-y-6 pb-24">
-    <header>
-      <h1 class="text-2xl font-display font-semibold text-brown-dark">วันนี้ของเธอ 🧋</h1>
-      <p class="text-sm text-brown-light">${today.toLocaleDateString("th-TH", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}</p>
-    </header>
-
-    <div class="grid sm:grid-cols-3 gap-3">
-      ${
-        upcomingExams.length === 0
-          ? `<div class="col-span-3 bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 text-sm text-brown-light">ยังไม่มีสอบที่กำลังจะมาถึง — เพิ่มวิชาสอบได้จากคลังสอบ</div>`
-          : upcomingExams
-              .map((exam) => {
-                const days = SH.daysUntil(exam.exam_date);
-                return `
-              <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 border-l-4 border-status-ready">
-                <div class="text-xs text-brown-light">${SH.esc(exam.type)}</div>
-                <div class="font-medium text-brown-dark truncate">${SH.esc(exam.subject_name)}</div>
-                <div class="text-2xl font-display font-semibold text-status-ready mt-1">${days === 0 ? "วันนี้!" : `เหลือ ${days} วัน`}</div>
-              </div>`;
-              })
-              .join("")
-      }
+      <div class="card focus-card">
+        <div class="section-title">🍅 โฟกัสอ่านหนังสือ</div>
+        <div class="pomo-mode" id="pomoMode">โฟกัส</div>
+        <div class="pomo-display" id="pomoDisplay">25:00</div>
+        <div class="pomo-controls">
+          <button class="btn btn-primary" id="pomoStartBtn">▶ เริ่ม</button>
+          <button class="btn btn-soft" id="pomoResetBtn">↺ รีเซ็ต</button>
+        </div>
+        <details class="pomo-settings-details">
+          <summary>⚙️ ปรับเวลาโฟกัส/พัก</summary>
+          <div class="pomo-settings">
+            <label>โฟกัส (นาที)<input type="number" id="pomoWorkInput" value="25" min="1" max="120"></label>
+            <label>พัก (นาที)<input type="number" id="pomoBreakInput" value="5" min="1" max="60"></label>
+          </div>
+        </details>
+        <hr class="focus-divider">
+        <div class="section-title" style="font-size:15px;">🎧 เสียงพื้นหลังช่วยสมาธิ</div>
+        <div class="sound-row">
+          <button class="sound-btn" data-sound="rain"><span class="emoji">🌧️</span>เสียงฝน</button>
+          <button class="sound-btn" data-sound="cafe"><span class="emoji">☕</span>คาเฟ่</button>
+          <button class="sound-btn" data-sound="waves"><span class="emoji">🌊</span>คลื่นทะเล</button>
+        </div>
+      </div>
     </div>
-
-    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
-      <h2 class="font-display font-medium text-brown-dark mb-3">งานวันนี้</h2>
-      <form id="quick-task-form" class="flex gap-2 mb-3">
-        <input id="quick-task-title" placeholder="เพิ่มงานเร็ว ๆ..." class="flex-1 px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light" />
-        <button type="submit" class="px-4 py-2 rounded-xl bg-milktea-caramel text-brown-dark text-sm font-medium">เพิ่ม</button>
-      </form>
-      ${
-        todaysTasks.length === 0
-          ? `<p class="text-sm text-brown-light">ไม่มีงานที่วางแผนไว้วันนี้ 🌤️</p>`
-          : `<ul class="space-y-2">
-              ${todaysTasks
-                .map(
-                  (t) => `
-                <li class="flex items-center gap-3">
-                  <input type="checkbox" data-task-toggle="${t.id}" ${t.status === "Done" ? "checked" : ""} class="w-4 h-4 accent-brown" />
-                  <span class="text-sm text-brown-dark">${SH.esc(t.title)}</span>
-                </li>`
-                )
-                .join("")}
-            </ul>`
-      }
-    </section>
-
-    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
-      <h2 class="font-display font-medium text-brown-dark mb-3 flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 5v6h6"/></svg>
-        ทบทวนวันนี้
-      </h2>
-      ${
-        dueReviews.length === 0
-          ? `<p class="text-sm text-brown-light">ไม่มีหัวข้อที่ต้องทบทวนวันนี้ ✨</p>`
-          : `<ul class="space-y-2">
-              ${dueReviews
-                .map(
-                  (r) => `
-                <li class="flex items-center justify-between px-3 py-2 rounded-xl bg-cream-card">
-                  <div>
-                    <div class="text-sm text-brown-dark">${SH.esc(r.topic_title)}</div>
-                    <div class="text-xs text-brown-light">${SH.esc(r.exam_title)}</div>
-                  </div>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F0B57A" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                </li>`
-                )
-                .join("")}
-            </ul>`
-      }
-    </section>
-
-    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 overflow-hidden">
-      <button id="backlog-toggle" class="w-full flex items-center justify-between p-5 font-display font-medium text-brown-dark">
-        <span>Backlog (${backlogTasks.length})</span>
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
-      <div id="backlog-body" class="hidden px-5 pb-5">
-        ${
-          backlogTasks.length === 0
-            ? `<p class="text-sm text-brown-light">ไม่มีงานค้าง</p>`
-            : `<ul class="space-y-2">
-                ${backlogTasks
-                  .map((t) => `<li class="text-sm text-brown-dark px-3 py-2 rounded-xl bg-cream-card">${SH.esc(t.title)}</li>`)
-                  .join("")}
-              </ul>`
-        }
-      </div>
-    </section>
   </div>
 
-  <div class="fixed bottom-20 md:bottom-6 right-6 z-40">
-    <button id="quick-add-btn" class="w-14 h-14 rounded-full bg-brown text-white shadow-cozy-lg flex items-center justify-center" aria-label="Quick add">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-    </button>
-  </div>
-  `;
-
-  document.getElementById("quick-task-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const input = document.getElementById("quick-task-title");
-    const title = input.value.trim();
-    if (!title) return;
-    D.tasks.push({ id: SH.uid(), title, status: "To-Do", deadline: null, planned_date: null, linked_topic_id: null });
-    SH.saveData();
-    SH.route();
-  });
-
-  container.querySelectorAll("[data-task-toggle]").forEach((el) => {
-    el.addEventListener("change", () => {
-      const id = el.getAttribute("data-task-toggle");
-      const task = D.tasks.find((t) => t.id === id);
-      if (task) task.status = el.checked ? "Done" : "To-Do";
-      SH.saveData();
-      SH.route();
-    });
-  });
-
-  document.getElementById("backlog-toggle").addEventListener("click", () => {
-    document.getElementById("backlog-body").classList.toggle("hidden");
-  });
-
-  document.getElementById("quick-add-btn").addEventListener("click", () => {
-    SH.go("/exams");
-  });
-};
-
-// ============================================================
-// PAGE: Exams List
-// ============================================================
-window.SH.pages.renderExamsList = async function (container) {
-  const D = SH.data;
-  const exams = D.exams.slice().sort((a, b) => a.exam_date.localeCompare(b.exam_date));
-
-  container.innerHTML = `
-  <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-display font-semibold text-brown-dark">คลังสอบ</h1>
-      <button id="toggle-exam-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ วิชาสอบใหม่</button>
+  <!-- CALENDAR -->
+  <div class="view" id="view-calendar">
+    <div class="card" id="backlogCard">
+      <div class="section-title">📦 Backlog (ยังไม่ได้ลงวันอ่าน)</div>
+      <div class="hint-text" style="margin-bottom:10px;">แตะ "เลือกวันอ่าน" ที่หัวข้อไหน แล้วเลือกวัน จะไปโผล่บนปฏิทินให้เองนะ</div>
+      <div id="backlogList"></div>
     </div>
+    <div class="card" style="margin-bottom:0;">
+      <div class="cal-header">
+        <button class="cal-nav-btn" id="calPrev">‹</button>
+        <div class="cal-title" id="calTitle"></div>
+        <button class="cal-nav-btn" id="calNext">›</button>
+      </div>
+      <div class="cal-legend" id="calLegend"></div>
+      <div class="cal-grid" id="calDow"></div>
+      <div class="cal-grid" id="calGrid" style="margin-top:6px;"></div>
+    </div>
+  </div>
 
-    <form id="exam-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 grid sm:grid-cols-2 gap-3">
-      <select id="f-type" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm">
-        <option>Midterm</option><option>Final</option><option>Quiz</option>
+  <!-- EXAM SETS -->
+  <div class="view" id="view-exams">
+    <div class="section-title" style="margin-top:4px;">📚 ชุดการสอบของฉัน</div>
+    <div class="hint-text" style="margin-bottom:14px;">แตะการ์ดเพื่อตั้งเป็น "ชุดสอบที่ใช้งานอยู่" · แตะ ✎ เพื่อแก้ไข</div>
+    <div class="grid-cards" id="examGrid"></div>
+  </div>
+
+  <!-- READING LIST -->
+  <div class="view" id="view-reading">
+    <div class="section-title" style="margin-top:4px;">✅ รายการอ่านหลัก</div>
+    <div class="filter-row">
+      <select id="filterExam"><option value="all">ชุดสอบทั้งหมด</option></select>
+      <select id="filterStatus">
+        <option value="all">สถานะทั้งหมด</option>
+        <option value="red">🔴 ยังไม่เริ่ม</option>
+        <option value="yellow">🟡 กำลังอ่าน</option>
+        <option value="green">🟢 เสร็จแล้ว</option>
       </select>
-      <input id="f-title" placeholder="ชื่อการสอบ (เช่น Midterm 1/2569)" required class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      <input id="f-code" placeholder="รหัสวิชา" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      <input id="f-subject" placeholder="ชื่อวิชา" required class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      <input id="f-date" type="date" required class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      <input id="f-target" type="number" placeholder="เป้าหมายคะแนน (ถ้ามี)" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      <button type="submit" class="sm:col-span-2 py-2 rounded-full bg-milktea-caramel text-brown-dark font-medium">บันทึก</button>
-    </form>
-
-    <div class="grid sm:grid-cols-2 gap-3">
-      ${exams
-        .map(
-          (exam) => `
-        <a href="#/exams/${exam.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
-          <div class="text-xs text-brown-light">${SH.esc(exam.type)}</div>
-          <div class="font-display font-medium text-brown-dark">${SH.esc(exam.subject_name)}</div>
-          <div class="text-xs text-brown-light mt-1">${SH.esc(exam.subject_code || "")} · ${SH.formatDate(exam.exam_date)}</div>
-        </a>`
-        )
-        .join("")}
+      <button class="btn btn-primary" id="addReadingBtn">+ เพิ่มหัวข้อ</button>
     </div>
-  </div>`;
+    <div id="readingListWrap"></div>
+  </div>
 
-  document.getElementById("toggle-exam-form").addEventListener("click", () => {
-    document.getElementById("exam-form").classList.toggle("hidden");
-  });
-
-  document.getElementById("exam-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const target = document.getElementById("f-target").value;
-    D.exams.push({
-      id: SH.uid(),
-      type: document.getElementById("f-type").value,
-      title: document.getElementById("f-title").value,
-      subject_code: document.getElementById("f-code").value || null,
-      subject_name: document.getElementById("f-subject").value,
-      exam_date: document.getElementById("f-date").value,
-      target_score: target ? Number(target) : null,
-    });
-    SH.saveData();
-    SH.route();
-  });
-};
-
-// ============================================================
-// PAGE: Exam Workspace — multi-level topic tree
-// ============================================================
-window.SH.pages.renderExamWorkspace = async function (container, examId) {
-  const D = SH.data;
-  const flat = D.topics.filter((t) => t.exam_id === examId);
-  const tree = buildTree(flat);
-  const coveragePct = flat.length
-    ? Math.round((flat.filter((t) => ["อ่านแล้ว", "ทวนแล้ว", "พร้อมสอบ"].includes(t.status)).length / flat.length) * 100)
-    : 0;
-  const readyPct = flat.length
-    ? Math.round((flat.filter((t) => t.status === "พร้อมสอบ").length / flat.length) * 100)
-    : 0;
-
-  container.innerHTML = `
-  <div class="p-6 max-w-3xl mx-auto space-y-5 pb-24">
-    <div class="grid grid-cols-2 gap-3">
-      ${progressCard("Coverage", coveragePct, "bg-status-read")}
-      ${progressCard("Exam Ready", readyPct, "bg-status-ready")}
+  <!-- DRUG CARDS -->
+  <div class="view" id="view-drugcards">
+    <div class="section-title" style="margin-top:4px;">💊 การ์ดยา</div>
+    <div class="hint-text" style="margin-bottom:14px;">การ์ดสรุปยาแยกต่างหากจากหัวข้ออ่าน — กรอกได้เท่าที่ต้องการ ไม่ต้องครบทุกช่อง</div>
+    <div class="filter-row">
+      <select id="filterDrugExam"><option value="all">ชุดสอบทั้งหมด</option></select>
+      <button class="btn btn-primary" id="addDrugCardBtn">+ เพิ่มการ์ดยา</button>
     </div>
+    <div id="drugCardListWrap"></div>
+  </div>
+</main>
 
-    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
-      <h2 class="font-display font-medium text-brown-dark mb-3">โครงสร้างหัวข้อ</h2>
-      <div id="topic-tree">${tree.map((t) => topicNodeHtml(t, 0)).join("")}</div>
+<button class="quick-add-fab" id="quickAddFab" title="เพิ่มด่วน">+</button>
 
-      <form id="add-topic-form" class="flex gap-2 mt-4 pt-3 border-t border-milktea-light">
-        <input id="new-topic-title" placeholder="หัวข้อใหม่ (ระดับบนสุด)..." class="flex-1 px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-        <button type="submit" class="px-4 py-2 rounded-xl bg-milktea-caramel text-brown-dark text-sm font-medium">เพิ่ม</button>
-      </form>
+<div class="mobile-nav">
+  <button class="active" data-view="dashboard"><span class="m-emoji">🏠</span>หน้าหลัก</button>
+  <button data-view="calendar"><span class="m-emoji">📅</span>ปฏิทิน</button>
+  <button data-view="exams"><span class="m-emoji">📚</span>ชุดสอบ</button>
+  <button data-view="reading"><span class="m-emoji">✅</span>รายการ</button>
+  <button data-view="drugcards"><span class="m-emoji">💊</span>ยา</button>
+</div>
+
+<!-- QUICK ADD CHOICE MODAL -->
+<div class="modal-overlay" id="quickAddOverlay">
+  <div class="modal-box">
+    <div class="modal-title">⚡ เพิ่มด่วน</div>
+    <div class="quick-add-choice">
+      <button class="btn btn-primary" id="quickAddTopicBtn">📖 หัวข้ออ่าน</button>
+      <button class="btn btn-soft" id="quickAddReviewBtn">🔁 การทบทวน</button>
+      <button class="btn btn-soft" id="quickAddDrugCardBtn">💊 การ์ดยา</button>
     </div>
-  </div>`;
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="quickAddCancelBtn" style="width:100%;">ปิด</button>
+    </div>
+  </div>
+</div>
 
-  document.getElementById("add-topic-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const input = document.getElementById("new-topic-title");
-    const title = input.value.trim();
-    if (!title) return;
-    D.topics.push({
-      id: SH.uid(), exam_id: examId, parent_id: null, title, order_index: 0,
-      status: "ยังไม่อ่าน", confidence_level: 1, summary_text: "", image_urls: [], planned_study_date: null,
-    });
-    SH.saveData();
-    SH.route();
+<!-- QUICK REVIEW MODAL -->
+<div class="modal-overlay" id="quickReviewOverlay">
+  <div class="modal-box">
+    <div class="modal-title">🔁 เพิ่มการทบทวน</div>
+    <div class="form-group"><label>ชื่อการทบทวน</label><input type="text" id="quickReviewTextInput" placeholder="เช่น ทบทวน Neuro รอบ 2"></div>
+    <div class="form-group"><label>วันที่</label><input type="date" id="quickReviewDateInput"></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="quickReviewCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="quickReviewSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="drugCardModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="drugCardModalTitle">💊 เพิ่มการ์ดยา</div>
+    <div class="modal-subnote">สำหรับชุดสอบ: <strong id="drugCardModalExamName">-</strong></div>
+    <div class="form-group"><label>วิชา</label><select id="drugCardSubjectSelect"></select></div>
+    <div class="form-group"><label>ชื่อยา</label><input type="text" id="drugNameInput" placeholder="เช่น Ibuprofen"></div>
+    <div class="form-group"><label>กลุ่มยา</label><input type="text" id="drugClassInput" placeholder="เช่น NSAIDs"></div>
+    <div class="form-group"><label>MOA (กลไกการออกฤทธิ์)</label><textarea id="drugMoaInput"></textarea></div>
+    <div class="form-group"><label>Indications</label><textarea id="drugIndicationsInput"></textarea></div>
+    <div class="form-group"><label>Adverse Effects</label><textarea id="drugAdverseInput"></textarea></div>
+    <div class="form-group"><label>Contraindications</label><textarea id="drugContraindicationsInput"></textarea></div>
+    <div class="form-group"><label>จุดต้องจำ</label><textarea id="drugKeyPointsInput"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="drugCardCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="drugCardSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="examModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="examModalTitle">➕ เพิ่มชุดสอบ</div>
+    <div class="form-group"><label>ชื่อชุดสอบ</label><input type="text" id="examNameInput" placeholder="เช่น สอบกลางภาค"></div>
+    <div class="form-group">
+      <label>รายวิชา + วันสอบของแต่ละวิชา</label>
+      <div class="hint-text" style="margin:-2px 0 8px;">แต่ละวิชาสอบคนละวันได้ ใส่วันของใครของมันเลย</div>
+      <div id="examSubjectRows"></div>
+      <button type="button" class="btn btn-soft" id="addSubjectRowBtn" style="width:100%;">+ เพิ่มวิชา</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="examCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="examSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="readModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title">➕ เพิ่มหัวข้ออ่าน</div>
+    <div class="modal-subnote">สำหรับชุดสอบ: <strong id="readModalExamName">-</strong></div>
+    <div class="form-group"><label>วิชา</label><select id="readSubjectSelect"></select></div>
+    <div class="form-group"><label>หัวข้อ</label><input type="text" id="readTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
+    <div class="form-group"><label>🔒 Deadline (วันส่งงาน — แก้ไม่ได้)</label><input type="date" id="readDeadlineInput"></div>
+    <div class="form-group"><label>📅 วันที่วางแผนอ่าน (เลื่อนได้)</label><input type="date" id="readScheduleDateInput"></div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="readCancelBtn">ยกเลิก</button>
+      <button class="btn btn-primary" id="readSaveBtn">บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="dayModalOverlay">
+  <div class="modal-box">
+    <div class="modal-title" id="dayModalTitle">📅 รายการวันที่</div>
+    <div id="dayExamInfo"></div>
+    <div class="section-title" style="font-size:13.5px;margin:4px 0 2px;">✅ หัวข้ออ่านวันนี้</div>
+    <div id="dayScheduledList"></div>
+    <div class="section-title" style="font-size:13.5px;margin:14px 0 2px;">🔁 การทบทวนวันนี้</div>
+    <div id="dayReviewList"></div>
+    <div class="day-add-section">
+      <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">➕ เพิ่มหัวข้อลงวันนี้</div>
+      <div class="modal-subnote" style="margin-top:0;">ชุดสอบ: <strong id="dayModalExamName">-</strong></div>
+      <div id="dayNoActiveExamMsg" class="no-active-exam-msg" style="display:none;">ยังไม่มีชุดสอบที่ใช้งานอยู่ ไปสร้างที่แท็บ "ชุดสอบ" ก่อนนะ 🧸</div>
+      <div id="dayAddFields">
+        <div class="form-group"><label>วิชา</label><select id="daySubjectSelect"></select></div>
+        <div class="hint-text" style="margin:-4px 0 4px;">แตะหัวข้อที่มีอยู่แล้วเพื่อเพิ่มลงวันนี้ทันที 👇</div>
+        <div class="quick-chip-row" id="dayQuickChips"></div>
+        <div class="form-group"><label>หรือพิมพ์หัวข้อใหม่</label><input type="text" id="dayNewTopicInput" placeholder="เช่น Cervical Biomechanics"></div>
+      </div>
+    </div>
+    <div class="day-add-section">
+      <div class="section-title" style="font-size:14.5px;margin-bottom:6px;">🔁 เพิ่มการทบทวน</div>
+      <div class="hint-text" style="margin:-4px 0 8px;">พิมพ์ชื่ออิสระได้เลย ไม่ต้องผูกกับวิชา เช่น "ทบทวนรวมก่อนสอบ"</div>
+      <div class="form-group"><input type="text" id="dayReviewInput" placeholder="เช่น ทบทวน Neuro รอบ 2"></div>
+      <button class="btn btn-soft" type="button" id="dayReviewAddBtn" style="width:100%;">+ เพิ่มการทบทวน</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-soft" id="dayCloseBtn">ปิด</button>
+      <button class="btn btn-primary" id="dayAddBtn">+ เพิ่มลงวันนี้</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay active" id="authGate" style="z-index:60;">
+  <div class="modal-box auth-gate-box">
+    <span class="emoji">🧋🔐</span>
+    <div class="modal-title">เข้าสู่ระบบก่อนเริ่มอ่านกันนะ</div>
+    <p>ล็อกอินเพื่อบันทึกแผนอ่านหนังสือของเธอไว้บนคลาวด์ ไม่ให้หายแม้เปลี่ยนเครื่องหรือล้าง cache</p>
+    <button class="btn btn-primary" id="authLoginBtn" style="width:100%;">เข้าสู่ระบบ / สมัครสมาชิก</button>
+    <div class="sync-note" id="authStatusNote"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+const STORAGE_KEY = 'studyPlannerPro_v4';
+let state = loadState();
+
+function normalizeExamSets(examSets){
+  return (examSets||[]).map(set=>{
+    if(set.subjects && set.subjects.length>0 && typeof set.subjects[0] === 'object'){
+      return set;
+    }
+    const fallbackDate = set.examDate || '';
+    const subjects = (set.subjects||[]).map(name=>({name, examDate:fallbackDate}));
+    const copy = Object.assign({}, set);
+    delete copy.examDate;
+    copy.subjects = subjects;
+    return copy;
   });
-
-  container.querySelectorAll("[data-status-select]").forEach((sel) => {
-    sel.addEventListener("change", () => {
-      const id = sel.getAttribute("data-status-select");
-      const topic = D.topics.find((t) => t.id === id);
-      if (topic) topic.status = sel.value;
-      SH.saveData();
-      SH.route();
-    });
+}
+function normalizeReadingItems(items){
+  return (items||[]).map(it=>{
+    if(it.scheduledDate===undefined) it.scheduledDate = null;
+    if(it.deadline===undefined) it.deadline = null;
+    return it;
   });
-
-  container.querySelectorAll("[data-heart-value]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const wrap = btn.closest("[data-topic-hearts]");
-      const id = wrap.getAttribute("data-topic-hearts");
-      const value = Number(btn.getAttribute("data-heart-value"));
-      const topic = D.topics.find((t) => t.id === id);
-      if (topic) topic.confidence_level = value;
-      SH.saveData();
-      SH.route();
-    });
-  });
-
-  container.querySelectorAll("[data-toggle-expand]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-toggle-expand");
-      const childrenEl = document.getElementById(`children-${id}`);
-      const icon = btn.querySelector("svg");
-      if (childrenEl) {
-        const hidden = childrenEl.classList.toggle("hidden");
-        icon.style.transform = hidden ? "rotate(-90deg)" : "rotate(0deg)";
-      }
-    });
-  });
-
-  container.querySelectorAll("[data-add-child]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const parentId = btn.getAttribute("data-add-child");
-      const title = prompt("ชื่อหัวข้อย่อย:");
-      if (!title || !title.trim()) return;
-      D.topics.push({
-        id: SH.uid(), exam_id: examId, parent_id: parentId, title: title.trim(), order_index: 0,
-        status: "ยังไม่อ่าน", confidence_level: 1, summary_text: "", image_urls: [], planned_study_date: null,
+}
+// migrates any old readingItems that had an embedded drug-card (from an earlier
+// version of the app) into their own standalone entry in state.drugCards
+function extractDrugCardsFromReadingItems(s){
+  if(!s.drugCards) s.drugCards = [];
+  if(!s.readingItems) return;
+  const migrated = [];
+  s.readingItems = s.readingItems.filter(it=>{
+    if(it.isDrugCard){
+      migrated.push({
+        id: uid(),
+        examSetId: it.examSetId,
+        subject: it.subject,
+        name: it.topic,
+        drugClass: (it.drugCard && it.drugCard.drugClass) || '',
+        moa: (it.drugCard && it.drugCard.moa) || '',
+        indications: (it.drugCard && it.drugCard.indications) || '',
+        adverse: (it.drugCard && it.drugCard.adverse) || '',
+        contraindications: (it.drugCard && it.drugCard.contraindications) || '',
+        keyPoints: (it.drugCard && it.drugCard.keyPoints) || ''
       });
-      SH.saveData();
-      SH.route();
-    });
-  });
-};
-
-function buildTree(topics) {
-  const byId = new Map(topics.map((t) => [t.id, Object.assign({}, t, { children: [] })]));
-  const roots = [];
-  byId.forEach((t) => {
-    if (t.parent_id && byId.has(t.parent_id)) byId.get(t.parent_id).children.push(t);
-    else roots.push(t);
-  });
-  return roots;
-}
-
-function topicNodeHtml(topic, depth) {
-  const hasChildren = topic.children && topic.children.length > 0;
-  const statusOptions = SH.STATUS_ORDER.map(
-    (s) => `<option value="${s}" ${s === topic.status ? "selected" : ""}>${s}</option>`
-  ).join("");
-
-  return `
-  <div>
-    <div class="flex items-center gap-2 py-2 group" style="padding-left:${depth * 20}px">
-      <button data-toggle-expand="${topic.id}" class="text-brown-light ${hasChildren ? "" : "invisible"}">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform .15s"><path d="M9 6l6 6-6 6"/></svg>
-      </button>
-      <a href="#/exams/${topic.exam_id}/topics/${topic.id}" class="flex-1 text-sm text-brown-dark hover:underline truncate">${SH.esc(topic.title)}</a>
-      <div data-topic-hearts="${topic.id}">${SH.heartRow(topic.confidence_level, 12, true)}</div>
-      <select data-status-select="${topic.id}" class="text-xs">${statusOptions}</select>
-      <span class="hidden sm:inline-flex px-3 py-1 rounded-full text-xs font-medium shadow-sm ${SH.STATUS_COLOR[topic.status]}">${topic.status}</span>
-      <button data-add-child="${topic.id}" class="opacity-0 group-hover:opacity-100 text-brown-light hover:text-brown" title="เพิ่มหัวข้อย่อย">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-      </button>
-    </div>
-    ${
-      hasChildren
-        ? `<div id="children-${topic.id}">${topic.children.map((c) => topicNodeHtml(c, depth + 1)).join("")}</div>`
-        : ""
+      return false;
     }
-  </div>`;
+    delete it.isDrugCard;
+    delete it.drugCard;
+    return true;
+  });
+  if(migrated.length) s.drugCards.push(...migrated);
 }
 
-function progressCard(label, pct, colorClass) {
-  return `
-  <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4">
-    <div class="flex justify-between text-sm mb-2">
-      <span class="text-brown-light">${label}</span>
-      <span class="font-medium text-brown-dark">${pct}%</span>
-    </div>
-    <div class="h-2 rounded-full bg-milktea-light overflow-hidden">
-      <div class="h-full ${colorClass}" style="width:${pct}%"></div>
-    </div>
-  </div>`;
-}
-
-// ============================================================
-// PAGE: Topic Detail
-// ============================================================
-window.SH.pages.renderTopicDetail = async function (container, examId, topicId) {
-  const D = SH.data;
-  const topic = D.topics.find((t) => t.id === topicId);
-  if (!topic) {
-    container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบหัวข้อนี้</div>`;
-    return;
+function loadState(){
+  const tryKeys = [STORAGE_KEY, 'studyPlannerPro_v3', 'studyPlannerPro_v2'];
+  for(const key of tryKeys){
+    const raw = localStorage.getItem(key);
+    if(!raw) continue;
+    try{
+      const s = JSON.parse(raw);
+      s.readingItems = normalizeReadingItems(s.readingItems);
+      if(!s.ui) s.ui = {activeExamSetId:null};
+      if(s.ui.activeExamSetId===undefined) s.ui.activeExamSetId = null;
+      if(!s.reviewSessions) s.reviewSessions = [];
+      s.examSets = normalizeExamSets(s.examSets);
+      s.settings = s.settings || {pomoWork:25,pomoBreak:5};
+      extractDrugCardsFromReadingItems(s);
+      if(key!=='studyPlannerPro_v2' && s.ui.activeExamSetId===null && s.examSets[0]) s.ui.activeExamSetId = null;
+      return s;
+    }catch(e){ /* try next */ }
   }
-  const traps = D.examTraps.filter((t) => t.topic_id === topicId).slice().reverse();
+  return {
+    user:{ exp:0, level:1, streak:0, lastActiveDate:null },
+    examSets:[],
+    readingItems:[],
+    reviewSessions:[],
+    drugCards:[],
+    settings:{ pomoWork:25, pomoBreak:5 },
+    ui:{ activeExamSetId:null }
+  };
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  saveRemote();
+}
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 
-  container.innerHTML = `
-  <div class="p-6 max-w-3xl mx-auto space-y-5 pb-24">
-    <header class="flex items-center justify-between">
-      <h1 class="text-xl font-display font-semibold text-brown-dark">${SH.esc(topic.title)}</h1>
-      <div data-topic-hearts="${topic.id}">${SH.heartRow(topic.confidence_level, 20, true)}</div>
-    </header>
+function getActiveExam(){
+  if(!state.ui.activeExamSetId) return null;
+  return state.examSets.find(e=>e.id===state.ui.activeExamSetId) || null;
+}
+function setActiveExam(id){
+  state.ui.activeExamSetId = id;
+  saveState();
+  renderActiveExamArea();
+  renderExamSets();
+}
+function ensureActiveExamValid(){
+  if(!getActiveExam() && state.examSets.length>0){
+    state.ui.activeExamSetId = state.examSets[0].id;
+    saveState();
+  }
+  if(state.examSets.length===0){
+    state.ui.activeExamSetId = null;
+  }
+}
 
-    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
-      <h2 class="font-display font-medium text-brown-dark mb-2">สรุปเนื้อหา</h2>
-      <textarea id="summary-text" rows="8" placeholder="เขียนสรุปย่อของหัวข้อนี้..." class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light">${SH.esc(topic.summary_text || "")}</textarea>
+/* ================= SUBJECT COLORS (warm brown palette) ================= */
+const SUBJECT_PALETTE = [
+  {bg:'#F0D9BE', text:'#8C5A2B'},
+  {bg:'#E8C4A0', text:'#7A4A1E'},
+  {bg:'#DCC1A1', text:'#6B4423'},
+  {bg:'#E0B8A0', text:'#7A3F26'},
+  {bg:'#F2DDB0', text:'#8A6410'},
+  {bg:'#D9B99B', text:'#5C3A1E'},
+  {bg:'#EAC9C0', text:'#7A4438'},
+  {bg:'#DDC7A8', text:'#6E4E22'}
+];
+function subjectColor(subject){
+  let hash = 0;
+  const str = subject || 'ทั่วไป';
+  for(let i=0;i<str.length;i++) hash = (hash*31 + str.charCodeAt(i)) >>> 0;
+  return SUBJECT_PALETTE[hash % SUBJECT_PALETTE.length];
+}
+function subjChip(subject){
+  const c = subjectColor(subject);
+  return `<span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(subject)}</span>`;
+}
 
-      <div class="mt-3">
-        <label class="inline-flex items-center gap-2 text-sm text-brown-light cursor-pointer hover:text-brown">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
-          แนบรูปภาพ
-          <input type="file" id="image-upload" accept="image/*" class="hidden" />
-        </label>
-        <p class="text-xs text-brown-light/70 mt-1">รูปเก็บในเครื่องนี้เท่านั้น ใส่เยอะเกินไปอาจทำให้พื้นที่เก็บข้อมูลเต็ม</p>
-        <div id="image-grid" class="grid grid-cols-3 gap-2 mt-3">
-          ${(topic.image_urls || []).map((url, i) => `
-            <div class="relative">
-              <img src="${SH.esc(url)}" class="rounded-xl object-cover h-24 w-full" />
-              <button data-remove-image="${i}" class="absolute top-1 right-1 bg-white/90 rounded-full w-5 h-5 flex items-center justify-center text-status-ready text-xs">✕</button>
-            </div>`).join("")}
-        </div>
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ================= NAV ================= */
+function switchView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+  document.querySelectorAll('.mobile-nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===name));
+}
+document.querySelectorAll('.tab-btn, .mobile-nav button').forEach(b=>{
+  b.addEventListener('click', ()=>switchView(b.dataset.view));
+});
+
+/* ================= EXP / LEVEL / STREAK ================= */
+function expForLevel(level){ return (level-1)*300; }
+function levelFromExp(exp){ return Math.floor(exp/300)+1; }
+function gainExp(amount){
+  const oldLevel = state.user.level;
+  state.user.exp += amount;
+  state.user.level = levelFromExp(state.user.exp);
+  saveState();
+  renderPet();
+  if(state.user.level > oldLevel){
+    showToast(`🎉 เลเวลอัพ! ตอนนี้ Lv.${state.user.level} แล้วน้าา`);
+    setPetSpeech(`เย้! โตขึ้นอีกขั้นแล้วว 🎓 เก่งมากเลย!`);
+  }
+}
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function checkStreak(){
+  const today = todayStr();
+  if(state.user.lastActiveDate === today) return;
+  if(!state.user.lastActiveDate){
+    state.user.streak = 1;
+  } else {
+    const last = new Date(state.user.lastActiveDate);
+    const now = new Date(today);
+    const diffDays = Math.round((now-last)/86400000);
+    if(diffDays === 1) state.user.streak += 1;
+    else if(diffDays > 1) state.user.streak = 1;
+  }
+  state.user.lastActiveDate = today;
+  saveState();
+}
+const PET_MESSAGES = [
+  'สู้ๆนะ วันนี้ก็อ่านให้ครบเป้าหมายกันเถอะ 💪',
+  'พักบ้างนะ แล้วค่อยลุยต่อ 🧋',
+  'ทุกหัวข้อที่อ่าน คือก้าวที่ใกล้สอบผ่านขึ้นอีกนิด 🌱',
+  'เหนื่อยก็พักได้ แต่อย่าพักจนลืมกลับมานะ 🐻',
+  'วันนี้ก็เก่งมากแล้วที่เปิดมาอ่าน มาต่อกันเลย!'
+];
+function setPetSpeech(text){ document.getElementById('petSpeech').textContent = text; }
+
+/* ================= PET RENDER ================= */
+function renderPet(){
+  document.getElementById('petLevel').textContent = state.user.level;
+  const nextLevelExp = expForLevel(state.user.level+1);
+  const curLevelExp = expForLevel(state.user.level);
+  const pct = Math.min(100, Math.round(((state.user.exp-curLevelExp)/(nextLevelExp-curLevelExp))*100));
+  document.getElementById('expFill').style.width = pct+'%';
+  document.getElementById('expNow').textContent = state.user.exp;
+  document.getElementById('expNext').textContent = nextLevelExp;
+
+  const stage = document.getElementById('petStage');
+  const lvl = state.user.level;
+  let html = '';
+  let name = 'น้องชานม';
+  if(lvl <= 2){
+    name = 'ไข่นมชานม';
+    html = `<div class="bear-egg"><div class="crack"></div></div>`;
+  } else {
+    let accessories = '';
+    if(lvl >= 3 && lvl < 6){ name = 'ลูกหมีชานม'; }
+    if(lvl >= 6 && lvl < 10){ name = 'หมีชานมผ้าพันคอ'; accessories += `<div class="bear-scarf"></div>`; }
+    if(lvl >= 10 && lvl < 15){ name = 'หมีชานมนักอ่าน'; accessories += `<div class="bear-scarf"></div><div class="bear-glasses"><div class="lens l"></div><div class="lens r"></div><div class="bridge"></div></div>`; }
+    if(lvl >= 15){ name = 'ด็อกเตอร์หมีชานม'; accessories += `<div class="bear-scarf"></div><div class="bear-glasses"><div class="lens l"></div><div class="lens r"></div><div class="bridge"></div></div><div class="bear-cap"></div><div class="bear-cap-top"></div><div class="bear-cap-btn"></div>`; }
+    html = `<div class="bear">
+      <div class="bear-ear l"><div class="bear-ear-in"></div></div>
+      <div class="bear-ear r"><div class="bear-ear-in"></div></div>
+      <div class="bear-head">
+        <div class="bear-eye l"></div><div class="bear-eye r"></div>
+        <div class="bear-blush l"></div><div class="bear-blush r"></div>
+        <div class="bear-snout"><div class="bear-nose"></div><div class="bear-mouth"></div></div>
       </div>
-    </section>
-
-    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
-      <h2 class="font-display font-medium text-brown-dark mb-3 flex items-center gap-2">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F0B57A" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a1.5 1.5 0 0 0 1.3 2.3h17.8a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0z"/></svg>
-        จุดที่ชอบสับสน
-      </h2>
-      <div class="space-y-2 mb-3">
-        ${traps
-          .map(
-            (t) => `
-          <div class="bg-cream-card rounded-xl p-3">
-            <div class="text-sm font-medium text-brown-dark">${SH.esc(t.context_title)}</div>
-            <div class="text-sm text-brown-light">${SH.esc(t.trap_detail)}</div>
-          </div>`
-          )
-          .join("")}
-      </div>
-      <div class="space-y-2">
-        <input id="trap-title" placeholder="หัวข้อที่สับสน" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-        <textarea id="trap-detail" rows="2" placeholder="รายละเอียด..." class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm"></textarea>
-        <button id="add-trap-btn" class="px-4 py-2 rounded-xl bg-milktea-caramel text-brown-dark text-sm font-medium">บันทึกจุดสับสน</button>
-      </div>
-    </section>
-  </div>`;
-
-  document.getElementById("summary-text").addEventListener("blur", (e) => {
-    topic.summary_text = e.target.value;
-    SH.saveData();
-  });
-
-  container.querySelectorAll("[data-heart-value]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      topic.confidence_level = Number(btn.getAttribute("data-heart-value"));
-      SH.saveData();
-      SH.route();
-    });
-  });
-
-  document.getElementById("image-upload").addEventListener("change", (e) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      topic.image_urls = topic.image_urls || [];
-      topic.image_urls.push(reader.result); // base64 data URL, stored inline
-      SH.saveData();
-      SH.route();
-    };
-    reader.readAsDataURL(file);
-  });
-
-  container.querySelectorAll("[data-remove-image]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idx = Number(btn.getAttribute("data-remove-image"));
-      topic.image_urls.splice(idx, 1);
-      SH.saveData();
-      SH.route();
-    });
-  });
-
-  document.getElementById("add-trap-btn").addEventListener("click", () => {
-    const title = document.getElementById("trap-title").value.trim();
-    const detail = document.getElementById("trap-detail").value.trim();
-    if (!title) return;
-    D.examTraps.push({ id: SH.uid(), topic_id: topic.id, context_title: title, trap_detail: detail });
-    SH.saveData();
-    SH.route();
-  });
-};
-
-// ============================================================
-// PAGE: Special Test Library
-// ============================================================
-let currentRegion = "All";
-
-window.SH.pages.renderSpecialTests = async function (container) {
-  const D = SH.data;
-  let tests = D.specialTests.slice().sort((a, b) => a.test_name.localeCompare(b.test_name));
-  if (currentRegion !== "All") tests = tests.filter((t) => t.body_region === currentRegion);
-
-  container.innerHTML = `
-  <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-display font-semibold text-brown-dark flex items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.8 2.3v6.5a5.2 5.2 0 0 0 10.4 0V2.3"/><path d="M10 15.5a6 6 0 0 0 6 6 6 6 0 0 0 6-6v-2"/><circle cx="20" cy="6" r="2"/></svg>
-        Special Test Library
-      </h1>
-      <button id="toggle-test-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ เพิ่ม Test</button>
-    </div>
-
-    <div class="flex flex-wrap gap-2">
-      ${["All", ...SH.BODY_REGIONS]
-        .map(
-          (r) => `
-        <button data-region="${r}" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-          currentRegion === r ? "bg-brown text-white border-brown" : "bg-white text-brown-light border-milktea-light hover:bg-cream-card"
-        }">${r === "All" ? "ทั้งหมด" : r}</button>`
-        )
-        .join("")}
-    </div>
-
-    <form id="test-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
-      ${testFormFieldsHtml()}
-      <div class="flex gap-2 pt-2">
-        <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
-        <button type="button" id="cancel-test-form" class="px-5 py-2 rounded-full text-brown-light text-sm">ยกเลิก</button>
-      </div>
-    </form>
-
-    ${
-      tests.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มี Special Test ในหมวดนี้ — เพิ่มอันแรกเลย!</div>`
-        : `<div class="grid sm:grid-cols-2 gap-3">
-            ${tests
-              .map(
-                (t) => `
-              <a href="#/special-tests/${t.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
-                <div class="text-xs text-brown-light">${SH.esc(t.body_region)}</div>
-                <div class="font-display font-medium text-brown-dark">${SH.esc(t.test_name)}</div>
-                ${t.purpose ? `<div class="text-xs text-brown-light mt-1 line-clamp-2">${SH.esc(t.purpose)}</div>` : ""}
-                ${
-                  t.sensitivity || t.specificity
-                    ? `<div class="text-xs text-brown-light mt-2">Sens ${t.sensitivity ?? "–"}% · Spec ${t.specificity ?? "–"}%</div>`
-                    : ""
-                }
-              </a>`
-              )
-              .join("")}
-          </div>`
-    }
-  </div>`;
-
-  document.getElementById("toggle-test-form").addEventListener("click", () => {
-    document.getElementById("test-form").classList.toggle("hidden");
-  });
-  document.getElementById("cancel-test-form").addEventListener("click", () => {
-    document.getElementById("test-form").classList.add("hidden");
-  });
-
-  container.querySelectorAll("[data-region]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      currentRegion = btn.getAttribute("data-region");
-      SH.route();
-    });
-  });
-
-  document.getElementById("test-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const val = (id) => document.getElementById(id).value.trim();
-    const numOrNull = (id) => (val(id) ? Number(val(id)) : null);
-    if (!val("f-test-name")) return;
-
-    D.specialTests.push({
-      id: SH.uid(),
-      test_name: val("f-test-name"),
-      body_region: document.getElementById("f-body-region").value,
-      purpose: val("f-purpose") || null,
-      patient_position: val("f-patient-position") || null,
-      therapist_position: val("f-therapist-position") || null,
-      execution_procedure: val("f-execution") || null,
-      positive_sign: val("f-positive-sign") || null,
-      interpretation: val("f-interpretation") || null,
-      sensitivity: numOrNull("f-sensitivity"),
-      specificity: numOrNull("f-specificity"),
-      differential_diagnosis: val("f-ddx") || null,
-    });
-    SH.saveData();
-    SH.route();
-  });
-};
-
-function testFormFieldsHtml() {
-  const inputCls =
-    "w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light";
-  const labelCls = "text-xs font-medium text-brown-light mb-1 block";
-  return `
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="${labelCls}">ชื่อ Special Test</label>
-        <input id="f-test-name" placeholder="เช่น Neer's Test" required class="${inputCls}" />
-      </div>
-      <div>
-        <label class="${labelCls}">ตำแหน่งร่างกาย (Body Region)</label>
-        <select id="f-body-region" class="${inputCls}">
-          ${SH.BODY_REGIONS.map((r) => `<option value="${r}">${r}</option>`).join("")}
-        </select>
-      </div>
-    </div>
-    <div>
-      <label class="${labelCls}">วัตถุประสงค์ (Purpose)</label>
-      <textarea id="f-purpose" rows="2" class="${inputCls}"></textarea>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="${labelCls}">ท่าผู้ป่วย (Patient Position)</label>
-        <textarea id="f-patient-position" rows="2" class="${inputCls}"></textarea>
-      </div>
-      <div>
-        <label class="${labelCls}">ท่านักกายภาพ (Therapist Position)</label>
-        <textarea id="f-therapist-position" rows="2" class="${inputCls}"></textarea>
-      </div>
-    </div>
-    <div>
-      <label class="${labelCls}">วิธีทำ (Execution Procedure)</label>
-      <textarea id="f-execution" rows="3" class="${inputCls}"></textarea>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="${labelCls}">Positive Sign</label>
-        <textarea id="f-positive-sign" rows="2" class="${inputCls}"></textarea>
-      </div>
-      <div>
-        <label class="${labelCls}">การแปลผล (Interpretation)</label>
-        <textarea id="f-interpretation" rows="2" class="${inputCls}"></textarea>
-      </div>
-    </div>
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="${labelCls}">Sensitivity (%)</label>
-        <input id="f-sensitivity" type="number" step="0.1" class="${inputCls}" />
-      </div>
-      <div>
-        <label class="${labelCls}">Specificity (%)</label>
-        <input id="f-specificity" type="number" step="0.1" class="${inputCls}" />
-      </div>
-    </div>
-    <div>
-      <label class="${labelCls}">Differential Diagnosis</label>
-      <textarea id="f-ddx" rows="2" class="${inputCls}"></textarea>
+      ${accessories}
     </div>`;
-}
-
-// ============================================================
-// PAGE: Special Test Detail — with Quiz Me mode
-// ============================================================
-let quizMode = false;
-
-window.SH.pages.renderSpecialTestDetail = async function (container, testId) {
-  const D = SH.data;
-  const test = D.specialTests.find((t) => t.id === testId);
-  if (!test) {
-    container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบ Special Test นี้</div>`;
-    return;
   }
-
-  container.innerHTML = `
-  <div class="p-6 max-w-2xl mx-auto space-y-4 pb-24">
-    <a href="#/special-tests" class="flex items-center gap-1 text-sm text-brown-light hover:text-brown w-fit">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      กลับไปคลัง
-    </a>
-
-    <div class="flex items-start justify-between">
-      <div>
-        <div class="text-xs text-brown-light">${SH.esc(test.body_region)}</div>
-        <h1 class="text-xl font-display font-semibold text-brown-dark">${SH.esc(test.test_name)}</h1>
-      </div>
-      <button id="delete-test-btn" class="text-status-ready hover:opacity-70">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-      </button>
-    </div>
-
-    <button id="quiz-toggle" class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-cozy transition-colors ${
-      quizMode ? "bg-status-ready text-white" : "bg-milktea-caramel text-brown-dark"
-    }">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.2 1 2.3h6c0-1.1.4-1.9 1-2.3A7 7 0 0 0 12 2z"/><path d="M9 18h6M10 22h4"/></svg>
-      ${quizMode ? "ออกจาก Quiz Me" : "Quiz Me — ทดสอบตัวเอง"}
-    </button>
-
-    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-4">
-      ${maskedField("วัตถุประสงค์ (Purpose)", test.purpose, false)}
-      <div class="grid sm:grid-cols-2 gap-4">
-        ${maskedField("ท่าผู้ป่วย (Patient Position)", test.patient_position, false)}
-        ${maskedField("ท่านักกายภาพ (Therapist Position)", test.therapist_position, false)}
-      </div>
-      ${maskedField("วิธีทำ (Execution Procedure)", test.execution_procedure, false)}
-
-      <div class="border-t border-milktea-light pt-4 space-y-4">
-        ${maskedField("Positive Sign", test.positive_sign, quizMode)}
-        ${maskedField("การแปลผล (Interpretation)", test.interpretation, quizMode)}
-        <div class="grid sm:grid-cols-2 gap-4">
-          ${maskedField("Sensitivity (%)", test.sensitivity !== null ? `${test.sensitivity}%` : null, quizMode)}
-          ${maskedField("Specificity (%)", test.specificity !== null ? `${test.specificity}%` : null, quizMode)}
-        </div>
-        ${maskedField("Differential Diagnosis", test.differential_diagnosis, quizMode)}
-      </div>
-    </div>
-  </div>`;
-
-  document.getElementById("quiz-toggle").addEventListener("click", () => {
-    quizMode = !quizMode;
-    SH.route();
-  });
-
-  document.getElementById("delete-test-btn").addEventListener("click", () => {
-    if (!confirm("ลบ Special Test นี้?")) return;
-    D.specialTests = D.specialTests.filter((t) => t.id !== test.id);
-    SH.data.specialTests = D.specialTests;
-    SH.saveData();
-    SH.go("/special-tests");
-  });
-
-  container.querySelectorAll("[data-reveal-toggle]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const fieldId = btn.getAttribute("data-reveal-toggle");
-      const valueEl = document.getElementById(`field-value-${fieldId}`);
-      const revealed = valueEl.classList.toggle("blurred-off");
-      valueEl.classList.toggle("blurred", !revealed);
-      btn.querySelector("[data-reveal-label]").textContent = revealed ? "ซ่อน" : "เฉลย";
-    });
-  });
-};
-
-let fieldCounter = 0;
-function maskedField(label, value, masked) {
-  fieldCounter++;
-  const id = fieldCounter;
-  const display = value === null || value === undefined || value === "" ? "—" : value;
-  return `
-  <div>
-    <div class="flex items-center justify-between mb-1">
-      <span class="text-xs font-medium text-brown-light">${SH.esc(label)}</span>
-      ${
-        masked
-          ? `<button data-reveal-toggle="${id}" class="text-brown-light hover:text-brown flex items-center gap-1 text-xs">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span data-reveal-label>เฉลย</span>
-            </button>`
-          : ""
-      }
-    </div>
-    <div id="field-value-${id}" class="text-sm rounded-xl px-3 py-2 min-h-[2.5rem] ${
-      masked ? "bg-milktea-light blurred" : "bg-cream-card"
-    } text-brown-dark">${SH.esc(display)}</div>
-  </div>`;
+  stage.innerHTML = html;
+  document.getElementById('petName').textContent = name;
 }
 
-// ============================================================
-// PAGE: Flashcards (Basic + Compare)
-// ============================================================
-let cardTypeFilter = "All";
-
-window.SH.pages.renderFlashcards = async function (container) {
-  const D = SH.data;
-  let cards = D.flashcards.filter((c) => c.card_type === "Basic" || c.card_type === "Compare");
-  if (cardTypeFilter !== "All") cards = cards.filter((c) => c.card_type === cardTypeFilter);
-
-  container.innerHTML = `
-  <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-display font-semibold text-brown-dark flex items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></svg>
-        Flashcards
-      </h1>
-      <button id="toggle-card-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ การ์ดใหม่</button>
-    </div>
-
-    <div class="flex gap-2">
-      ${["All", "Basic", "Compare"]
-        .map(
-          (t) => `<button data-type-filter="${t}" class="px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-            cardTypeFilter === t ? "bg-brown text-white border-brown" : "bg-white text-brown-light border-milktea-light hover:bg-cream-card"
-          }">${t === "All" ? "ทั้งหมด" : t}</button>`
-        )
-        .join("")}
-    </div>
-
-    <form id="card-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
-      <div>
-        <label class="text-xs font-medium text-brown-light mb-1 block">ประเภทการ์ด</label>
-        <select id="f-card-type" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm">
-          <option value="Basic">Basic — หน้า/หลัง</option>
-          <option value="Compare">Compare — เปรียบเทียบ</option>
-        </select>
-      </div>
-      <div>
-        <label class="text-xs font-medium text-brown-light mb-1 block">หมวดหมู่</label>
-        <input id="f-category" placeholder="เช่น Neuro, Ortho" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-      </div>
-      <div id="basic-fields" class="space-y-3">
-        <div>
-          <label class="text-xs font-medium text-brown-light mb-1 block">คำถาม (หน้าการ์ด)</label>
-          <textarea id="f-front" rows="2" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm"></textarea>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-brown-light mb-1 block">คำตอบ (หลังการ์ด)</label>
-          <textarea id="f-back" rows="2" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm"></textarea>
-        </div>
-      </div>
-      <div id="compare-fields" class="hidden space-y-3">
-        <div class="grid sm:grid-cols-2 gap-3">
-          <input id="f-entity-a" placeholder="สิ่งที่ 1 (เช่น ACL tear)" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-          <input id="f-entity-b" placeholder="สิ่งที่ 2 (เช่น MCL tear)" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-brown-light mb-1 block">ตารางเทียบ — 1 บรรทัดต่อ 1 ประเด็น รูปแบบ: หัวข้อ | ค่าของสิ่งที่1 | ค่าของสิ่งที่2</label>
-          <textarea id="f-matrix" rows="4" placeholder="Mechanism | Pivot shift | Valgus stress&#10;Special test | Lachman | Valgus stress test" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm font-mono"></textarea>
-        </div>
-      </div>
-      <div class="flex gap-2 pt-2">
-        <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
-        <button type="button" id="cancel-card-form" class="px-5 py-2 rounded-full text-brown-light text-sm">ยกเลิก</button>
-      </div>
-    </form>
-
-    ${
-      cards.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มีการ์ด — เพิ่มอันแรกเลย!</div>`
-        : `<div class="grid sm:grid-cols-2 gap-3">${cards.map(cardHtml).join("")}</div>`
-    }
-  </div>`;
-
-  document.getElementById("toggle-card-form").addEventListener("click", () => {
-    document.getElementById("card-form").classList.toggle("hidden");
-  });
-  document.getElementById("cancel-card-form").addEventListener("click", () => {
-    document.getElementById("card-form").classList.add("hidden");
-  });
-  document.getElementById("f-card-type").addEventListener("change", (e) => {
-    const isCompare = e.target.value === "Compare";
-    document.getElementById("basic-fields").classList.toggle("hidden", isCompare);
-    document.getElementById("compare-fields").classList.toggle("hidden", !isCompare);
-  });
-  container.querySelectorAll("[data-type-filter]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      cardTypeFilter = btn.getAttribute("data-type-filter");
-      SH.route();
+/* ================= POMODORO ================= */
+let pomoInterval = null;
+let pomoSeconds = state.settings.pomoWork*60;
+let pomoMode = 'work';
+let pomoRunning = false;
+function fmtTime(sec){ const m=Math.floor(sec/60), s=sec%60; return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
+function renderPomo(){
+  document.getElementById('pomoDisplay').textContent = fmtTime(pomoSeconds);
+  document.getElementById('pomoMode').textContent = pomoMode==='work' ? '🎯 โฟกัส' : '☕ พักผ่อน';
+}
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    [880,1046,1318].forEach((freq,i)=>{
+      const o = ctx.createOscillator(); const g = ctx.createGain();
+      o.type='sine'; o.frequency.value = freq;
+      o.connect(g); g.connect(ctx.destination);
+      const t0 = ctx.currentTime + i*0.13;
+      g.gain.setValueAtTime(0.0001, t0);
+      g.gain.exponentialRampToValueAtTime(0.25, t0+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+0.28);
+      o.start(t0); o.stop(t0+0.3);
     });
-  });
-
-  document.getElementById("card-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const type = document.getElementById("f-card-type").value;
-    const category = document.getElementById("f-category").value.trim() || null;
-
-    if (type === "Basic") {
-      const front = document.getElementById("f-front").value.trim();
-      const back = document.getElementById("f-back").value.trim();
-      if (!front) return;
-      D.flashcards.push({ id: SH.uid(), card_type: "Basic", category, front, back });
+  }catch(e){}
+}
+function pomoTick(){
+  pomoSeconds--;
+  if(pomoSeconds < 0){
+    playBeep();
+    if(pomoMode==='work'){
+      gainExp(50);
+      setPetSpeech('เซสชันโฟกัสจบแล้ว! ไปพักหายใจกันก่อนน้า ☁️');
+      pomoMode='break'; pomoSeconds = state.settings.pomoBreak*60;
+      showToast('🍅 ครบเวลาโฟกัสแล้ว! พักก่อนนะ (+50 EXP)');
     } else {
-      const entityA = document.getElementById("f-entity-a").value.trim();
-      const entityB = document.getElementById("f-entity-b").value.trim();
-      const matrixText = document.getElementById("f-matrix").value.trim();
-      if (!entityA || !entityB) return;
-      const matrix = {};
-      matrixText.split("\n").forEach((line) => {
-        const parts = line.split("|").map((s) => s.trim());
-        if (parts.length === 3 && parts[0]) matrix[parts[0]] = [parts[1] || "", parts[2] || ""];
-      });
-      D.flashcards.push({ id: SH.uid(), card_type: "Compare", category, compare_entity_a: entityA, compare_entity_b: entityB, comparison_matrix: matrix });
+      setPetSpeech('พักพอแล้ว กลับมาลุยต่อกันเถอะ! 🔥');
+      pomoMode='work'; pomoSeconds = state.settings.pomoWork*60;
+      showToast('⏰ หมดเวลาพัก กลับมาโฟกัสกันต่อ!');
     }
-    SH.saveData();
-    SH.route();
-  });
-
-  container.querySelectorAll("[data-flip-card]").forEach((el) => {
-    el.addEventListener("click", (e) => {
-      if (e.target.closest("[data-delete-card]")) return;
-      el.classList.toggle("is-flipped");
-      const front = el.querySelector("[data-face='front']");
-      const back = el.querySelector("[data-face='back']");
-      const flipped = el.classList.contains("is-flipped");
-      front.classList.toggle("hidden", flipped);
-      back.classList.toggle("hidden", !flipped);
-    });
-  });
-
-  container.querySelectorAll("[data-delete-card]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-delete-card");
-      if (!confirm("ลบการ์ดนี้?")) return;
-      D.flashcards = D.flashcards.filter((c) => c.id !== id);
-      SH.data.flashcards = D.flashcards;
-      SH.saveData();
-      SH.route();
-    });
-  });
-};
-
-function cardHtml(card) {
-  if (card.card_type === "Compare") {
-    const matrix = card.comparison_matrix || {};
-    const rows = Object.entries(matrix)
-      .map(
-        ([k, v]) => `
-        <tr class="border-t border-milktea-light">
-          <td class="py-1.5 pr-2 text-xs text-brown-light align-top">${SH.esc(k)}</td>
-          <td class="py-1.5 pr-2 text-xs text-brown-dark align-top">${SH.esc(v[0])}</td>
-          <td class="py-1.5 text-xs text-brown-dark align-top">${SH.esc(v[1])}</td>
-        </tr>`
-      )
-      .join("");
-    return `
-    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 relative">
-      <button data-delete-card="${card.id}" class="absolute top-3 right-3 text-brown-light hover:text-status-ready">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-      </button>
-      ${card.category ? `<div class="text-xs text-brown-light mb-1">${SH.esc(card.category)}</div>` : ""}
-      <div class="text-sm font-medium text-brown-dark mb-2">${SH.esc(card.compare_entity_a)} vs ${SH.esc(card.compare_entity_b)}</div>
-      <table class="w-full">
-        <thead><tr class="text-xs text-brown-light"><th class="text-left font-medium pb-1"></th><th class="text-left font-medium pb-1">${SH.esc(card.compare_entity_a)}</th><th class="text-left font-medium pb-1">${SH.esc(card.compare_entity_b)}</th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
   }
-  return `
-  <div data-flip-card class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 relative cursor-pointer min-h-[100px]">
-    <button data-delete-card="${card.id}" class="absolute top-3 right-3 text-brown-light hover:text-status-ready">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-    </button>
-    ${card.category ? `<div class="text-xs text-brown-light mb-1">${SH.esc(card.category)}</div>` : ""}
-    <div data-face="front" class="text-sm text-brown-dark pr-6">${SH.esc(card.front || "—")}</div>
-    <div data-face="back" class="hidden text-sm text-brown-dark pr-6">${SH.esc(card.back || "—")}</div>
-    <div class="text-xs text-brown-light mt-3">แตะเพื่อพลิกการ์ด</div>
-  </div>`;
+  renderPomo();
+}
+document.getElementById('pomoStartBtn').addEventListener('click', ()=>{
+  pomoRunning = !pomoRunning;
+  const btn = document.getElementById('pomoStartBtn');
+  if(pomoRunning){ btn.textContent = '⏸ พัก'; pomoInterval = setInterval(pomoTick, 1000); }
+  else { btn.textContent = '▶ เริ่ม'; clearInterval(pomoInterval); }
+});
+document.getElementById('pomoResetBtn').addEventListener('click', ()=>{
+  clearInterval(pomoInterval); pomoRunning=false;
+  document.getElementById('pomoStartBtn').textContent='▶ เริ่ม';
+  pomoMode='work';
+  pomoSeconds = (parseInt(document.getElementById('pomoWorkInput').value)||25)*60;
+  renderPomo();
+});
+document.getElementById('pomoWorkInput').addEventListener('change', e=>{
+  state.settings.pomoWork = Math.max(1, parseInt(e.target.value)||25);
+  if(!pomoRunning && pomoMode==='work'){ pomoSeconds = state.settings.pomoWork*60; renderPomo(); }
+  saveState();
+});
+document.getElementById('pomoBreakInput').addEventListener('change', e=>{
+  state.settings.pomoBreak = Math.max(1, parseInt(e.target.value)||5);
+  if(!pomoRunning && pomoMode==='break'){ pomoSeconds = state.settings.pomoBreak*60; renderPomo(); }
+  saveState();
+});
+document.getElementById('pomoWorkInput').value = state.settings.pomoWork;
+document.getElementById('pomoBreakInput').value = state.settings.pomoBreak;
+
+/* ================= SOUNDSCAPES ================= */
+let audioCtx = null;
+const activeSounds = {};
+function getCtx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+function makeNoiseBuffer(ctx){
+  const bufferSize = ctx.sampleRate*4;
+  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const data = buffer.getChannelData(0);
+  let b0=0,b1=0,b2=0;
+  for(let i=0;i<bufferSize;i++){
+    const white = Math.random()*2-1;
+    b0 = 0.99*b0 + white*0.1; b1 = 0.97*b1 + white*0.06; b2 = white*0.02;
+    data[i] = b0+b1+b2;
+  }
+  return buffer;
+}
+function startSound(name){
+  const ctx = getCtx();
+  const buffer = makeNoiseBuffer(ctx);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer; source.loop = true;
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+  let lfo = null, lfoGain=null;
+  if(name==='rain'){
+    filter.type='bandpass'; filter.frequency.value=2200; filter.Q.value=0.7;
+    gain.gain.value = 0.16;
+  } else if(name==='cafe'){
+    filter.type='lowpass'; filter.frequency.value=900;
+    gain.gain.value = 0.14;
+    lfo = ctx.createOscillator(); lfo.frequency.value=0.15;
+    lfoGain = ctx.createGain(); lfoGain.gain.value=0.03;
+    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+    lfo.start();
+  } else if(name==='waves'){
+    filter.type='lowpass'; filter.frequency.value=650;
+    lfo = ctx.createOscillator(); lfo.type='sine'; lfo.frequency.value=0.12;
+    lfoGain = ctx.createGain(); lfoGain.gain.value=0.13;
+    lfo.connect(lfoGain); lfoGain.connect(gain.gain);
+    gain.gain.value = 0.1;
+    lfo.start();
+  }
+  source.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+  source.start();
+  activeSounds[name] = {source, gain, filter, lfo};
+}
+function stopSound(name){
+  const s = activeSounds[name];
+  if(!s) return;
+  try{ s.gain.gain.exponentialRampToValueAtTime(0.0001, getCtx().currentTime+0.3); }catch(e){}
+  setTimeout(()=>{ try{s.source.stop();}catch(e){} if(s.lfo){try{s.lfo.stop();}catch(e){}} }, 350);
+  delete activeSounds[name];
+}
+document.querySelectorAll('.sound-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const name = btn.dataset.sound;
+    if(activeSounds[name]){ stopSound(name); btn.classList.remove('active'); }
+    else { startSound(name); btn.classList.add('active'); }
+  });
+});
+
+/* ================= HELPERS ================= */
+function escapeHtml(str){ const div = document.createElement('div'); div.textContent = str||''; return div.innerHTML; }
+const THAI_MONTHS = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+const THAI_MONTHS_SHORT = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+function formatThaiDate(dateStr){
+  if(!dateStr) return '-';
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+function shortThaiDate(dateStr){
+  const d = new Date(dateStr+'T00:00:00');
+  return `${d.getDate()} ${THAI_MONTHS_SHORT[d.getMonth()]}`;
 }
 
-// ============================================================
-// PAGE: Drug Library (separate from Flashcards)
-// ============================================================
-let drugSearch = "";
+/* ================= TODAY PANEL ================= */
+function renderTodayPanel(){
+  const today = todayStr();
+  const topics = state.readingItems.filter(it=>it.scheduledDate===today);
+  const reviews = state.reviewSessions.filter(r=>r.date===today);
+  const deadlinesToday = state.readingItems.filter(it=>it.deadline===today && it.scheduledDate!==today);
+  const content = document.getElementById('todayContent');
 
-window.SH.pages.renderDrugLibrary = async function (container) {
-  const D = SH.data;
-  let drugs = D.flashcards.filter((c) => c.card_type === "Drug").sort((a, b) => (a.drug_name || "").localeCompare(b.drug_name || ""));
-  if (drugSearch.trim()) {
-    const q = drugSearch.trim().toLowerCase();
-    drugs = drugs.filter(
-      (d) => (d.drug_name || "").toLowerCase().includes(q) || (d.drug_class || "").toLowerCase().includes(q)
-    );
-  }
-
-  container.innerHTML = `
-  <div class="p-6 max-w-4xl mx-auto space-y-4 pb-24">
-    <div class="flex items-center justify-between">
-      <h1 class="text-2xl font-display font-semibold text-brown-dark flex items-center gap-2">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7z"/><path d="m8.5 8.5 7 7"/></svg>
-        คลังยา
-      </h1>
-      <button id="toggle-drug-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ เพิ่มยา</button>
-    </div>
-
-    <input id="drug-search" value="${SH.esc(drugSearch)}" placeholder="ค้นหาชื่อยา หรือกลุ่มยา..." class="w-full px-4 py-2.5 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light" />
-
-    <form id="drug-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
-      ${drugFormFieldsHtml()}
-      <div class="flex gap-2 pt-2">
-        <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
-        <button type="button" id="cancel-drug-form" class="px-5 py-2 rounded-full text-brown-light text-sm">ยกเลิก</button>
-      </div>
-    </form>
-
-    ${
-      drugs.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มียาในคลัง — เพิ่มตัวแรกเลย!</div>`
-        : `<div class="grid sm:grid-cols-2 gap-3">
-            ${drugs
-              .map(
-                (d) => `
-              <a href="#/drugs/${d.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
-                ${d.drug_class ? `<div class="text-xs text-brown-light">${SH.esc(d.drug_class)}</div>` : ""}
-                <div class="font-display font-medium text-brown-dark">${SH.esc(d.drug_name)}</div>
-                ${d.indications ? `<div class="text-xs text-brown-light mt-1 line-clamp-2">${SH.esc(d.indications)}</div>` : ""}
-              </a>`
-              )
-              .join("")}
-          </div>`
-    }
-  </div>`;
-
-  document.getElementById("toggle-drug-form").addEventListener("click", () => {
-    document.getElementById("drug-form").classList.toggle("hidden");
-  });
-  document.getElementById("cancel-drug-form").addEventListener("click", () => {
-    document.getElementById("drug-form").classList.add("hidden");
-  });
-
-  let searchTimer;
-  document.getElementById("drug-search").addEventListener("input", (e) => {
-    clearTimeout(searchTimer);
-    const val = e.target.value;
-    searchTimer = setTimeout(() => {
-      drugSearch = val;
-      SH.route();
-    }, 300);
-  });
-
-  document.getElementById("drug-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const val = (id) => document.getElementById(id).value.trim();
-    if (!val("f-drug-name")) return;
-    D.flashcards.push({
-      id: SH.uid(),
-      card_type: "Drug",
-      drug_name: val("f-drug-name"),
-      drug_class: val("f-drug-class") || null,
-      moa: val("f-moa") || null,
-      indications: val("f-indications") || null,
-      adverse_effects: val("f-adverse") || null,
-      contraindications: val("f-contra") || null,
-      key_takeaways: val("f-key") || null,
-    });
-    SH.saveData();
-    SH.route();
-  });
-};
-
-function drugFormFieldsHtml() {
-  const inputCls =
-    "w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light";
-  const labelCls = "text-xs font-medium text-brown-light mb-1 block";
-  return `
-    <div class="grid sm:grid-cols-2 gap-3">
-      <div>
-        <label class="${labelCls}">ชื่อยา</label>
-        <input id="f-drug-name" placeholder="เช่น Ibuprofen" required class="${inputCls}" />
-      </div>
-      <div>
-        <label class="${labelCls}">กลุ่มยา (Drug Class)</label>
-        <input id="f-drug-class" placeholder="เช่น NSAIDs" class="${inputCls}" />
-      </div>
-    </div>
-    <div>
-      <label class="${labelCls}">กลไกการออกฤทธิ์ (MOA)</label>
-      <textarea id="f-moa" rows="2" class="${inputCls}"></textarea>
-    </div>
-    <div>
-      <label class="${labelCls}">ข้อบ่งใช้ (Indications)</label>
-      <textarea id="f-indications" rows="2" class="${inputCls}"></textarea>
-    </div>
-    <div>
-      <label class="${labelCls}">ผลข้างเคียง (Adverse Effects)</label>
-      <textarea id="f-adverse" rows="2" class="${inputCls}"></textarea>
-    </div>
-    <div>
-      <label class="${labelCls}">ข้อห้ามใช้ (Contraindications)</label>
-      <textarea id="f-contra" rows="2" class="${inputCls}"></textarea>
-    </div>
-    <div>
-      <label class="${labelCls}">สรุปจำ (Key Takeaways)</label>
-      <textarea id="f-key" rows="2" class="${inputCls}"></textarea>
-    </div>`;
-}
-
-// ============================================================
-// PAGE: Drug Detail — with Quiz Me mode
-// ============================================================
-let drugQuizMode = false;
-let drugFieldCounter = 0;
-
-window.SH.pages.renderDrugDetail = async function (container, drugId) {
-  const D = SH.data;
-  const drug = D.flashcards.find((c) => c.id === drugId);
-  if (!drug) {
-    container.innerHTML = `<div class="p-6 text-sm text-brown-light">ไม่พบยานี้</div>`;
+  if(topics.length===0 && reviews.length===0 && deadlinesToday.length===0){
+    content.innerHTML = `<div class="today-empty"><span class="emoji">🎉</span>วันนี้ไม่มีอะไรต้องทำ พักผ่อนได้เลย!</div>`;
     return;
   }
 
-  container.innerHTML = `
-  <div class="p-6 max-w-2xl mx-auto space-y-4 pb-24">
-    <a href="#/drugs" class="flex items-center gap-1 text-sm text-brown-light hover:text-brown w-fit">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-      กลับไปคลังยา
-    </a>
-    <div class="flex items-start justify-between">
-      <div>
-        ${drug.drug_class ? `<div class="text-xs text-brown-light">${SH.esc(drug.drug_class)}</div>` : ""}
-        <h1 class="text-xl font-display font-semibold text-brown-dark">${SH.esc(drug.drug_name)}</h1>
-      </div>
-      <button id="delete-drug-btn" class="text-status-ready hover:opacity-70">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
-      </button>
-    </div>
-    <button id="drug-quiz-toggle" class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium shadow-cozy transition-colors ${
-      drugQuizMode ? "bg-status-ready text-white" : "bg-milktea-caramel text-brown-dark"
-    }">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.2 1 2.3h6c0-1.1.4-1.9 1-2.3A7 7 0 0 0 12 2z"/><path d="M9 18h6M10 22h4"/></svg>
-      ${drugQuizMode ? "ออกจาก Quiz Me" : "Quiz Me — ทดสอบตัวเอง"}
-    </button>
-    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-4">
-      ${drugMaskedField("กลไกการออกฤทธิ์ (MOA)", drug.moa, drugQuizMode)}
-      ${drugMaskedField("ข้อบ่งใช้ (Indications)", drug.indications, drugQuizMode)}
-      ${drugMaskedField("ผลข้างเคียง (Adverse Effects)", drug.adverse_effects, drugQuizMode)}
-      ${drugMaskedField("ข้อห้ามใช้ (Contraindications)", drug.contraindications, drugQuizMode)}
-      ${drugMaskedField("สรุปจำ (Key Takeaways)", drug.key_takeaways, drugQuizMode)}
-    </div>
-  </div>`;
+  let html = '';
+  if(deadlinesToday.length>0){
+    html += deadlinesToday.map(it=>`<div class="deadline-banner">🔒 ครบกำหนดส่งวันนี้: ${escapeHtml(it.topic)} (${escapeHtml(it.subject)})</div>`).join('');
+  }
+  if(topics.length>0){
+    html += `<div class="today-group-title">📖 หัวข้ออ่านวันนี้</div>`;
+    html += topics.map(it=>{
+      const lockTag = it.deadline===today ? ' 🔒' : '';
+      return `<div class="today-row">
+        <input type="checkbox" ${it.status==='green'?'checked':''} data-today-topic="${it.id}">
+        <span class="today-row-text ${it.status==='green'?'done':''}">${escapeHtml(it.topic)}${lockTag}</span>
+      </div>`;
+    }).join('');
+  }
+  if(reviews.length>0){
+    html += `<div class="today-group-title">🔁 ทบทวนวันนี้</div>`;
+    html += reviews.map(r=>`<div class="today-row">
+      <input type="checkbox" ${r.done?'checked':''} data-today-review="${r.id}">
+      <span class="today-row-text ${r.done?'done':''}">${escapeHtml(r.text)}</span>
+    </div>`).join('');
+  }
+  content.innerHTML = html;
 
-  document.getElementById("drug-quiz-toggle").addEventListener("click", () => {
-    drugQuizMode = !drugQuizMode;
-    SH.route();
-  });
-
-  document.getElementById("delete-drug-btn").addEventListener("click", () => {
-    if (!confirm("ลบยานี้ออกจากคลัง?")) return;
-    D.flashcards = D.flashcards.filter((c) => c.id !== drug.id);
-    SH.data.flashcards = D.flashcards;
-    SH.saveData();
-    SH.go("/drugs");
-  });
-
-  container.querySelectorAll("[data-drug-reveal]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const fieldId = btn.getAttribute("data-drug-reveal");
-      const valueEl = document.getElementById(`drug-field-${fieldId}`);
-      const revealed = valueEl.classList.toggle("blurred-off");
-      valueEl.classList.toggle("blurred", !revealed);
-      btn.querySelector("[data-drug-reveal-label]").textContent = revealed ? "ซ่อน" : "เฉลย";
+  content.querySelectorAll('[data-today-topic]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.readingItems.find(r=>r.id===cb.dataset.todayTopic);
+      item.status = cb.checked ? 'green' : 'yellow';
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderTodayPanel(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar();
     });
   });
-};
-
-function drugMaskedField(label, value, masked) {
-  drugFieldCounter++;
-  const id = drugFieldCounter;
-  const display = value === null || value === undefined || value === "" ? "—" : value;
-  return `
-  <div>
-    <div class="flex items-center justify-between mb-1">
-      <span class="text-xs font-medium text-brown-light">${SH.esc(label)}</span>
-      ${
-        masked
-          ? `<button data-drug-reveal="${id}" class="text-brown-light hover:text-brown flex items-center gap-1 text-xs">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-              <span data-drug-reveal-label>เฉลย</span>
-            </button>`
-          : ""
+  content.querySelectorAll('[data-today-review]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.reviewSessions.find(r=>r.id===cb.dataset.todayReview);
+      item.done = cb.checked;
+      if(item.done && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
       }
-    </div>
-    <div id="drug-field-${id}" class="text-sm rounded-xl px-3 py-2 min-h-[2.5rem] ${
-      masked ? "bg-milktea-light blurred" : "bg-cream-card"
-    } text-brown-dark">${SH.esc(display)}</div>
-  </div>`;
+      saveState(); renderTodayPanel(); renderCalendar();
+    });
+  });
 }
 
-    window.SH.boot();
-  </script>
+/* ================= QUICK ADD ================= */
+document.getElementById('quickAddFab').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.add('active');
+});
+document.getElementById('quickAddCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+});
+document.getElementById('quickAddTopicBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+  openReadModal();
+});
+document.getElementById('quickAddReviewBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+  document.getElementById('quickReviewTextInput').value = '';
+  document.getElementById('quickReviewDateInput').value = todayStr();
+  document.getElementById('quickReviewOverlay').classList.add('active');
+});
+document.getElementById('quickAddDrugCardBtn').addEventListener('click', ()=>{
+  document.getElementById('quickAddOverlay').classList.remove('active');
+  openDrugCardModal(null);
+});
+document.getElementById('quickReviewCancelBtn').addEventListener('click', ()=>{
+  document.getElementById('quickReviewOverlay').classList.remove('active');
+});
+document.getElementById('quickReviewSaveBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('quickReviewTextInput').value.trim();
+  const date = document.getElementById('quickReviewDateInput').value || todayStr();
+  if(!text){ showToast('พิมพ์ชื่อการทบทวนก่อนนะ'); return; }
+  state.reviewSessions.push({id:uid(), text, date, done:false, expGiven:false});
+  saveState();
+  document.getElementById('quickReviewOverlay').classList.remove('active');
+  renderTodayPanel(); renderCalendar();
+  showToast('เพิ่มการทบทวนแล้ว 🔁');
+});
+
+/* ================= ACTIVE EXAM AREA (dashboard) ================= */
+function renderActiveExamArea(){
+  ensureActiveExamValid();
+  const onboard = document.getElementById('onboardCard');
+  const card = document.getElementById('activeExamCard');
+  if(state.examSets.length===0){
+    onboard.style.display = '';
+    card.style.display = 'none';
+    return;
+  }
+  onboard.style.display = 'none';
+  card.style.display = '';
+  const sel = document.getElementById('activeExamSelect');
+  sel.innerHTML = state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
+  sel.value = state.ui.activeExamSetId;
+  renderDdayContent();
+}
+document.getElementById('activeExamSelect').addEventListener('change', e=>{
+  setActiveExam(e.target.value);
+  renderReadingFilters(); renderCalendar();
+});
+document.getElementById('onboardCreateBtn').addEventListener('click', ()=>{
+  switchView('exams');
+  openExamModal(null);
+});
+
+function renderDdayContent(){
+  const content = document.getElementById('ddayContent');
+  const set = getActiveExam();
+  if(!set){ content.innerHTML=''; return; }
+  if(set.subjects.length===0){
+    content.innerHTML = `<div class="hint-text" style="text-align:center;padding:10px 0;">ยังไม่มีวิชาในชุดสอบนี้ ไปเพิ่มที่แท็บ "ชุดสอบ" ก่อนนะ</div>`;
+    return;
+  }
+  const today = new Date(); today.setHours(0,0,0,0);
+  const rows = set.subjects.map(s=>{
+    const items = state.readingItems.filter(r=>r.examSetId===set.id && r.subject===s.name);
+    const remaining = items.filter(r=>r.status!=='green').length;
+    let diffDays = null;
+    if(s.examDate){
+      const examDate = new Date(s.examDate+'T00:00:00');
+      diffDays = Math.ceil((examDate-today)/86400000);
+    }
+    return { name:s.name, examDate:s.examDate, diffDays, remaining };
+  });
+  rows.sort((a,b)=>{
+    if(a.diffDays===null) return 1;
+    if(b.diffDays===null) return -1;
+    return a.diffDays-b.diffDays;
+  });
+  const nearest = rows[0];
+  let ddayLabel, adviceText;
+  if(nearest.diffDays===null){
+    ddayLabel = '—';
+    adviceText = `ยังไม่ได้กำหนดวันสอบ "${escapeHtml(nearest.name)}" ไปกำหนดที่แท็บชุดสอบได้เลย`;
+  } else if(nearest.diffDays > 0){
+    ddayLabel = `D-${nearest.diffDays}`;
+    adviceText = nearest.remaining===0
+      ? `🎉 "${escapeHtml(nearest.name)}" อ่านครบแล้ว! ทบทวนเบาๆ รอสอบได้เลย`
+      : `"${escapeHtml(nearest.name)}" ต้องอ่านวันละ ~${Math.ceil(nearest.remaining/nearest.diffDays)} หัวข้อ ถึงจะครบทันสอบ 💪`;
+  } else if(nearest.diffDays === 0){
+    ddayLabel = 'วันนี้!';
+    adviceText = nearest.remaining>0 ? `"${escapeHtml(nearest.name)}" เหลืออีก ${nearest.remaining} หัวข้อ ทบทวนรอบสุดท้ายสู้ๆ!` : `พร้อมสอบ "${escapeHtml(nearest.name)}" เต็มที่ สู้ๆนะ! 🌟`;
+  } else {
+    ddayLabel = 'ผ่านไปแล้ว';
+    adviceText = `"${escapeHtml(nearest.name)}" สอบผ่านไปแล้ว เก่งมาก! 🎊`;
+  }
+  const listHtml = rows.map(r=>{
+    const c = subjectColor(r.name);
+    const dLabel = r.diffDays===null ? 'ยังไม่กำหนด' : (r.diffDays>0 ? `D-${r.diffDays}` : (r.diffDays===0 ? 'วันนี้!' : 'ผ่านไปแล้ว'));
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--cream-2);font-size:12.5px;">
+      <span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(r.name)}</span>
+      <span style="color:var(--brown-soft);font-weight:600;">${dLabel} · เหลือ ${r.remaining} หัวข้อ</span>
+    </div>`;
+  }).join('');
+  content.innerHTML = `
+    <div class="dday-grid">
+      <div class="dday-box"><div class="dday-num">${ddayLabel}</div><div class="dday-label">ใกล้สุด: ${escapeHtml(nearest.name)}</div></div>
+      <div class="dday-box"><div class="dday-num">${rows.reduce((sum,r)=>sum+r.remaining,0)}</div><div class="dday-label">หัวข้อที่เหลือทั้งหมด</div></div>
+    </div>
+    <div class="dday-advice">${adviceText}</div>
+    ${rows.length>1 ? `<div style="margin-top:12px;">${listHtml}</div>` : ''}
+  `;
+}
+
+/* ================= CALENDAR ================= */
+let calViewDate = new Date();
+const THAI_DOW = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+let currentDayModalDate = null;
+function dateKey(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
+
+function allSubjectExamDates(){
+  const out = [];
+  state.examSets.forEach(set=>{
+    set.subjects.forEach(s=>{
+      if(s.examDate) out.push({examSetId:set.id, examSetName:set.name, subject:s.name, examDate:s.examDate});
+    });
+  });
+  return out;
+}
+function renderCalLegend(){
+  const set = getActiveExam();
+  const subjects = set ? set.subjects.map(s=>s.name) : [...new Set(state.examSets.flatMap(e=>e.subjects.map(s=>s.name)))];
+  const legend = document.getElementById('calLegend');
+  let html = subjects.map(s=>subjChip(s)).join('');
+  html += `<span class="legend-note">🔁 ทบทวน · 📝 วันสอบ · 🔒 Deadline</span>`;
+  legend.innerHTML = html;
+}
+function dayItemsCombined(key){
+  const topics = state.readingItems.filter(it=>it.scheduledDate===key).map(it=>({type:'topic', label:it.topic, done:it.status==='green', subject:it.subject}));
+  const reviews = state.reviewSessions.filter(r=>r.date===key).map(r=>({type:'review', label:r.text, done:r.done}));
+  return topics.concat(reviews);
+}
+function renderCalendar(){
+  const y = calViewDate.getFullYear(), m = calViewDate.getMonth();
+  document.getElementById('calTitle').textContent = `${THAI_MONTHS[m]} ${y+543}`;
+  renderCalLegend();
+  const dowWrap = document.getElementById('calDow');
+  dowWrap.innerHTML = THAI_DOW.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  const firstDow = new Date(y,m,1).getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const grid = document.getElementById('calGrid');
+  let html = '';
+  for(let i=0;i<firstDow;i++) html += `<div class="cal-cell empty"></div>`;
+  const todayKey = todayStr();
+  for(let d=1; d<=daysInMonth; d++){
+    const key = dateKey(y,m,d);
+    const isToday = key === todayKey;
+    const examDayMarkers = allSubjectExamDates().filter(mm=>mm.examDate===key);
+    const deadlineMarkers = state.readingItems.filter(it=>it.deadline===key);
+    const combined = dayItemsCombined(key);
+    let urgentHtml = '';
+    examDayMarkers.slice(0,1).forEach(mrk=>{ urgentHtml += `<div class="cal-urgent-badge">📝 ${escapeHtml(mrk.subject)}</div>`; });
+    deadlineMarkers.slice(0,1).forEach(dl=>{ urgentHtml += `<div class="cal-urgent-badge">🔒 ${escapeHtml(dl.topic)}</div>`; });
+    let taskHtml = combined.slice(0,2).map(it=>{
+      if(it.type==='topic'){
+        const c = subjectColor(it.subject);
+        return `<div class="cal-task-dot ${it.done?'done':''}" style="background:${c.bg};color:${c.text};"><span class="mini-dot" style="background:${c.text};"></span>${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
+      }
+      return `<div class="cal-task-dot review ${it.done?'done':''}">🔁 ${it.done?'✓ ':''}${escapeHtml(it.label)}</div>`;
+    }).join('');
+    if(combined.length>2) taskHtml += `<div class="cal-more">+${combined.length-2} เพิ่มเติม</div>`;
+    const hasUrgent = examDayMarkers.length>0 || deadlineMarkers.length>0;
+    html += `<div class="cal-cell ${isToday?'today':''} ${hasUrgent?'examday':''}" data-key="${key}">
+      <div class="cal-daynum">${d}</div>
+      ${urgentHtml}
+      <div class="cal-tasks">${taskHtml}</div>
+    </div>`;
+  }
+  grid.innerHTML = html;
+  grid.querySelectorAll('.cal-cell:not(.empty)').forEach(cell=>{
+    cell.addEventListener('click', ()=>openDayModal(cell.dataset.key));
+  });
+  renderBacklog();
+}
+document.getElementById('calPrev').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()-1); renderCalendar(); });
+document.getElementById('calNext').addEventListener('click', ()=>{ calViewDate.setMonth(calViewDate.getMonth()+1); renderCalendar(); });
+
+/* ================= BACKLOG ================= */
+function renderBacklog(){
+  const items = state.readingItems.filter(it=>!it.scheduledDate);
+  const wrap = document.getElementById('backlogList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="hint-text">ไม่มีหัวข้อค้างอยู่ ทุกอย่างลงวันหมดแล้ว 🎉</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>{
+    const set = state.examSets.find(e=>e.id===it.examSetId);
+    const deadlineTxt = it.deadline ? `🔒 ${shortThaiDate(it.deadline)}` : '';
+    return `<div class="backlog-row">
+      <div class="backlog-info">
+        <div class="backlog-topic">${escapeHtml(it.topic)}</div>
+        <div class="backlog-meta">${subjChip(it.subject)} ${set?escapeHtml(set.name):''} ${deadlineTxt}</div>
+      </div>
+      <button class="date-chip" data-backlog-schedule="${it.id}">📅 เลือกวันอ่าน</button>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('[data-backlog-schedule]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.backlogSchedule);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = todayStr();
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(e){} }
+      function commit(){
+        if(input.value){
+          item.scheduledDate = input.value;
+          saveState();
+          renderBacklog(); renderCalendar(); renderReadingList(); renderTodayPanel();
+          showToast('ลงปฏิทินแล้ว 🧋');
+        } else {
+          renderBacklog();
+        }
+      }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+}
+
+function openDayModal(key){
+  currentDayModalDate = key;
+  const d = new Date(key+'T00:00:00');
+  document.getElementById('dayModalTitle').textContent = `📅 ${d.getDate()} ${THAI_MONTHS[d.getMonth()]} ${d.getFullYear()+543}`;
+  renderDayExamInfo();
+  renderDayScheduled();
+  renderDayReviewList();
+  const set = getActiveExam();
+  document.getElementById('dayModalExamName').textContent = set ? set.name : '-';
+  document.getElementById('dayAddFields').style.display = set ? '' : 'none';
+  document.getElementById('dayNoActiveExamMsg').style.display = set ? 'none' : '';
+  if(set) populateDaySubjectSelect();
+  document.getElementById('dayModalOverlay').classList.add('active');
+}
+function renderDayExamInfo(){
+  const markers = allSubjectExamDates().filter(m=>m.examDate===currentDayModalDate);
+  const deadlineMarkers = state.readingItems.filter(it=>it.deadline===currentDayModalDate);
+  const el = document.getElementById('dayExamInfo');
+  let html = markers.map(m=>`<div class="exam-day-alert">🎯 วันนี้คือวันสอบ: ${escapeHtml(m.subject)} (${escapeHtml(m.examSetName)})</div>`).join('');
+  html += deadlineMarkers.map(dl=>`<div class="exam-day-alert">🔒 ครบกำหนดส่ง: ${escapeHtml(dl.topic)}</div>`).join('');
+  el.innerHTML = html;
+}
+function renderDayScheduled(){
+  const items = state.readingItems.filter(it=>it.scheduledDate===currentDayModalDate);
+  const wrap = document.getElementById('dayScheduledList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีหัวข้อกำหนดไว้วันนี้ ลองเพิ่มด้านล่างได้เลย 🧋</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>{
+    const examSet = state.examSets.find(e=>e.id===it.examSetId);
+    return `<div class="day-scheduled-row">
+      <input type="checkbox" ${it.status==='green'?'checked':''} data-item="${it.id}">
+      <div class="day-scheduled-info">
+        <div class="day-scheduled-topic ${it.status==='green'?'done':''}">${escapeHtml(it.topic)}</div>
+        <div style="margin-top:3px;">${subjChip(it.subject)} <span style="font-size:10.5px;color:var(--brown-soft);">${examSet?escapeHtml(examSet.name):''}</span></div>
+      </div>
+      <button class="icon-btn" data-unschedule="${it.id}" title="เอาออกจากวันนี้">📤</button>
+    </div>`;
+  }).join('');
+  wrap.querySelectorAll('input[type=checkbox]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.readingItems.find(r=>r.id===cb.dataset.item);
+      item.status = cb.checked ? 'green' : 'yellow';
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent(); renderTodayPanel();
+    });
+  });
+  wrap.querySelectorAll('[data-unschedule]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===btn.dataset.unschedule);
+      item.scheduledDate = null;
+      saveState(); renderDayScheduled(); renderCalendar(); renderReadingList(); populateDayTopicChips(); renderTodayPanel();
+      showToast('เอาหัวข้อนี้ออกจากวันที่แล้ว (ไปอยู่ Backlog แทน)');
+    });
+  });
+}
+function populateDaySubjectSelect(){
+  const set = getActiveExam();
+  const subSel = document.getElementById('daySubjectSelect');
+  subSel.innerHTML = (set?.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || '<option value="ทั่วไป">ทั่วไป</option>';
+  populateDayTopicChips();
+}
+function populateDayTopicChips(){
+  const set = getActiveExam();
+  const subject = document.getElementById('daySubjectSelect').value;
+  const chipWrap = document.getElementById('dayQuickChips');
+  if(!set){ chipWrap.innerHTML=''; return; }
+  const existing = state.readingItems.filter(it=>it.examSetId===set.id && it.subject===subject && it.status!=='green');
+  if(existing.length===0){
+    chipWrap.innerHTML = `<span style="font-size:11.5px;color:var(--brown-soft);">ยังไม่มีหัวข้อเดิมของวิชานี้ ลองพิมพ์ใหม่ด้านล่างได้เลย</span>`;
+    return;
+  }
+  chipWrap.innerHTML = existing.map(it=>{
+    const already = it.scheduledDate===currentDayModalDate;
+    return `<button type="button" class="quick-chip" data-quickadd="${it.id}" ${already?'disabled style="opacity:.5;"':''}>${already?'✓ ':'+ '}${escapeHtml(it.topic)}</button>`;
+  }).join('');
+  chipWrap.querySelectorAll('[data-quickadd]').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const item = state.readingItems.find(r=>r.id===chip.dataset.quickadd);
+      item.scheduledDate = currentDayModalDate;
+      saveState();
+      renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderExamSets(); renderDdayContent(); renderTodayPanel();
+      showToast('เพิ่มลงปฏิทินแล้ว 🧋');
+    });
+  });
+}
+document.getElementById('daySubjectSelect').addEventListener('change', populateDayTopicChips);
+document.getElementById('dayAddBtn').addEventListener('click', ()=>{
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ ถึงจะกำหนดหัวข้อได้'); return; }
+  const subject = document.getElementById('daySubjectSelect').value;
+  const newTopicText = document.getElementById('dayNewTopicInput').value.trim();
+  if(!newTopicText){ showToast('พิมพ์ชื่อหัวข้อใหม่ก่อนนะ (หรือแตะหัวข้อเดิมด้านบน)'); return; }
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic:newTopicText, status:'red', expGiven:false, scheduledDate:currentDayModalDate, deadline:null});
+  document.getElementById('dayNewTopicInput').value = '';
+  saveState();
+  renderDayScheduled(); populateDayTopicChips(); renderCalendar(); renderReadingList(); renderReadingFilters(); renderExamSets(); renderDdayContent(); renderTodayPanel();
+  showToast('เพิ่มลงปฏิทินแล้ว 🧋');
+});
+document.getElementById('dayReviewAddBtn').addEventListener('click', ()=>{
+  const input = document.getElementById('dayReviewInput');
+  const text = input.value.trim();
+  if(!text){ showToast('พิมพ์ชื่อการทบทวนก่อนนะ'); return; }
+  state.reviewSessions.push({id:uid(), text, date:currentDayModalDate, done:false, expGiven:false});
+  input.value = '';
+  saveState();
+  renderDayReviewList(); renderCalendar(); renderTodayPanel();
+  showToast('เพิ่มการทบทวนแล้ว 🔁');
+});
+document.getElementById('dayCloseBtn').addEventListener('click', ()=>{
+  document.getElementById('dayModalOverlay').classList.remove('active');
+});
+function renderDayReviewList(){
+  const items = state.reviewSessions.filter(r=>r.date===currentDayModalDate);
+  const wrap = document.getElementById('dayReviewList');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="day-empty-note">ยังไม่มีการทบทวนกำหนดไว้วันนี้</div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(it=>`
+    <div class="day-scheduled-row review-row">
+      <input type="checkbox" ${it.done?'checked':''} data-review="${it.id}">
+      <div class="day-scheduled-info">
+        <div class="day-scheduled-topic ${it.done?'done':''}">🔁 ${escapeHtml(it.text)}</div>
+      </div>
+      <button class="icon-btn" data-reviewdel="${it.id}">✕</button>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('[data-review]').forEach(cb=>{
+    cb.addEventListener('change', ()=>{
+      const item = state.reviewSessions.find(r=>r.id===cb.dataset.review);
+      item.done = cb.checked;
+      if(item.done && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('ทบทวนจบแล้ว ความจำแน่นขึ้นอีกนิด! 🔁💗');
+      }
+      saveState(); renderDayReviewList(); renderCalendar(); renderTodayPanel();
+    });
+  });
+  wrap.querySelectorAll('[data-reviewdel]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.reviewSessions = state.reviewSessions.filter(r=>r.id!==btn.dataset.reviewdel);
+      saveState(); renderDayReviewList(); renderCalendar(); renderTodayPanel();
+    });
+  });
+}
+
+/* ================= EXAM SETS ================= */
+let editingExamId = null;
+function addSubjectRow(name, date){
+  const wrap = document.getElementById('examSubjectRows');
+  const row = document.createElement('div');
+  row.className = 'subject-row';
+  row.innerHTML = `
+    <input type="text" class="subj-name-input" placeholder="ชื่อวิชา" value="${escapeHtml(name||'')}">
+    <input type="date" class="subj-date-input" value="${date||''}">
+    <button type="button" class="icon-btn" data-remove-row>✕</button>
+  `;
+  row.querySelector('[data-remove-row]').addEventListener('click', ()=> row.remove());
+  wrap.appendChild(row);
+}
+document.getElementById('addSubjectRowBtn').addEventListener('click', ()=> addSubjectRow('',''));
+function openExamModal(id){
+  editingExamId = id || null;
+  const set = id ? state.examSets.find(e=>e.id===id) : null;
+  document.getElementById('examModalTitle').textContent = id ? '✏️ แก้ไขชุดสอบ' : '➕ เพิ่มชุดสอบ';
+  document.getElementById('examNameInput').value = set ? set.name : '';
+  document.getElementById('examSubjectRows').innerHTML = '';
+  if(set && set.subjects.length>0){ set.subjects.forEach(s=> addSubjectRow(s.name, s.examDate)); }
+  else { addSubjectRow('', ''); }
+  document.getElementById('examModalOverlay').classList.add('active');
+}
+document.getElementById('examCancelBtn').addEventListener('click', ()=>document.getElementById('examModalOverlay').classList.remove('active'));
+document.getElementById('examSaveBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('examNameInput').value.trim();
+  const rows = document.querySelectorAll('#examSubjectRows .subject-row');
+  const subjects = [];
+  rows.forEach(row=>{
+    const nm = row.querySelector('.subj-name-input').value.trim();
+    const dt = row.querySelector('.subj-date-input').value || '';
+    if(nm) subjects.push({name:nm, examDate:dt});
+  });
+  if(!name || subjects.length===0){ showToast('ใส่ชื่อชุดสอบ และอย่างน้อย 1 วิชาด้วยนะ'); return; }
+  let newId = null;
+  if(editingExamId){
+    const set = state.examSets.find(e=>e.id===editingExamId);
+    set.name = name; set.subjects = subjects;
+  } else {
+    newId = uid();
+    state.examSets.push({id:newId, name, subjects});
+  }
+  if(!state.ui.activeExamSetId && newId) state.ui.activeExamSetId = newId;
+  saveState();
+  document.getElementById('examModalOverlay').classList.remove('active');
+  renderExamSets(); renderActiveExamArea(); renderReadingFilters(); renderReadingList(); renderCalendar();
+  showToast('บันทึกชุดสอบแล้ว 📚');
+});
+function deleteExam(id){
+  if(!confirm('ลบชุดสอบนี้ และรายการอ่านที่ผูกอยู่ทั้งหมด?')) return;
+  state.examSets = state.examSets.filter(e=>e.id!==id);
+  state.readingItems = state.readingItems.filter(r=>r.examSetId!==id);
+  if(state.ui.activeExamSetId===id) state.ui.activeExamSetId = state.examSets[0]?.id || null;
+  saveState();
+  renderExamSets(); renderActiveExamArea(); renderReadingFilters(); renderReadingList(); renderCalendar();
+}
+function examProgress(examId){
+  const items = state.readingItems.filter(r=>r.examSetId===examId);
+  if(items.length===0) return 0;
+  const done = items.filter(r=>r.status==='green').length;
+  return Math.round((done/items.length)*100);
+}
+function updateSubjectDate(examSetId, subjectName, newDate){
+  const set = state.examSets.find(e=>e.id===examSetId);
+  if(!set) return;
+  const subj = set.subjects.find(s=>s.name===subjectName);
+  if(subj){ subj.examDate = newDate || ''; saveState(); }
+}
+function renderExamSets(){
+  const grid = document.getElementById('examGrid');
+  let html = state.examSets.map(set=>{
+    const pct = examProgress(set.id);
+    const itemCount = state.readingItems.filter(r=>r.examSetId===set.id).length;
+    const isActive = set.id === state.ui.activeExamSetId;
+    const subjectRows = set.subjects.map(s=>{
+      const c = subjectColor(s.name);
+      const dateLabel = s.examDate ? formatThaiDate(s.examDate) : 'ยังไม่กำหนดวัน';
+      return `<div class="subject-date-badge">
+        <span class="subj-chip" style="background:${c.bg};color:${c.text};"><span class="subj-dot" style="background:${c.text};"></span>${escapeHtml(s.name)}</span>
+        <button class="date-chip" data-subj-date="${set.id}|${escapeHtml(s.name)}">📅 ${dateLabel}</button>
+      </div>`;
+    }).join('') || '<span class="hint-text">ยังไม่มีวิชา</span>';
+    return `<div class="exam-card ${isActive?'is-active':''}" data-select="${set.id}">
+      ${isActive?'<span class="active-ribbon">🎯 ใช้งานอยู่</span>':''}
+      <div class="edit-x">
+        <button class="icon-btn" data-edit="${set.id}">✎</button>
+        <button class="icon-btn" data-del="${set.id}">✕</button>
+      </div>
+      <div class="exam-name" style="margin-top:${isActive?'16px':'2px'};">${escapeHtml(set.name)}</div>
+      <div class="exam-tags" style="flex-direction:column;align-items:flex-start;gap:8px;margin-top:8px;">${subjectRows}</div>
+      <div class="progress-track" style="margin-top:10px;"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="progress-txt">${pct}% (${itemCount} หัวข้อ)</div>
+    </div>`;
+  }).join('');
+  html += `<div class="add-card" id="addExamCard"><div style="font-size:26px;">➕</div>เพิ่มชุดสอบใหม่</div>`;
+  grid.innerHTML = html;
+  grid.querySelectorAll('[data-select]').forEach(cardEl=>{
+    cardEl.addEventListener('click', (e)=>{
+      if(e.target.closest('[data-edit]') || e.target.closest('[data-del]') || e.target.closest('[data-subj-date]')) return;
+      setActiveExam(cardEl.dataset.select);
+      renderReadingFilters(); renderCalendar();
+      showToast('ตั้งเป็นชุดสอบที่ใช้งานอยู่แล้ว 🎯');
+    });
+  });
+  grid.querySelectorAll('[data-edit]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); openExamModal(b.dataset.edit); }));
+  grid.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', (e)=>{ e.stopPropagation(); deleteExam(b.dataset.del); }));
+  grid.querySelectorAll('[data-subj-date]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const [examSetId, subjectName] = btn.dataset.subjDate.split('|');
+      const set = state.examSets.find(x=>x.id===examSetId);
+      const subj = set.subjects.find(s=>s.name===subjectName);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = subj.examDate || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){
+        updateSubjectDate(examSetId, subjectName, input.value);
+        renderExamSets(); renderActiveExamArea(); renderCalendar();
+      }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+  document.getElementById('addExamCard').addEventListener('click', ()=>openExamModal(null));
+}
+
+/* ================= READING LIST ================= */
+function renderReadingFilters(){
+  const fe = document.getElementById('filterExam');
+  const cur = fe.value;
+  fe.innerHTML = `<option value="all">ชุดสอบทั้งหมด</option>` + state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
+  fe.value = state.examSets.find(e=>e.id===cur) ? cur : 'all';
+}
+document.getElementById('filterExam').addEventListener('change', renderReadingList);
+document.getElementById('filterStatus').addEventListener('change', renderReadingList);
+
+function renderDrugFieldsHtml(card){
+  const fields = [
+    ['กลุ่มยา', card.drugClass],
+    ['MOA', card.moa],
+    ['Indications', card.indications],
+    ['Adverse Effects', card.adverse],
+    ['Contraindications', card.contraindications],
+    ['จุดต้องจำ', card.keyPoints]
+  ].filter(([,v])=>v && v.trim());
+  if(fields.length===0) return '<div class="hint-text">ยังไม่ได้กรอกรายละเอียดยา</div>';
+  return fields.map(([label,val])=>`<div class="drug-field"><span class="drug-field-label">${label}</span><span class="drug-field-value">${escapeHtml(val)}</span></div>`).join('');
+}
+
+function renderReadingList(){
+  const fe = document.getElementById('filterExam').value;
+  const fst = document.getElementById('filterStatus').value;
+  let items = state.readingItems.slice();
+  if(fe!=='all') items = items.filter(i=>i.examSetId===fe);
+  if(fst!=='all') items = items.filter(i=>i.status===fst);
+
+  const groups = {};
+  items.forEach(it=>{ if(!groups[it.subject]) groups[it.subject] = []; groups[it.subject].push(it); });
+  const subjectNames = Object.keys(groups);
+
+  const wrap = document.getElementById('readingListWrap');
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty-state"><span class="emoji">📖</span>ยังไม่มีหัวข้อในตัวกรองนี้ ลองเพิ่มหรือปรับตัวกรองดูนะ</div>`;
+    return;
+  }
+  const statusMeta = {red:{icon:'🔴',cls:'status-red'}, yellow:{icon:'🟡',cls:'status-yellow'}, green:{icon:'🟢',cls:'status-green'}};
+  wrap.innerHTML = subjectNames.map(subject=>{
+    const c = subjectColor(subject);
+    const doneCount = groups[subject].filter(it=>it.status==='green').length;
+    const rows = groups[subject].map(it=>{
+      const set = state.examSets.find(e=>e.id===it.examSetId);
+      const meta = statusMeta[it.status];
+      const deadlineChip = `<button class="date-chip deadline-chip" data-deadline="${it.id}">🔒 ${it.deadline ? shortThaiDate(it.deadline) : 'Deadline'}</button>`;
+      const plannedChip = `<button class="date-chip" data-schedule="${it.id}">${it.scheduledDate ? '📅 '+shortThaiDate(it.scheduledDate) : '📅 กำหนดวัน'}</button>`;
+      return `<div class="read-item" style="border-left-color:${c.text};">
+        <button class="status-btn ${meta.cls}" data-cycle="${it.id}" title="กดเพื่อเปลี่ยนสถานะ">${meta.icon}</button>
+        <div class="read-info">
+          <div class="read-topic">${escapeHtml(it.topic)}</div>
+          <div class="read-meta"><span>${set?escapeHtml(set.name):'-'}</span>${plannedChip}${deadlineChip}</div>
+        </div>
+        <div class="read-actions"><button class="icon-btn" data-del="${it.id}">✕</button></div>
+      </div>`;
+    }).join('');
+    return `<details class="subject-group" open>
+      <summary>${subjChip(subject)}<span class="group-count">${doneCount}/${groups[subject].length} เสร็จแล้ว</span></summary>
+      ${rows}
+    </details>`;
+  }).join('');
+
+  wrap.querySelectorAll('[data-cycle]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const item = state.readingItems.find(r=>r.id===btn.dataset.cycle);
+      const order = ['red','yellow','green'];
+      const nextIdx = (order.indexOf(item.status)+1)%order.length;
+      item.status = order[nextIdx];
+      if(item.status==='green' && !item.expGiven){
+        item.expGiven = true; gainExp(100); checkStreak(); renderTopStreak();
+        setPetSpeech('อ่านจบอีกหัวข้อแล้ว เก่งสุดๆ! 🌟');
+      }
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel();
+    });
+  });
+  wrap.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      state.readingItems = state.readingItems.filter(r=>r.id!==btn.dataset.del);
+      saveState(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel(); renderBacklog();
+    });
+  });
+  wrap.querySelectorAll('[data-schedule]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); e.preventDefault();
+      const item = state.readingItems.find(r=>r.id===btn.dataset.schedule);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = item.scheduledDate || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){ item.scheduledDate = input.value || null; saveState(); renderReadingList(); renderCalendar(); renderTodayPanel(); }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+  wrap.querySelectorAll('[data-deadline]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); e.preventDefault();
+      const item = state.readingItems.find(r=>r.id===btn.dataset.deadline);
+      const input = document.createElement('input');
+      input.type = 'date'; input.className = 'date-chip-input';
+      input.value = item.deadline || '';
+      btn.replaceWith(input);
+      input.focus();
+      if(input.showPicker){ try{ input.showPicker(); }catch(err){} }
+      function commit(){ item.deadline = input.value || null; saveState(); renderReadingList(); renderCalendar(); renderTodayPanel(); }
+      input.addEventListener('change', commit);
+      input.addEventListener('blur', ()=>{ if(document.body.contains(input)) commit(); });
+    });
+  });
+}
+
+function openReadModal(){
+  const set = getActiveExam();
+  if(!set){
+    showToast('เพิ่มชุดสอบก่อนนะ ถึงจะเพิ่มหัวข้ออ่านได้');
+    switchView('exams');
+    return;
+  }
+  document.getElementById('readModalExamName').textContent = set.name;
+  const subSel = document.getElementById('readSubjectSelect');
+  subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
+  document.getElementById('readTopicInput').value = '';
+  document.getElementById('readScheduleDateInput').value = '';
+  document.getElementById('readDeadlineInput').value = '';
+  document.getElementById('readModalOverlay').classList.add('active');
+}
+document.getElementById('addReadingBtn').addEventListener('click', openReadModal);
+document.getElementById('readCancelBtn').addEventListener('click', ()=>document.getElementById('readModalOverlay').classList.remove('active'));
+document.getElementById('readSaveBtn').addEventListener('click', ()=>{
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ'); return; }
+  const subject = document.getElementById('readSubjectSelect').value;
+  const topic = document.getElementById('readTopicInput').value.trim();
+  const scheduledDate = document.getElementById('readScheduleDateInput').value || null;
+  const deadline = document.getElementById('readDeadlineInput').value || null;
+  if(!topic){ showToast('ใส่ชื่อหัวข้อด้วยนะ'); return; }
+  state.readingItems.push({id:uid(), examSetId:set.id, subject, topic, status:'red', expGiven:false, scheduledDate, deadline});
+  saveState();
+  document.getElementById('readModalOverlay').classList.remove('active');
+  renderReadingFilters(); renderReadingList(); renderExamSets(); renderDdayContent(); renderCalendar(); renderTodayPanel(); renderBacklog();
+  showToast(scheduledDate ? 'เพิ่มหัวข้ออ่านและลงปฏิทินแล้ว 📖📅' : 'เพิ่มหัวข้ออ่านแล้ว (อยู่ใน Backlog) 📖📦');
+});
+
+/* ================= STREAK RENDER ================= */
+/* ================= DRUG CARDS (standalone feature) ================= */
+function renderDrugFilters(){
+  const fe = document.getElementById('filterDrugExam');
+  const cur = fe.value;
+  fe.innerHTML = `<option value="all">ชุดสอบทั้งหมด</option>` + state.examSets.map(e=>`<option value="${e.id}">${escapeHtml(e.name)}</option>`).join('');
+  fe.value = state.examSets.find(e=>e.id===cur) ? cur : 'all';
+}
+document.getElementById('filterDrugExam').addEventListener('change', renderDrugCards);
+
+function renderDrugCards(){
+  const fe = document.getElementById('filterDrugExam').value;
+  let cards = state.drugCards.slice();
+  if(fe!=='all') cards = cards.filter(c=>c.examSetId===fe);
+
+  const wrap = document.getElementById('drugCardListWrap');
+  if(cards.length===0){
+    wrap.innerHTML = `<div class="empty-state"><span class="emoji">💊</span>ยังไม่มีการ์ดยา ลองกด "+ เพิ่มการ์ดยา" ดูนะ</div>`;
+    return;
+  }
+  const groups = {};
+  cards.forEach(c=>{ if(!groups[c.subject]) groups[c.subject] = []; groups[c.subject].push(c); });
+  const subjectNames = Object.keys(groups);
+
+  wrap.innerHTML = subjectNames.map(subject=>{
+    const rows = groups[subject].map(card=>{
+      const set = state.examSets.find(e=>e.id===card.examSetId);
+      return `<details class="drug-card-wrap">
+        <summary>
+          <div class="read-item" style="border-left-color:${subjectColor(subject).text};margin-bottom:0;box-shadow:none;">
+            <div class="read-info">
+              <div class="read-topic">💊 ${escapeHtml(card.name)}</div>
+              <div class="read-meta"><span>${set?escapeHtml(set.name):'-'}</span></div>
+            </div>
+            <div class="read-actions">
+              <button class="icon-btn" data-edit-drug="${card.id}">✎</button>
+              <button class="icon-btn" data-del-drug="${card.id}">✕</button>
+            </div>
+          </div>
+        </summary>
+        <div class="drug-card-fields">${renderDrugFieldsHtml(card)}</div>
+      </details>`;
+    }).join('');
+    return `<details class="subject-group" open>
+      <summary>${subjChip(subject)}<span class="group-count">${groups[subject].length} รายการ</span></summary>
+      ${rows}
+    </details>`;
+  }).join('');
+
+  wrap.querySelectorAll('[data-edit-drug]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{ e.stopPropagation(); e.preventDefault(); openDrugCardModal(btn.dataset.editDrug); });
+  });
+  wrap.querySelectorAll('[data-del-drug]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation(); e.preventDefault();
+      if(!confirm('ลบการ์ดยานี้?')) return;
+      state.drugCards = state.drugCards.filter(c=>c.id!==btn.dataset.delDrug);
+      saveState(); renderDrugCards();
+    });
+  });
+}
+
+let editingDrugCardId = null;
+function openDrugCardModal(id){
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ ถึงจะเพิ่มการ์ดยาได้'); switchView('exams'); return; }
+  editingDrugCardId = id || null;
+  const card = id ? state.drugCards.find(c=>c.id===id) : null;
+  document.getElementById('drugCardModalTitle').textContent = id ? '✏️ แก้ไขการ์ดยา' : '💊 เพิ่มการ์ดยา';
+  document.getElementById('drugCardModalExamName').textContent = set.name;
+  const subSel = document.getElementById('drugCardSubjectSelect');
+  subSel.innerHTML = (set.subjects||[]).map(s=>`<option value="${escapeHtml(s.name)}">${escapeHtml(s.name)}</option>`).join('') || `<option value="ทั่วไป">ทั่วไป</option>`;
+  if(card) subSel.value = card.subject;
+  document.getElementById('drugNameInput').value = card ? card.name : '';
+  document.getElementById('drugClassInput').value = card ? card.drugClass : '';
+  document.getElementById('drugMoaInput').value = card ? card.moa : '';
+  document.getElementById('drugIndicationsInput').value = card ? card.indications : '';
+  document.getElementById('drugAdverseInput').value = card ? card.adverse : '';
+  document.getElementById('drugContraindicationsInput').value = card ? card.contraindications : '';
+  document.getElementById('drugKeyPointsInput').value = card ? card.keyPoints : '';
+  document.getElementById('drugCardModalOverlay').classList.add('active');
+}
+document.getElementById('addDrugCardBtn').addEventListener('click', ()=>openDrugCardModal(null));
+document.getElementById('drugCardCancelBtn').addEventListener('click', ()=>document.getElementById('drugCardModalOverlay').classList.remove('active'));
+document.getElementById('drugCardSaveBtn').addEventListener('click', ()=>{
+  const set = getActiveExam();
+  if(!set){ showToast('เพิ่มชุดสอบก่อนนะ'); return; }
+  const name = document.getElementById('drugNameInput').value.trim();
+  if(!name){ showToast('ใส่ชื่อยาด้วยนะ'); return; }
+  const payload = {
+    examSetId: set.id,
+    subject: document.getElementById('drugCardSubjectSelect').value,
+    name,
+    drugClass: document.getElementById('drugClassInput').value.trim(),
+    moa: document.getElementById('drugMoaInput').value.trim(),
+    indications: document.getElementById('drugIndicationsInput').value.trim(),
+    adverse: document.getElementById('drugAdverseInput').value.trim(),
+    contraindications: document.getElementById('drugContraindicationsInput').value.trim(),
+    keyPoints: document.getElementById('drugKeyPointsInput').value.trim()
+  };
+  if(editingDrugCardId){
+    const card = state.drugCards.find(c=>c.id===editingDrugCardId);
+    Object.assign(card, payload);
+  } else {
+    state.drugCards.push(Object.assign({id:uid()}, payload));
+  }
+  saveState();
+  document.getElementById('drugCardModalOverlay').classList.remove('active');
+  renderDrugFilters(); renderDrugCards();
+  showToast('บันทึกการ์ดยาแล้ว 💊');
+});
+
+function renderTopStreak(){ document.getElementById('streakCount').textContent = state.user.streak; }
+
+/* ================= NETLIFY IDENTITY (login) ================= */
+let currentUser = null;
+let saveDebounceTimer = null;
+let appInitialized = false;
+function showAuthGate(msg){
+  document.getElementById('authGate').classList.add('active');
+  document.getElementById('userPill').style.display = 'none';
+  document.getElementById('authStatusNote').textContent = msg || '';
+}
+function hideAuthGate(){ document.getElementById('authGate').classList.remove('active'); }
+async function onLoggedIn(user){
+  currentUser = user;
+  hideAuthGate();
+  document.getElementById('userPill').style.display = 'flex';
+  document.getElementById('userEmailLabel').textContent = user.email || '';
+  document.getElementById('authStatusNote').textContent = 'กำลังโหลดข้อมูล...';
+  await loadRemoteData();
+  if(!appInitialized){ appInitialized = true; init(); }
+  else {
+    renderTopStreak(); renderPet(); renderActiveExamArea(); renderCalendar();
+    renderExamSets(); renderReadingFilters(); renderReadingList(); renderTodayPanel();
+    renderDrugFilters(); renderDrugCards();
+  }
+}
+async function loadRemoteData(){
+  try{
+    const token = await currentUser.jwt();
+    const res = await fetch('/api/plan', { headers: { Authorization: 'Bearer '+token } });
+    if(res.ok){
+      const json = await res.json();
+      if(json.data){
+        state = json.data;
+        if(!state.reviewSessions) state.reviewSessions = [];
+        if(!state.ui) state.ui = {activeExamSetId:null};
+        state.readingItems = normalizeReadingItems(state.readingItems);
+        state.examSets = normalizeExamSets(state.examSets);
+        extractDrugCardsFromReadingItems(state);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+    }
+  }catch(e){
+    console.error('โหลดข้อมูลจากคลาวด์ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทนไปก่อน', e);
+  }
+}
+function saveRemote(){
+  if(!currentUser) return;
+  clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(async ()=>{
+    try{
+      const token = await currentUser.jwt();
+      await fetch('/api/plan', {
+        method:'POST',
+        headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token },
+        body: JSON.stringify(state)
+      });
+    }catch(e){ console.error('บันทึกขึ้นคลาวด์ไม่สำเร็จ', e); }
+  }, 800);
+}
+function initIdentity(){
+  if(!window.netlifyIdentity){ showAuthGate('โหลดระบบล็อกอินไม่สำเร็จ ลองรีเฟรชหน้าอีกครั้งนะ'); return; }
+  netlifyIdentity.on('init', user=>{ if(user) onLoggedIn(user); else showAuthGate(); });
+  netlifyIdentity.on('login', user=>{ onLoggedIn(user); netlifyIdentity.close(); });
+  netlifyIdentity.on('logout', ()=>{ currentUser = null; showToast('ออกจากระบบแล้ว'); showAuthGate(); });
+  netlifyIdentity.on('error', err=>{
+    console.error('Identity error', err);
+    document.getElementById('authGate').style.display = '';
+    showAuthGate('เกิดข้อผิดพลาด ลองใหม่อีกครั้งนะ');
+  });
+  netlifyIdentity.on('close', ()=>{
+    document.getElementById('authGate').style.display = '';
+    if(!currentUser) showAuthGate();
+  });
+  netlifyIdentity.init();
+}
+document.getElementById('authLoginBtn').addEventListener('click', ()=>{
+  if(window.netlifyIdentity){
+    document.getElementById('authGate').style.display = 'none';
+    netlifyIdentity.open();
+  }
+});
+document.getElementById('logoutBtn').addEventListener('click', ()=>{
+  if(window.netlifyIdentity) netlifyIdentity.logout();
+});
+
+/* ================= INIT ================= */
+function init(){
+  checkStreak();
+  ensureActiveExamValid();
+  renderTopStreak();
+  renderPet();
+  renderPomo();
+  renderTodayPanel();
+  renderActiveExamArea();
+  renderCalendar();
+  renderExamSets();
+  renderReadingFilters();
+  renderReadingList();
+  renderDrugFilters();
+  renderDrugCards();
+  setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]);
+  setInterval(()=>{ setPetSpeech(PET_MESSAGES[Math.floor(Math.random()*PET_MESSAGES.length)]); }, 45000);
+  saveState();
+}
+initIdentity();
+</script>
 </body>
 </html>
