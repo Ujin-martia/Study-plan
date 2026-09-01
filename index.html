@@ -145,7 +145,7 @@
   SH.comingSoonHtml = function (title) {
     return `
     <div class="p-6 max-w-3xl mx-auto">
-      <div class="bg-white rounded-2xl shadow-cozy p-10 text-center">
+      <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-10 text-center">
         <div class="text-4xl mb-3">🧋</div>
         <h1 class="text-xl font-display font-semibold text-brown-dark mb-2">${SH.esc(title)}</h1>
         <p class="text-sm text-brown-light">โมดูลนี้อยู่ใน Phase ถัดไปของการพัฒนา</p>
@@ -259,7 +259,7 @@
     const user = window.netlifyIdentity && netlifyIdentity.currentUser();
     return `
     <div class="min-h-screen flex bg-cream-bg">
-      <aside class="hidden md:flex w-56 flex-col bg-white border-r border-milktea-light shadow-cozy p-4">
+      <aside class="hidden md:flex w-56 flex-col bg-white border-r border-milktea-light shadow-cozy border border-milktea-light/70 p-4">
         <div class="text-xl font-display font-semibold text-brown mb-6 px-2">StudyHub 🧋</div>
         <nav class="flex-1 space-y-1">
           ${NAV.map(
@@ -282,6 +282,22 @@
         </div>
       </aside>
       <main class="flex-1 min-w-0" id="page-content"></main>
+
+      <!-- Mobile bottom nav — the sidebar above is desktop-only (hidden below md).
+           This is the phone-friendly equivalent, fixed to the bottom of the screen. -->
+      <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-milktea-light shadow-cozy-lg flex overflow-x-auto">
+        ${NAV.map(
+          (n) => `
+          <a href="#${n.to === "/" ? "" : n.to}" class="flex-1 min-w-[64px] flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
+            activeNav === n.to ? "text-brown" : "text-brown-light"
+          }">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${
+              activeNav === n.to ? "2.5" : "2"
+            }" stroke-linecap="round" stroke-linejoin="round">${ICONS[n.icon]}</svg>
+            ${n.label}
+          </a>`
+        ).join("")}
+      </nav>
     </div>`;
   }
 
@@ -296,7 +312,7 @@
   function renderLoggedOut() {
     app.innerHTML = `
     <div class="min-h-screen flex items-center justify-center bg-cream-bg px-4">
-      <div class="w-full max-w-sm bg-white rounded-3xl shadow-cozy-lg p-8 text-center">
+      <div class="w-full max-w-sm bg-white rounded-3xl shadow-cozy-lg border border-milktea-light/70 p-8 text-center">
         <div class="text-4xl mb-2">🧋</div>
         <h1 class="text-2xl font-display font-semibold text-brown-dark">StudyHub</h1>
         <p class="text-sm text-brown-light mt-1 mb-6">คลังอ่านหนังสือน่ารัก ๆ สำหรับนักศึกษา PT</p>
@@ -387,12 +403,12 @@ window.SH.pages.renderDashboard = async function (container) {
     <div class="grid sm:grid-cols-3 gap-3">
       ${
         upcomingExams.length === 0
-          ? `<div class="col-span-3 bg-white rounded-2xl shadow-cozy p-4 text-sm text-brown-light">ยังไม่มีสอบที่กำลังจะมาถึง — เพิ่มวิชาสอบได้จากคลังสอบ</div>`
+          ? `<div class="col-span-3 bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 text-sm text-brown-light">ยังไม่มีสอบที่กำลังจะมาถึง — เพิ่มวิชาสอบได้จากคลังสอบ</div>`
           : upcomingExams
               .map((exam) => {
                 const days = SH.daysUntil(exam.exam_date);
                 return `
-              <div class="bg-white rounded-2xl shadow-cozy p-4 border-l-4 border-status-ready">
+              <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 border-l-4 border-status-ready">
                 <div class="text-xs text-brown-light">${SH.esc(exam.type)}</div>
                 <div class="font-medium text-brown-dark truncate">${SH.esc(exam.subject_name)}</div>
                 <div class="text-2xl font-display font-semibold text-status-ready mt-1">${days === 0 ? "วันนี้!" : `เหลือ ${days} วัน`}</div>
@@ -402,7 +418,7 @@ window.SH.pages.renderDashboard = async function (container) {
       }
     </div>
 
-    <section class="bg-white rounded-2xl shadow-cozy p-5">
+    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
       <h2 class="font-display font-medium text-brown-dark mb-3">งานวันนี้</h2>
       <form id="quick-task-form" class="flex gap-2 mb-3">
         <input id="quick-task-title" placeholder="เพิ่มงานเร็ว ๆ..." class="flex-1 px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light" />
@@ -425,7 +441,7 @@ window.SH.pages.renderDashboard = async function (container) {
       }
     </section>
 
-    <section class="bg-white rounded-2xl shadow-cozy p-5">
+    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
       <h2 class="font-display font-medium text-brown-dark mb-3 flex items-center gap-2">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 5v6h6"/></svg>
         ทบทวนวันนี้
@@ -450,7 +466,7 @@ window.SH.pages.renderDashboard = async function (container) {
       }
     </section>
 
-    <section class="bg-white rounded-2xl shadow-cozy overflow-hidden">
+    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 overflow-hidden">
       <button id="backlog-toggle" class="w-full flex items-center justify-between p-5 font-display font-medium text-brown-dark">
         <span>Backlog (${backlogTasks.length})</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
@@ -469,7 +485,7 @@ window.SH.pages.renderDashboard = async function (container) {
     </section>
   </div>
 
-  <div class="fixed bottom-6 right-6 z-40">
+  <div class="fixed bottom-20 md:bottom-6 right-6 z-40">
     <button id="quick-add-btn" class="w-14 h-14 rounded-full bg-brown text-white shadow-cozy-lg flex items-center justify-center" aria-label="Quick add">
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
     </button>
@@ -519,7 +535,7 @@ window.SH.pages.renderExamsList = async function (container) {
       <button id="toggle-exam-form" class="flex items-center gap-1 px-4 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">+ วิชาสอบใหม่</button>
     </div>
 
-    <form id="exam-form" class="hidden bg-white rounded-2xl shadow-cozy p-5 grid sm:grid-cols-2 gap-3">
+    <form id="exam-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 grid sm:grid-cols-2 gap-3">
       <select id="f-type" class="px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm">
         <option>Midterm</option><option>Final</option><option>Quiz</option>
       </select>
@@ -535,7 +551,7 @@ window.SH.pages.renderExamsList = async function (container) {
       ${exams
         .map(
           (exam) => `
-        <a href="#/exams/${exam.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
+        <a href="#/exams/${exam.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
           <div class="text-xs text-brown-light">${SH.esc(exam.type)}</div>
           <div class="font-display font-medium text-brown-dark">${SH.esc(exam.subject_name)}</div>
           <div class="text-xs text-brown-light mt-1">${SH.esc(exam.subject_code || "")} · ${SH.formatDate(exam.exam_date)}</div>
@@ -587,7 +603,7 @@ window.SH.pages.renderExamWorkspace = async function (container, examId) {
       ${progressCard("Exam Ready", readyPct, "bg-status-ready")}
     </div>
 
-    <div class="bg-white rounded-2xl shadow-cozy p-5">
+    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
       <h2 class="font-display font-medium text-brown-dark mb-3">โครงสร้างหัวข้อ</h2>
       <div id="topic-tree">${tree.map((t) => topicNodeHtml(t, 0)).join("")}</div>
 
@@ -700,7 +716,7 @@ function topicNodeHtml(topic, depth) {
 
 function progressCard(label, pct, colorClass) {
   return `
-  <div class="bg-white rounded-2xl shadow-cozy p-4">
+  <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4">
     <div class="flex justify-between text-sm mb-2">
       <span class="text-brown-light">${label}</span>
       <span class="font-medium text-brown-dark">${pct}%</span>
@@ -730,7 +746,7 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
       <div data-topic-hearts="${topic.id}">${SH.heartRow(topic.confidence_level, 20, true)}</div>
     </header>
 
-    <section class="bg-white rounded-2xl shadow-cozy p-5">
+    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
       <h2 class="font-display font-medium text-brown-dark mb-2">สรุปเนื้อหา</h2>
       <textarea id="summary-text" rows="8" placeholder="เขียนสรุปย่อของหัวข้อนี้..." class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light">${SH.esc(topic.summary_text || "")}</textarea>
 
@@ -751,7 +767,7 @@ window.SH.pages.renderTopicDetail = async function (container, examId, topicId) 
       </div>
     </section>
 
-    <section class="bg-white rounded-2xl shadow-cozy p-5">
+    <section class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5">
       <h2 class="font-display font-medium text-brown-dark mb-3 flex items-center gap-2">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F0B57A" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a1.5 1.5 0 0 0 1.3 2.3h17.8a1.5 1.5 0 0 0 1.3-2.3L13.7 3.9a1.5 1.5 0 0 0-2.6 0z"/></svg>
         จุดที่ชอบสับสน
@@ -851,7 +867,7 @@ window.SH.pages.renderSpecialTests = async function (container) {
         .join("")}
     </div>
 
-    <form id="test-form" class="hidden bg-white rounded-2xl shadow-cozy p-5 space-y-3">
+    <form id="test-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
       ${testFormFieldsHtml()}
       <div class="flex gap-2 pt-2">
         <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
@@ -861,12 +877,12 @@ window.SH.pages.renderSpecialTests = async function (container) {
 
     ${
       tests.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มี Special Test ในหมวดนี้ — เพิ่มอันแรกเลย!</div>`
+        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มี Special Test ในหมวดนี้ — เพิ่มอันแรกเลย!</div>`
         : `<div class="grid sm:grid-cols-2 gap-3">
             ${tests
               .map(
                 (t) => `
-              <a href="#/special-tests/${t.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
+              <a href="#/special-tests/${t.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
                 <div class="text-xs text-brown-light">${SH.esc(t.body_region)}</div>
                 <div class="font-display font-medium text-brown-dark">${SH.esc(t.test_name)}</div>
                 ${t.purpose ? `<div class="text-xs text-brown-light mt-1 line-clamp-2">${SH.esc(t.purpose)}</div>` : ""}
@@ -1019,7 +1035,7 @@ window.SH.pages.renderSpecialTestDetail = async function (container, testId) {
       ${quizMode ? "ออกจาก Quiz Me" : "Quiz Me — ทดสอบตัวเอง"}
     </button>
 
-    <div class="bg-white rounded-2xl shadow-cozy p-5 space-y-4">
+    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-4">
       ${maskedField("วัตถุประสงค์ (Purpose)", test.purpose, false)}
       <div class="grid sm:grid-cols-2 gap-4">
         ${maskedField("ท่าผู้ป่วย (Patient Position)", test.patient_position, false)}
@@ -1117,7 +1133,7 @@ window.SH.pages.renderFlashcards = async function (container) {
         .join("")}
     </div>
 
-    <form id="card-form" class="hidden bg-white rounded-2xl shadow-cozy p-5 space-y-3">
+    <form id="card-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
       <div>
         <label class="text-xs font-medium text-brown-light mb-1 block">ประเภทการ์ด</label>
         <select id="f-card-type" class="w-full px-3 py-2 rounded-xl border border-milktea-light bg-cream-card text-sm">
@@ -1157,7 +1173,7 @@ window.SH.pages.renderFlashcards = async function (container) {
 
     ${
       cards.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มีการ์ด — เพิ่มอันแรกเลย!</div>`
+        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มีการ์ด — เพิ่มอันแรกเลย!</div>`
         : `<div class="grid sm:grid-cols-2 gap-3">${cards.map(cardHtml).join("")}</div>`
     }
   </div>`;
@@ -1245,7 +1261,7 @@ function cardHtml(card) {
       )
       .join("");
     return `
-    <div class="bg-white rounded-2xl shadow-cozy p-4 relative">
+    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 relative">
       <button data-delete-card="${card.id}" class="absolute top-3 right-3 text-brown-light hover:text-status-ready">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
       </button>
@@ -1258,7 +1274,7 @@ function cardHtml(card) {
     </div>`;
   }
   return `
-  <div data-flip-card class="bg-white rounded-2xl shadow-cozy p-4 relative cursor-pointer min-h-[100px]">
+  <div data-flip-card class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 relative cursor-pointer min-h-[100px]">
     <button data-delete-card="${card.id}" class="absolute top-3 right-3 text-brown-light hover:text-status-ready">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>
     </button>
@@ -1296,7 +1312,7 @@ window.SH.pages.renderDrugLibrary = async function (container) {
 
     <input id="drug-search" value="${SH.esc(drugSearch)}" placeholder="ค้นหาชื่อยา หรือกลุ่มยา..." class="w-full px-4 py-2.5 rounded-xl border border-milktea-light bg-cream-card text-sm focus:outline-none focus:ring-2 focus:ring-brown-light" />
 
-    <form id="drug-form" class="hidden bg-white rounded-2xl shadow-cozy p-5 space-y-3">
+    <form id="drug-form" class="hidden bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-3">
       ${drugFormFieldsHtml()}
       <div class="flex gap-2 pt-2">
         <button type="submit" class="px-5 py-2 rounded-full bg-brown text-white text-sm font-medium shadow-cozy">บันทึก</button>
@@ -1306,12 +1322,12 @@ window.SH.pages.renderDrugLibrary = async function (container) {
 
     ${
       drugs.length === 0
-        ? `<div class="bg-white rounded-2xl shadow-cozy p-8 text-center text-sm text-brown-light">ยังไม่มียาในคลัง — เพิ่มตัวแรกเลย!</div>`
+        ? `<div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-8 text-center text-sm text-brown-light">ยังไม่มียาในคลัง — เพิ่มตัวแรกเลย!</div>`
         : `<div class="grid sm:grid-cols-2 gap-3">
             ${drugs
               .map(
                 (d) => `
-              <a href="#/drugs/${d.id}" class="bg-white rounded-2xl shadow-cozy p-4 hover:shadow-cozy-lg transition-shadow block">
+              <a href="#/drugs/${d.id}" class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-4 hover:shadow-cozy-lg transition-shadow block">
                 ${d.drug_class ? `<div class="text-xs text-brown-light">${SH.esc(d.drug_class)}</div>` : ""}
                 <div class="font-display font-medium text-brown-dark">${SH.esc(d.drug_name)}</div>
                 ${d.indications ? `<div class="text-xs text-brown-light mt-1 line-clamp-2">${SH.esc(d.indications)}</div>` : ""}
@@ -1431,7 +1447,7 @@ window.SH.pages.renderDrugDetail = async function (container, drugId) {
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-4 12.7c.6.4 1 1.2 1 2.3h6c0-1.1.4-1.9 1-2.3A7 7 0 0 0 12 2z"/><path d="M9 18h6M10 22h4"/></svg>
       ${drugQuizMode ? "ออกจาก Quiz Me" : "Quiz Me — ทดสอบตัวเอง"}
     </button>
-    <div class="bg-white rounded-2xl shadow-cozy p-5 space-y-4">
+    <div class="bg-white rounded-2xl shadow-cozy border border-milktea-light/70 p-5 space-y-4">
       ${drugMaskedField("กลไกการออกฤทธิ์ (MOA)", drug.moa, drugQuizMode)}
       ${drugMaskedField("ข้อบ่งใช้ (Indications)", drug.indications, drugQuizMode)}
       ${drugMaskedField("ผลข้างเคียง (Adverse Effects)", drug.adverse_effects, drugQuizMode)}
